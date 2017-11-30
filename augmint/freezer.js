@@ -27,13 +27,17 @@ function lockAcd(actorId, acdAmount) {
     augmint.actorBalances[actorId].acd -= acdAmount;
     augmint.balances.frozenAcdPool += interestInAcd + acdAmount;
 
+    const lockId = counter;
+    counter++;
+
     // create lock
     locks[actorId] = locks[actorId] || {};
-    locks[actorId][counter] = {
+    locks[actorId][lockId] = {
         acdValue: interestInAcd + acdAmount,
         lockedUntil: clock.getTime() + augmint.params.lockTime
     };
-    counter++;
+    
+    return lockId;
 
 }
 
@@ -58,10 +62,11 @@ function releaseAcd(actorId, lockId) {
     }
 
     // remove lock:
-    locks[actorId][lockId] = null;
+    delete locks[actorId][lockId];
 
 }
 
+// allows actors to query their locks:
 function getLocksForActor(actorId) {
 
     return locks[actorId];

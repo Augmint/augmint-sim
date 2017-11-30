@@ -13,6 +13,9 @@ let counter = 0;
 
 function createLoanProduct(minimumLoanInAcd, loanCollateralRatio, premiumPercentage, repaymentPeriod, defaultFeePercentage) {
 
+    const loanProductId = counter;
+    counter++;
+
     loanProducts[counter] = {
         active: true,
         minimumLoanInAcd,
@@ -21,7 +24,8 @@ function createLoanProduct(minimumLoanInAcd, loanCollateralRatio, premiumPercent
         repaymentPeriod,
         defaultFeePercentage
     };
-    counter++;
+    
+    return loanProductId;
 
 }
 
@@ -35,9 +39,9 @@ function removeLoanProduct(loanId) {
 
 }
 
-function takeLoan(actorId, loanId, loanAmountInAcd) {
+function takeLoan(actorId, loanProductId, loanAmountInAcd) {
 
-    const loan = loanProducts[loanId];
+    const loan = loanProducts[loanProductId];
 
     if (!loan) {
         return false;
@@ -69,16 +73,20 @@ function takeLoan(actorId, loanId, loanAmountInAcd) {
     // track state of acd created:
     augmint.totalAcd += (loanAmountInAcd + premiumInAcd);
 
+    const loanId = counter;
+    counter++;
+
     // save loan:
     loans[actorId] = loans[actorId] || {};
-    loans[actorId][counter] = {
+    loans[actorId][loanId] = {
         collateralInEth,
         repayBy,
         loanAmountInAcd,
         premiumInAcd,
         defaultFeePercentage: loan.defaultFeePercentage
     };
-    counter++;
+
+    return loanId;
 
 }
 
@@ -126,7 +134,7 @@ function repayLoan(actorId, loanId) {
     }
 
     // remove loan
-    loans[actorId][loanId] = null;
+    delete loans[actorId][loanId];
 
 }
 
@@ -163,7 +171,7 @@ function collectDefaultedLoan(actorId, loanId) {
     }
 
     // remove loan
-    loans[actorId][loanId] = null;
+    delete loans[actorId][loanId];
 
 }
 
