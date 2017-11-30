@@ -3,11 +3,11 @@ Simulating the augmint system
 
 ## TODO
 
-- differentiate between moves that are simple invalid (e.g. actor doesn't have enough funds) and those because augmint is out of funds etc.
+- differentiate between moves that are simple invalid (e.g. actor doesn't have enough funds) and those due to system failures (e.g. because augmint is out of funds etc.)
 - better tracking/indexing of loans/locks
 - mo-dule for generating normally distributed numbers? - will be useful for distributing funds to actors
 - helpers for init of augmint and actors, and displaying/formatting state
-- ability to step through history as well as start/stop/rewind etc.
+- ability to step through history as well as start/stop/rewind etc. (probably hold all state in augmint.js then)
 - put all possible moves into moves.js, so there's a directory of moves?
 - use BigInt and start using Wei etc. properly to avoid floating point math
 
