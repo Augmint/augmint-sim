@@ -10,7 +10,7 @@ const locks = {};
 // just using a simple counter for id-ing locks:
 let counter = 0;
 
-function lockAcd(actorId, acdAmount) {
+function lockACD(actorId, acdAmount) {
 
     const interestInAcd = Math.floor(acdAmount * augmint.params.lockedAcdInterestPercentage);
 
@@ -33,6 +33,7 @@ function lockAcd(actorId, acdAmount) {
     // create lock
     locks[actorId] = locks[actorId] || {};
     locks[actorId][lockId] = {
+        id: lockId,
         acdValue: interestInAcd + acdAmount,
         lockedUntil: clock.getTime() + augmint.params.lockTime
     };
@@ -41,7 +42,7 @@ function lockAcd(actorId, acdAmount) {
 
 }
 
-function releaseAcd(actorId, lockId) {
+function releaseACD(actorId, lockId) {
 
     if (!locks[actorId] || !locks[actorId][lockId]) {
         return false;
@@ -74,7 +75,7 @@ function getLocksForActor(actorId) {
 }
 
 module.exports = {
-    lockAcd,
-    releaseAcd,
+    lockACD,
+    releaseACD,
     getLocksForActor
 };

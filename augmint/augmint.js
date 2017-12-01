@@ -1,24 +1,28 @@
 
-// stores balances, and params for augmint
+// stores all state for the simulation
 
 'use strict';
 
+// TODO: move loan and locks state here:
 // TODO: would prefer proper setters/getters, but this is cool for now...
 // TODO: burn/mint functions would be good too
 module.exports = {
 
-    // TODO: seperate this out?
     actorBalances: {},
 
+    actorState: {},
+
     balances: {
+        // acd:
         acdReserve: 0,
-        ethReserve: 0,
         acdFeesEarned: 0,
-        ethFeesEarned: 0,
         frozenAcdPool: 0,
-        collateralHeld: 0,
         interestHoldingPool: 0,
-        interestEarnedPool: 0
+        interestEarnedPool: 0,
+        // eth:
+        ethReserve: 0,
+        ethFeesEarned: 0,
+        collateralHeld: 0
     },
 
     params: {

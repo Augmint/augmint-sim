@@ -5,9 +5,9 @@ const ONE_DAY_IN_SECS = 24 * 60 * 60;
 
 const augmint = require('./augmint/augmint.js');
 const loanManager = require('./augmint/loan.manager.js');
-const exchange = require('./augmint/exchange.js');
-const freezer = require('./augmint/freezer.js');
-const clock = require('./lib/clock.js');
+const BorrowerExample = require('./actors/borrower.example.js');
+const LockerExample = require('./actors/locker.example.js');
+const simulation = require('./lib/simulation.js');
 
 // init augmint state/set initial conditions
 Object.assign(augmint.balances, {
@@ -26,26 +26,11 @@ augmint.totalAcd = 2150;
 loanManager.createLoanProduct(0, 0.5, 0.15, ONE_DAY_IN_SECS * 5, 0.05);
 
 // init actors
-augmint.actorBalances['borrower'] = { acd: 0, eth: 2150 };
-augmint.actorBalances['locker'] = { acd: 0, eth: 1000 };
+const actors = [
+    new BorrowerExample('borrower', 2150, 0, true),
+    new LockerExample('locker', 1000)
+];
 
-// START:
-
-// locker buys and then locks 1000 ACD
-exchange.buyACD('locker', 1000);
-freezer.lockAcd('locker', 1000);
-
-// borrower gets 1000 ACD loan and sells it
-loanManager.takeLoan('borrower', 0, 1000);  // HACK: right now i know the loan product i want has id 0
-exchange.sellACD('borrower', 1000);
-
-clock.incrementBy(ONE_DAY_IN_SECS * 10);
-
-// collect defaulted loan
-loanManager.collectDefaultedLoan('borrower', 1);  // HACK: again, i know the id here
-
-// unlock funds and sell:
-freezer.releaseAcd('locker', 0);  // HACK: again, known id
-exchange.sellACD('locker', 1100);
+simulation.run(actors, ONE_DAY_IN_SECS, 12);
 
 console.log(JSON.stringify(augmint, null, '  '));

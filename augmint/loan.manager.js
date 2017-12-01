@@ -6,58 +6,45 @@
 const augmint = require('./augmint.js');
 const clock = require('../lib/clock.js');
 
-const loanProducts = {};
+const loanProducts = [];
 const loans = {};
-// just gonna use a counter for id-ing loans and loanProducts:
+// just gonna use a counter for id-ing loans:
 let counter = 0;
 
 function createLoanProduct(minimumLoanInAcd, loanCollateralRatio, premiumPercentage, repaymentPeriod, defaultFeePercentage) {
 
-    const loanProductId = counter;
-    counter++;
-
-    loanProducts[counter] = {
-        active: true,
+    loanProducts.push({
+        id: loanProducts.length,
         minimumLoanInAcd,
         loanCollateralRatio,
         premiumPercentage,
         repaymentPeriod,
         defaultFeePercentage
-    };
-    
-    return loanProductId;
+    });
 
 }
 
-function removeLoanProduct(loanId) {
+function getLoanProducts() {
 
-    if (!loanProducts[loanId]) {
-        return false;
-    }
-
-    loanProducts[loanId].active = false;
+    return loanProducts;
 
 }
 
 function takeLoan(actorId, loanProductId, loanAmountInAcd) {
 
-    const loan = loanProducts[loanProductId];
+    const loanProduct = loanProducts[loanProductId];
 
-    if (!loan) {
+    if (!loanProduct) {
         return false;
     }
 
-    if (!loan.active) {
+    if (loanAmountInAcd < loanProduct.minimumLoanInAcd) {
         return false;
     }
 
-    if (loanAmountInAcd < loan.minimumLoanInAcd) {
-        return false;
-    }
-
-    const collateralInEth = Math.floor(loanAmountInAcd * augmint.params.acdPriceInEth / loan.loanCollateralRatio);
-    const premiumInAcd = Math.floor(loanAmountInAcd * loan.premiumPercentage);
-    const repayBy = clock.getTime() + loan.repaymentPeriod;
+    const collateralInEth = Math.floor(loanAmountInAcd * augmint.params.acdPriceInEth / loanProduct.loanCollateralRatio);
+    const premiumInAcd = Math.floor(loanAmountInAcd * loanProduct.premiumPercentage);
+    const repayBy = clock.getTime() + loanProduct.repaymentPeriod;
 
     if (augmint.actorBalances[actorId].eth < collateralInEth) {
         return false;
@@ -79,11 +66,12 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     // save loan:
     loans[actorId] = loans[actorId] || {};
     loans[actorId][loanId] = {
+        id: loanId,
         collateralInEth,
         repayBy,
         loanAmountInAcd,
         premiumInAcd,
-        defaultFeePercentage: loan.defaultFeePercentage
+        defaultFeePercentage: loanProduct.defaultFeePercentage
     };
 
     return loanId;
@@ -201,7 +189,7 @@ function getLoansForActor(actorId) {
 
 module.exports = {
     createLoanProduct,
-    removeLoanProduct,
+    getLoanProducts,
     takeLoan,
     repayLoan,
     collectDefaultedLoan,
