@@ -1,4 +1,6 @@
 
+// a class which encapulates an actor's behaviour, and an interface with which to interact with augmint etc.
+
 'use strict';
 
 const augmint = require('../augmint/augmint.js');
@@ -10,18 +12,20 @@ class Actor {
     
     constructor(id, eth = 0, acd = 0) {
         this.id = id;
-        augmint.actorBalances[this.id] = { eth, acd };
-        augmint.actorState[this.id] = {};
+        augmint.actors[this.id] = {
+            balances: { eth, acd },
+            state: {}
+        };
     }
 
     // STATE:
     // NB: I'm storing all state in augmint/loan manager/etc for the sake of making pausing/replaying etc. easier
     get acdBalance() {
-        return augmint.actorBalances[this.id].acd || 0;
+        return augmint.actors[this.id].balances.acd || 0;
     }
 
     get ethBalance() {
-        return augmint.actorBalances[this.id].eth || 0;
+        return augmint.actors[this.id].balances.eth || 0;
     }
 
     get loans() {
@@ -38,11 +42,11 @@ class Actor {
 
     // GENERAL STATE:
     getKey(key) {
-        return augmint.actorState[this.id][key];
+        return augmint.actors[this.id].state[key];
     }
 
     setKey(key, value) {
-        augmint.actorState[this.id][key] = value;
+        augmint.actors[this.id].state[key] = value;
         return value;
     }
 

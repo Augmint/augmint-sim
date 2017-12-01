@@ -46,19 +46,17 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     const premiumInAcd = Math.floor(loanAmountInAcd * loanProduct.premiumPercentage);
     const repayBy = clock.getTime() + loanProduct.repaymentPeriod;
 
-    if (augmint.actorBalances[actorId].eth < collateralInEth) {
+    if (augmint.actors[actorId].balances.eth < collateralInEth) {
         return false;
     }
 
     // move collateral user -> augmint
-    augmint.actorBalances[actorId].eth -= collateralInEth;
+    augmint.actors[actorId].balances.eth -= collateralInEth;
     augmint.balances.collateralHeld += collateralInEth;
 
     // MINT acd -> user/interest pool
-    augmint.actorBalances[actorId].acd += loanAmountInAcd;
+    augmint.actors[actorId].balances.acd += loanAmountInAcd;
     augmint.balances.interestHoldingPool += premiumInAcd;
-    // track state of acd created:
-    augmint.totalAcd += (loanAmountInAcd + premiumInAcd);
 
     const loanId = counter;
     counter++;
@@ -92,22 +90,20 @@ function repayLoan(actorId, loanId) {
 
     const repaymentDue = loan.loanAmountInAcd + loan.premiumInAcd;
 
-    if (augmint.actorBalances[actorId].acd < repaymentDue) {
+    if (augmint.actors[actorId].balances.acd < repaymentDue) {
         return false;
     }
 
     // repayment acd -> BURN acd
-    augmint.actorBalances[actorId].acd -= repaymentDue;
-    // track state of acd burned:
-    augmint.totalAcd -= repaymentDue;
-    // sanity check
+    augmint.actors[actorId].balances.acd -= repaymentDue;
+    // sanity check (NB: totalAcd is calculated on the fly by a getter)
     if (augmint.totalAcd < 0) {
         throw new Error('totalAcd has gone negative');
     }
 
     // move collateral augmint -> user
     augmint.balances.collateralHeld -= loan.collateralInEth;
-    augmint.actorBalances[actorId].eth += loan.collateralInEth;
+    augmint.actors[actorId].balances.eth += loan.collateralInEth;
     // sanity check
     if (augmint.balances.collateralHeld < 0) {
         throw new Error('collateralHeld has gone negative');
@@ -144,7 +140,7 @@ function collectDefaultedLoan(actorId, loanId) {
     // move collateral -> augmint reserves/user
     augmint.balances.collateralHeld -= loan.collateralInEth;
     augmint.balances.ethReserve += actualDefaultFeeInEth;
-    augmint.actorBalances[actorId].eth += loan.collateralInEth - actualDefaultFeeInEth;
+    augmint.actors[actorId].balances.eth += loan.collateralInEth - actualDefaultFeeInEth;
     // sanity check
     if (augmint.balances.collateralHeld < 0) {
         throw new Error('collateralHeld has gone negative');
@@ -173,7 +169,7 @@ function collectAllDefaultedLoans() {
             const loan = loans[actorId][loanId];
 
             if (loan && loan.repayBy < now) {
-                collectDefaultedLoan(actorId, loanId)
+                collectDefaultedLoan(actorId, loanId);
             }
 
         });

@@ -20,7 +20,6 @@ Object.assign(augmint.params, {
     lockedAcdInterestPercentage: 0.1,
     lockTime: ONE_DAY_IN_SECS * 10 // 10 days
 });
-augmint.totalAcd = 2150;
 
 loanManager.createLoanProduct(0, 0.5, 0.15, ONE_DAY_IN_SECS * 5, 0.05);
 

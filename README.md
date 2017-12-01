@@ -49,3 +49,4 @@ Simulating the augmint system
 - are we going to allow wiggle room for loan repayment deadline? (this is more of a UI issue. i.e. '3 month' = 3 month and a few days)
 - man, the eth/acd price (set by the eth/usd price) really has to be rock solid
 - do we really need to keep all these different earning pools separate?
+- default fee always has to be larger than the loan premium fee?

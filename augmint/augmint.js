@@ -5,18 +5,15 @@
 
 // TODO: move loan and locks state here:
 // TODO: would prefer proper setters/getters, but this is cool for now...
-// TODO: burn/mint functions would be good too
 module.exports = {
 
-    actorBalances: {},
-
-    actorState: {},
+    actors: {},
 
     balances: {
         // acd:
         acdReserve: 0,
         acdFeesEarned: 0,
-        frozenAcdPool: 0,
+        lockedAcdPool: 0,
         interestHoldingPool: 0,
         interestEarnedPool: 0,
         // eth:
@@ -33,7 +30,18 @@ module.exports = {
         lockTime: 0
     },
 
-    // for tracking state:
-    totalAcd: 0
+    get totalAcd() {
+
+        const actorsAcd = Object.keys(this.actors).reduce((sum, actorId) => {
+
+            return sum + this.actors[actorId].balances.acd;
+
+        }, 0);
+        const systemBalances = this.balances;
+
+        return actorsAcd + systemBalances.acdReserve + systemBalances.acdFeesEarned + systemBalances.lockedAcdPool 
+                    + systemBalances.interestHoldingPool + systemBalances.interestEarnedPool;
+
+    }
 
 };

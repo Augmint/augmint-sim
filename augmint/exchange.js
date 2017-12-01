@@ -10,7 +10,7 @@ function buyACD(actorId, acdAmount) {
     const ethAmount = Math.floor(acdAmount * augmint.params.acdPriceInEth);
     const feesInAcd = Math.floor(acdAmount * augmint.params.exchangeFeePercentage);
 
-    if (augmint.actorBalances[actorId].eth < ethAmount) {
+    if (augmint.actors[actorId].balances.eth < ethAmount) {
         return false;
     }
 
@@ -19,13 +19,13 @@ function buyACD(actorId, acdAmount) {
     }
 
     // actor eth -> reserves
-    augmint.actorBalances[actorId].eth -= ethAmount;
+    augmint.actors[actorId].balances.eth -= ethAmount;
     augmint.balances.ethReserve += ethAmount;
 
     // reserve acd -> actor
     // fees -> augmint fees earned
     augmint.balances.acdReserve -= acdAmount;
-    augmint.actorBalances[actorId].acd += (acdAmount - feesInAcd);
+    augmint.actors[actorId].balances.acd += (acdAmount - feesInAcd);
     augmint.balances.acdFeesEarned += feesInAcd;
 
 }
@@ -35,7 +35,7 @@ function sellACD(actorId, acdAmount) {
     const ethAmount = Math.floor(acdAmount * augmint.params.acdPriceInEth);
     const feesInEth = Math.floor(ethAmount * augmint.params.exchangeFeePercentage);
 
-    if (augmint.actorBalances[actorId].acd < acdAmount) {
+    if (augmint.actors[actorId].balances.acd < acdAmount) {
         return false;
     }
 
@@ -44,13 +44,13 @@ function sellACD(actorId, acdAmount) {
     }
 
     // actor acd -> reserves
-    augmint.actorBalances[actorId].acd -= acdAmount;
+    augmint.actors[actorId].balances.acd -= acdAmount;
     augmint.balances.acdReserve += acdAmount;
 
     // reserve eth -> actor
     // fees -> augmint fees earned
     augmint.balances.ethReserve -= ethAmount;
-    augmint.actorBalances[actorId].eth += (ethAmount - feesInEth);
+    augmint.actors[actorId].balances.eth += (ethAmount - feesInEth);
     augmint.balances.ethFeesEarned += feesInEth;
 
 }

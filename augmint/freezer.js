@@ -14,7 +14,7 @@ function lockACD(actorId, acdAmount) {
 
     const interestInAcd = Math.floor(acdAmount * augmint.params.lockedAcdInterestPercentage);
 
-    if (augmint.actorBalances[actorId].acd < acdAmount) {
+    if (augmint.actors[actorId].balances.acd < acdAmount) {
         return false;
     }
 
@@ -24,8 +24,8 @@ function lockACD(actorId, acdAmount) {
 
     // move acd user -> lock
     augmint.balances.interestEarnedPool -= interestInAcd;
-    augmint.actorBalances[actorId].acd -= acdAmount;
-    augmint.balances.frozenAcdPool += interestInAcd + acdAmount;
+    augmint.actors[actorId].balances.acd -= acdAmount;
+    augmint.balances.lockedAcdPool += interestInAcd + acdAmount;
 
     const lockId = counter;
     counter++;
@@ -55,11 +55,11 @@ function releaseACD(actorId, lockId) {
     }
 
     // move acd lock -> user
-    augmint.balances.frozenAcdPool -= lock.acdValue;
-    augmint.actorBalances[actorId].acd += lock.acdValue;
+    augmint.balances.lockedAcdPool -= lock.acdValue;
+    augmint.actors[actorId].balances.acd += lock.acdValue;
     // sanity check:
-    if (augmint.balances.frozenAcdPool < 0) {
-        throw new Error('frozenAcdPool has gone negative.');
+    if (augmint.balances.lockedAcdPool < 0) {
+        throw new Error('lockedAcdPool has gone negative.');
     }
 
     // remove lock:
