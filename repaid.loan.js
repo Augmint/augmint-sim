@@ -25,8 +25,8 @@ loanManager.createLoanProduct(0, 0.5, 0.15, ONE_DAY_IN_SECS * 5, 0.05);
 
 // init actors
 const actors = [
-    new BorrowerExample('borrower', 2150),
-    new LockerExample('locker', 1000)
+    new BorrowerExample('borrower', { eth: 2150 }),
+    new LockerExample('locker', { eth: 1000 })
 ];
 
 simulation.run(actors, ONE_DAY_IN_SECS, 12);

@@ -10,12 +10,22 @@ const exchange = require('../augmint/exchange.js');
 
 class Actor {
     
-    constructor(id, eth = 0, acd = 0) {
+    constructor(id, balances = {}, state = null) {
         this.id = id;
         augmint.actors[this.id] = {
-            balances: { eth, acd },
-            state: {}
+            balances: {
+                eth: balances.eth || 0,
+                acd: balances.acd || 0
+            },
+            state: state || {}
         };
+    }
+
+    // BEHAVIOUR
+    executeMoves(now) {
+
+        // to be implemented by child classes
+
     }
 
     // STATE:

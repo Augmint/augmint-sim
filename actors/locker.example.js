@@ -5,8 +5,8 @@ const Actor = require('./actor.js');
 
 class LockerExample extends Actor {
     
-    constructor(id, eth = 0, acd = 0) {
-        super(id, eth, acd);
+    constructor(id, balances, state) {
+        super(id, balances, state);
     }
 
     executeMoves(now) {

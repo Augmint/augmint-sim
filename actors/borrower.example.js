@@ -5,9 +5,8 @@ const Actor = require('./actor.js');
 
 class BorrowerExample extends Actor {
     
-    constructor(id, eth = 0, acd = 0, shouldDefault = false) {
-        super(id, eth, acd);
-        this.setKey('shouldDefault', !!shouldDefault);
+    constructor(id, balances, state) {
+        super(id, balances, state);
     }
 
     executeMoves(now) {
