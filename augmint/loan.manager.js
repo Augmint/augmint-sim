@@ -5,6 +5,7 @@
 
 const augmint = require('./augmint.js');
 const clock = require('../lib/clock.js');
+const logger = require('../lib/logger.js');
 
 const loanProducts = [];
 const loans = {};
@@ -157,6 +158,7 @@ function collectDefaultedLoan(actorId, loanId) {
     // remove loan
     delete loans[actorId][loanId];
 
+    logger.logMove("loan.manager", "collectDefaultedLoan", "loanId: " + loanId);
 }
 
 function collectAllDefaultedLoans() {
@@ -190,5 +192,6 @@ module.exports = {
     repayLoan,
     collectDefaultedLoan,
     collectAllDefaultedLoans,
-    getLoansForActor
+    getLoansForActor,
+    counter
 };

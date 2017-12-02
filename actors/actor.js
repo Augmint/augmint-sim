@@ -7,6 +7,7 @@ const augmint = require('../augmint/augmint.js');
 const loanManager = require('../augmint/loan.manager.js');
 const freezer = require('../augmint/freezer.js');
 const exchange = require('../augmint/exchange.js');
+const logger = require('../lib/logger.js');
 
 class Actor {
     
@@ -75,26 +76,39 @@ class Actor {
 
     // MOVE SET:
     buyACD(acdAmount) {
-        return exchange.buyACD(this.id, acdAmount)
+        logger.logMove(this.id, "buyAcd", "acdAmount: " + acdAmount);
+        return exchange.buyACD(this.id, acdAmount);
     }
 
     sellACD(acdAmount) {
-        return exchange.sellACD(this.id, acdAmount)
+        logger.logMove(this.id, "sellAcd", "acdAmount: " + acdAmount);
+        return exchange.sellACD(this.id, acdAmount);
     }
 
     lockACD(acdAmount) {
+        logger.logMove(this.id, "lockACD", "acdAmount: " + acdAmount);
         return freezer.lockACD(this.id, acdAmount);
     }
 
     releaseACD(lockId) {
+        logger.logMove(this.id, "releaseACD", "lockId: " + lockId);
         return freezer.releaseACD(this.id, lockId);
     }
 
     takeLoan(loanProductId, loanAmountInAcd) {
+        logger.logMove(
+            this.id,
+            "takeLoan",
+            "loanProductId: " +
+                loanProductId +
+                " loanAmountInAcd: " +
+                loanAmountInAcd
+        );
         return loanManager.takeLoan(this.id, loanProductId, loanAmountInAcd);
     }
 
     repayLoan(loanId) {
+        logger.logMove(this.id, "repayLoan", "loanId: " + loanId);
         return loanManager.repayLoan(this.id, loanId);
     }
 
