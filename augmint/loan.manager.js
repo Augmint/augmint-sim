@@ -158,7 +158,7 @@ function collectDefaultedLoan(actorId, loanId) {
     // remove loan
     delete loans[actorId][loanId];
 
-    logger.logMove("loan.manager", "collectDefaultedLoan", "loanId: " + loanId);
+    logger.logMove(actorId, "collectDefaultedLoan", {loanId: loanId});
 }
 
 function collectAllDefaultedLoans() {
