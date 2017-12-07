@@ -77,6 +77,5 @@ function getLocksForActor(actorId) {
 module.exports = {
     lockACD,
     releaseACD,
-    getLocksForActor,
-    counter
+    getLocksForActor
 };
