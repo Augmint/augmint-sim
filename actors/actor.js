@@ -17,7 +17,8 @@ class Actor {
                 eth: balances.eth || 0,
                 acd: balances.acd || 0
             },
-            state: state || {}
+            state: state || {},
+            type: this.constructor.name
         };
     }
 

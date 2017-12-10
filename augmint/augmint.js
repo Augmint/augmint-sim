@@ -23,11 +23,10 @@ module.exports = {
     },
 
     params: {
-        acdPriceInEth: 0,
-        exchangeFeePercentage: 0,
-        lockedAcdInterestPercentage: 0,
-        // length of lock in seconds:
-        lockTime: 0
+        acdPriceInEth: 1,
+        exchangeFeePercentage: 0.10,
+        lockedAcdInterestPercentage: 0.5,
+        lockTimeInDays: 365
     },
 
     get totalAcd() {

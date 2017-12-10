@@ -3,8 +3,11 @@
 
 'use strict';
 
+const ONE_DAY_IN_SECS = 24 * 60 * 60;
+
 const augmint = require('./augmint.js');
 const clock = require('../lib/clock.js');
+const AugmintError = require('./augmint.error.js');
 
 const locks = {};
 // just using a simple counter for id-ing locks:
@@ -19,7 +22,7 @@ function lockACD(actorId, acdAmount) {
     }
 
     if (augmint.balances.interestEarnedPool < interestInAcd) {
-        return false;
+        throw new AugmintError('Unable to lock ACD. interestEarnedPool is empty.');
     }
 
     // move acd user -> lock
@@ -35,7 +38,7 @@ function lockACD(actorId, acdAmount) {
     locks[actorId][lockId] = {
         id: lockId,
         acdValue: interestInAcd + acdAmount,
-        lockedUntil: clock.getTime() + augmint.params.lockTime
+        lockedUntil: clock.getTime() + (augmint.params.lockTimeInDays * ONE_DAY_IN_SECS)
     };
     
     return lockId;

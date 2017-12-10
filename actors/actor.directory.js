@@ -3,10 +3,9 @@
 
 'use strict';
 
-const BorrowerExample = require('./borrower.example.js');
-const LockerExample = require('./locker.example.js');
-
 module.exports = {
-    BorrowerExample,
-    LockerExample
+    BorrowerExample: require('./borrower.example.js'),
+    LockerExample: require('./locker.example.js'),
+    RandomLocker: require('./random.locker.js'),
+    RandomBorrower: require('./random.borrower.js')
 };

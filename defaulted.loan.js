@@ -19,7 +19,7 @@ Object.assign(augmint.params, {
     acdPriceInEth: 1,
     exchangeFeePercentage: 0,
     lockedAcdInterestPercentage: 0.1,
-    lockTime: ONE_DAY_IN_SECS * 10 // 10 days
+    lockTimeInDays: 10
 });
 
 loanManager.createLoanProduct(0, 0.5, 0.15, ONE_DAY_IN_SECS * 5, 0.05);

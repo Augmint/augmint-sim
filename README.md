@@ -1,8 +1,14 @@
 # augmint-sim
 Simulating the augmint system
 
+## TO RUN:
+- `watchify lib/ui.js -o dist/bundle.js`
+- Run local server out of simulation directory
+
 ## TODO
 
+- Use AugmintError in all the right places
+- Have state history (only updating after a simulation loop has run without error)
 - better tracking/indexing of loans/locks (would prefer to avoid using delete for performance, but probably too soon to worry about it)
 - module for generating normally distributed numbers? - will be useful for distributing funds to actors
 - helpers for init of augmint and actors, and displaying/formatting state
@@ -10,7 +16,6 @@ Simulating the augmint system
 - use BigInt and start using Wei etc. properly to avoid floating point math
 - move all state to augmint.js (loans etc.)
 - actor directory
-- AugmintError for when moves aren't possible because Augmint's reserves are depleated etc.
 
 ## Augmint
 
