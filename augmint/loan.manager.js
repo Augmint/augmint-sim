@@ -42,7 +42,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
         return false;
     }
 
-    const collateralInEth = Math.floor(loanAmountInAcd * augmint.params.acdPriceInEth / loanProduct.loanCollateralRatio);
+    const collateralInEth = Math.floor(loanAmountInAcd * augmint.rates.ethToAcd / loanProduct.loanCollateralRatio);
     const premiumInAcd = Math.floor(loanAmountInAcd * loanProduct.premiumPercentage);
     const repayBy = clock.getTime() + loanProduct.repaymentPeriod;
 
@@ -134,7 +134,7 @@ function collectDefaultedLoan(actorId, loanId) {
         return false;
     }
 
-    const targetDefaultFeeInEth = Math.floor(loan.loanAmountInAcd * augmint.params.acdPriceInEth * (1 + loan.defaultFeePercentage));
+    const targetDefaultFeeInEth = Math.floor(loan.loanAmountInAcd * augmint.rates.ethToAcd * (1 + loan.defaultFeePercentage));
     const actualDefaultFeeInEth = Math.min(loan.collateralInEth, targetDefaultFeeInEth);
 
     // move collateral -> augmint reserves/user

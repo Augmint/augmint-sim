@@ -4,8 +4,7 @@
 'use strict';
 
 module.exports = {
-    BorrowerExample: require('./borrower.example.js'),
-    LockerExample: require('./locker.example.js'),
     RandomLocker: require('./random.locker.js'),
-    RandomBorrower: require('./random.borrower.js')
+    RandomBorrower: require('./random.borrower.js'),
+    ExchangeTester: require('./exchange.tester.js')
 };
