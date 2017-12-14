@@ -70,8 +70,28 @@ class Actor {
         return augmint.params[name];
     }
 
+    getAugmintBalance(name) {
+        return augmint.balances[name];
+    }
+
+    getAcdDemand() {
+        return augmint.netAcdDemand;
+    }
+
     getLoanProducts() {
         return loanManager.getLoanProducts();
+    }
+
+    getMaxLockableAcd() {
+        return freezer.getMaxLockableAcd();
+    }
+
+    convertAcdToEth(acdAmount) {
+        return exchange.convertAcdToEth(acdAmount);
+    }
+
+    convertEthToAcd(ethAmount) {
+        return exchange.convertEthToAcd(ethAmount);
     }
 
     // MOVE SET:

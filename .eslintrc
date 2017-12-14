@@ -1,6 +1,6 @@
 {
     extends: 'eslint:recommended',
-    parserOptions: { ecmaVersion: 6 },
+    parserOptions: { ecmaVersion: 7 },
     env: { node: true, es6: true, browser: true},
     rules: {
          max-len: 'off',

@@ -123,7 +123,17 @@ function sellACD(actorId, acdAmount) {
     }
 }
 
+function convertAcdToEth(acdAmount) {
+    return acdAmount * augmint.rates.ethToAcd;
+}
+
+function convertEthToAcd(ethAmount) {
+    return ethAmount / augmint.rates.ethToAcd;
+}
+
 module.exports = {
     buyACD,
-    sellACD
+    sellACD,
+    convertAcdToEth,
+    convertEthToAcd
 };

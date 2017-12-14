@@ -9,14 +9,12 @@ module.exports = {
 
     balances: {
         // acd:
-        acdReserve: 0,
         acdFeesEarned: 0,
         lockedAcdPool: 0,
         interestHoldingPool: 0,
         interestEarnedPool: 0,
         exchangeAcd: 0,
         // eth:
-        ethReserve: 0,
         ethFeesEarned: 0,
         collateralHeld: 0,
         exchangeEth: 0
@@ -58,7 +56,6 @@ module.exports = {
 
         return (
             actorsAcd +
-            systemBalances.acdReserve +
             systemBalances.acdFeesEarned +
             systemBalances.lockedAcdPool +
             systemBalances.interestHoldingPool +

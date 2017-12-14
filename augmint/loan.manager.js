@@ -137,7 +137,7 @@ function collectDefaultedLoan(actorId, loanId) {
 
     // move collateral -> augmint reserves/user
     augmint.balances.collateralHeld -= loan.collateralInEth;
-    augmint.balances.ethReserve += actualDefaultFeeInEth;
+    augmint.actors.reserve.balances.eth += actualDefaultFeeInEth;
     augmint.actors[actorId].balances.eth += loan.collateralInEth - actualDefaultFeeInEth;
     // sanity check
     if (augmint.balances.collateralHeld < 0) {
@@ -146,7 +146,7 @@ function collectDefaultedLoan(actorId, loanId) {
 
     // move interest holding pool -> reserve
     augmint.balances.interestHoldingPool -= loan.premiumInAcd;
-    augmint.balances.acdReserve += loan.premiumInAcd;
+    augmint.actors.reserve.balances.acd += loan.premiumInAcd;
     // sanity check (NB: interestHoldingPool < 0 can only come about through an error in logic, not market forces)
     if (augmint.balances.interestHoldingPool < 0) {
         throw new Error('interestHoldingPool has gone negative');
