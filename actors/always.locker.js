@@ -1,6 +1,9 @@
 'use strict';
 
 const Actor = require('./actor.js');
+const ONE_DAY_IN_SECS = 24 * 60 * 60;
+const RELEASE_DELAY = ONE_DAY_IN_SECS * 10;
+let totalAcdToConvert = 10000;
 
 class AlwaysLocker extends Actor {
     constructor(id, balances, state) {
@@ -8,17 +11,19 @@ class AlwaysLocker extends Actor {
     }
 
     executeMoves(now) {
-        if (this.ethBalance > 0) {
-            this.buyACD(this.convertEthToAcd(this.ethBalance));
+        let maxAcdToConvert = Math.min(this.convertEthToAcd(this.ethBalance), totalAcdToConvert);
+        totalAcdToConvert -= maxAcdToConvert;
+        if (maxAcdToConvert > 0) {
+            this.buyACD(maxAcdToConvert);
         }
         let lockAmount = Math.min(this.acdBalance, this.getMaxLockableAcd());
         //console.debug('AlwaysLocker locked: ', lockAmount, this.acdBalance, this.getMaxLockableAcd());
         if (lockAmount > 0) {
             this.lockACD(lockAmount);
-            console.debug('AlwaysLocker locked: ', lockAmount);
+            console.debug('AlwaysLocker locked: ', lockAmount, 'ACD');
         }
 
-        if (this.locks[0] && now >= this.locks[0].lockedUntil) {
+        if (this.locks[0] && now >= this.locks[0].lockedUntil + RELEASE_DELAY) {
             // unlocks ACD:
             this.releaseACD(this.locks[0].id);
         }

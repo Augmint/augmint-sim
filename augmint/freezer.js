@@ -13,7 +13,7 @@ let counter = 0;
 
 function lockACD(actorId, acdAmount) {
     const interestPt = (1 + augmint.params.lockedAcdInterestPercentage) ** (augmint.params.lockTimeInDays / 365) - 1;
-    const interestInAcd = Math.floor(acdAmount * interestPt);
+    const interestInAcd = acdAmount * interestPt;
 
     if (augmint.actors[actorId].balances.acd < acdAmount) {
         return false;

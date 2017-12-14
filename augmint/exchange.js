@@ -6,7 +6,7 @@ const augmint = require('./augmint.js');
 const orderBook = augmint.orderBook;
 
 function buyACD(actorId, acdAmount) {
-    const totalEthAmount = acdAmount * augmint.rates.ethToAcd;
+    const totalEthAmount = acdAmount / augmint.rates.ethToAcd;
 
     if (augmint.actors[actorId].balances.eth < totalEthAmount) {
         return false;
@@ -23,7 +23,7 @@ function buyACD(actorId, acdAmount) {
         // get fulfilled, we're always looking at the first element
         const sellOrder = sellOrders[0];
         const sellAmount = sellOrder.amount > acdAmount ? acdAmount : sellOrder.amount;
-        const ethAmount = sellAmount * augmint.rates.ethToAcd;
+        const ethAmount = sellAmount / augmint.rates.ethToAcd;
         const feesInAcd = sellAmount * augmint.params.exchangeFeePercentage;
 
         // reduce remaining buy order:
@@ -81,7 +81,7 @@ function sellACD(actorId, acdAmount) {
         // get fulfilled, we're always looking at the first element
         const buyOrder = buyOrders[0];
         const buyAmount = buyOrder.amount > acdAmount ? acdAmount : buyOrder.amount;
-        const ethAmount = buyAmount * augmint.rates.ethToAcd;
+        const ethAmount = buyAmount / augmint.rates.ethToAcd;
         const feesInEth = ethAmount * augmint.params.exchangeFeePercentage;
 
         // reduce remaining sell order:
@@ -124,11 +124,11 @@ function sellACD(actorId, acdAmount) {
 }
 
 function convertAcdToEth(acdAmount) {
-    return acdAmount * augmint.rates.ethToAcd;
+    return acdAmount / augmint.rates.ethToAcd;
 }
 
 function convertEthToAcd(ethAmount) {
-    return ethAmount / augmint.rates.ethToAcd;
+    return ethAmount * augmint.rates.ethToAcd;
 }
 
 module.exports = {
