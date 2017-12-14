@@ -1,4 +1,3 @@
-
 // allows freezing/unfreezing of funds
 
 'use strict';
@@ -13,7 +12,6 @@ const locks = {};
 let counter = 0;
 
 function lockACD(actorId, acdAmount) {
-
     const interestInAcd = Math.floor(acdAmount * augmint.params.lockedAcdInterestPercentage);
 
     if (augmint.actors[actorId].balances.acd < acdAmount) {
@@ -37,15 +35,13 @@ function lockACD(actorId, acdAmount) {
     locks[actorId][lockId] = {
         id: lockId,
         acdValue: interestInAcd + acdAmount,
-        lockedUntil: clock.getTime() + (augmint.params.lockTimeInDays * ONE_DAY_IN_SECS)
+        lockedUntil: clock.getTime() + augmint.params.lockTimeInDays * ONE_DAY_IN_SECS
     };
-    
-    return lockId;
 
+    return lockId;
 }
 
 function releaseACD(actorId, lockId) {
-
     if (!locks[actorId] || !locks[actorId][lockId]) {
         return false;
     }
@@ -66,14 +62,11 @@ function releaseACD(actorId, lockId) {
 
     // remove lock:
     delete locks[actorId][lockId];
-
 }
 
 // allows actors to query their locks:
 function getLocksForActor(actorId) {
-
     return locks[actorId];
-    
 }
 
 module.exports = {

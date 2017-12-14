@@ -1,8 +1,6 @@
-
 'use strict';
 
 function AugmintError(message) {
-
     if (!(this instanceof AugmintError)) {
         return new AugmintError(message);
     }
@@ -11,7 +9,6 @@ function AugmintError(message) {
     this.message = message || '';
 
     Error.captureStackTrace(this, AugmintError);
-
 }
 
 AugmintError.prototype = Object.create(Error.prototype);

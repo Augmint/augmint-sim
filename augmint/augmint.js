@@ -1,4 +1,3 @@
-
 // stores all state for the simulation
 
 'use strict';
@@ -6,7 +5,6 @@
 // TODO: move loan and locks state here:
 // TODO: would prefer proper setters/getters, but this is cool for now...
 module.exports = {
-
     actors: {},
 
     balances: {
@@ -25,13 +23,13 @@ module.exports = {
     },
 
     params: {
-        exchangeFeePercentage: 0.10,
+        exchangeFeePercentage: 0.1,
         lockedAcdInterestPercentage: 0.5,
         lockTimeInDays: 365
     },
 
     rates: {
-        ethToAcd: 1,  // i.e. price per acd in eth
+        ethToAcd: 1, // i.e. price per acd in eth
         ethToUsd: 1
     },
 
@@ -41,27 +39,31 @@ module.exports = {
     },
 
     get netAcdDemand() {
-
         const orderBook = this.orderBook;
-        const totalBuyAmount = orderBook.buy.reduce((sum, order) => { return sum + order.amount; }, 0);
-        const totalSellAmount = orderBook.sell.reduce((sum, order) => { return sum + order.amount; }, 0);
+        const totalBuyAmount = orderBook.buy.reduce((sum, order) => {
+            return sum + order.amount;
+        }, 0);
+        const totalSellAmount = orderBook.sell.reduce((sum, order) => {
+            return sum + order.amount;
+        }, 0);
 
         return totalBuyAmount - totalSellAmount;
-
     },
 
     get totalAcd() {
-
         const actorsAcd = Object.keys(this.actors).reduce((sum, actorId) => {
-
             return sum + this.actors[actorId].balances.acd;
-
         }, 0);
         const systemBalances = this.balances;
 
-        return actorsAcd + systemBalances.acdReserve + systemBalances.acdFeesEarned + systemBalances.lockedAcdPool 
-                    + systemBalances.interestHoldingPool + systemBalances.interestEarnedPool + systemBalances.exchangeAcd;
-
+        return (
+            actorsAcd +
+            systemBalances.acdReserve +
+            systemBalances.acdFeesEarned +
+            systemBalances.lockedAcdPool +
+            systemBalances.interestHoldingPool +
+            systemBalances.interestEarnedPool +
+            systemBalances.exchangeAcd
+        );
     }
-
 };

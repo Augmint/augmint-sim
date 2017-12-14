@@ -1,16 +1,13 @@
-
 'use strict';
 
 const Actor = require('./actor.js');
 
 class RandomLocker extends Actor {
-    
     constructor(id, balances, state) {
         super(id, balances, state);
     }
 
     executeMoves(now) {
-
         if (this.acdBalance && Math.random() > 0.995) {
             this.lockACD(this.acdBalance);
         }
@@ -19,9 +16,7 @@ class RandomLocker extends Actor {
             // unlocks ACD:
             this.releaseACD(this.locks[0].id);
         }
-        
     }
-
 }
 
 module.exports = RandomLocker;

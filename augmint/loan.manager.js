@@ -1,4 +1,3 @@
-
 // keeps track of loans
 
 'use strict';
@@ -11,8 +10,13 @@ const loans = {};
 // just gonna use a counter for id-ing loans:
 let counter = 0;
 
-function createLoanProduct(minimumLoanInAcd, loanCollateralRatio, premiumPercentage, repaymentPeriod, defaultFeePercentage) {
-
+function createLoanProduct(
+    minimumLoanInAcd,
+    loanCollateralRatio,
+    premiumPercentage,
+    repaymentPeriod,
+    defaultFeePercentage
+) {
     loanProducts.push({
         id: loanProducts.length,
         minimumLoanInAcd,
@@ -21,17 +25,13 @@ function createLoanProduct(minimumLoanInAcd, loanCollateralRatio, premiumPercent
         repaymentPeriod,
         defaultFeePercentage
     });
-
 }
 
 function getLoanProducts() {
-
     return loanProducts;
-
 }
 
 function takeLoan(actorId, loanProductId, loanAmountInAcd) {
-
     const loanProduct = loanProducts[loanProductId];
 
     if (!loanProduct) {
@@ -73,11 +73,9 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     };
 
     return loanId;
-
 }
 
 function repayLoan(actorId, loanId) {
-
     if (!loans[actorId] || !loans[actorId][loanId]) {
         return false;
     }
@@ -119,11 +117,9 @@ function repayLoan(actorId, loanId) {
 
     // remove loan
     delete loans[actorId][loanId];
-
 }
 
 function collectDefaultedLoan(actorId, loanId) {
-
     if (!loans[actorId] || !loans[actorId][loanId]) {
         return false;
     }
@@ -134,7 +130,9 @@ function collectDefaultedLoan(actorId, loanId) {
         return false;
     }
 
-    const targetDefaultFeeInEth = Math.floor(loan.loanAmountInAcd * augmint.rates.ethToAcd * (1 + loan.defaultFeePercentage));
+    const targetDefaultFeeInEth = Math.floor(
+        loan.loanAmountInAcd * augmint.rates.ethToAcd * (1 + loan.defaultFeePercentage)
+    );
     const actualDefaultFeeInEth = Math.min(loan.collateralInEth, targetDefaultFeeInEth);
 
     // move collateral -> augmint reserves/user
@@ -156,31 +154,24 @@ function collectDefaultedLoan(actorId, loanId) {
 
     // remove loan
     delete loans[actorId][loanId];
-
 }
 
 function collectAllDefaultedLoans() {
-
     const now = clock.getTime();
 
-    Object.keys(loans).forEach((actorId) => {
-        Object.keys(loans[actorId]).forEach((loanId) => {
-
+    Object.keys(loans).forEach(actorId => {
+        Object.keys(loans[actorId]).forEach(loanId => {
             const loan = loans[actorId][loanId];
 
             if (loan && loan.repayBy < now) {
                 collectDefaultedLoan(actorId, loanId);
             }
-
         });
     });
-
 }
 
 function getLoansForActor(actorId) {
-
     return loans[actorId];
-
 }
 
 module.exports = {

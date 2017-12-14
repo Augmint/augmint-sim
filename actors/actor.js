@@ -1,4 +1,3 @@
-
 // a class which encapulates an actor's behaviour, and an interface with which to interact with augmint etc.
 
 'use strict';
@@ -9,7 +8,6 @@ const freezer = require('../augmint/freezer.js');
 const exchange = require('../augmint/exchange.js');
 
 class Actor {
-    
     constructor(id, balances = {}, state = null) {
         this.id = id;
         augmint.actors[this.id] = {
@@ -24,9 +22,7 @@ class Actor {
 
     // BEHAVIOUR
     executeMoves(now) {
-
         // to be implemented by child classes
-
     }
 
     // STATE:
@@ -41,14 +37,22 @@ class Actor {
 
     get loans() {
         const loansHashMap = loanManager.getLoansForActor(this.id);
-        if (!loansHashMap) { return []; }
-        return Object.keys(loansHashMap).map((lockId) => { return loansHashMap[lockId]; });
+        if (!loansHashMap) {
+            return [];
+        }
+        return Object.keys(loansHashMap).map(lockId => {
+            return loansHashMap[lockId];
+        });
     }
 
     get locks() {
         const locksHashMap = freezer.getLocksForActor(this.id);
-        if (!locksHashMap) { return []; }
-        return Object.keys(locksHashMap).map((lockId) => { return locksHashMap[lockId]; });
+        if (!locksHashMap) {
+            return [];
+        }
+        return Object.keys(locksHashMap).map(lockId => {
+            return locksHashMap[lockId];
+        });
     }
 
     // GENERAL STATE:
@@ -63,24 +67,20 @@ class Actor {
 
     // QUERYING SYSTEMS (e.g. augmint, secondary markets etc.)
     getAugmintParam(name) {
-
         return augmint.params[name];
-
     }
 
     getLoanProducts() {
-
         return loanManager.getLoanProducts();
-
     }
 
     // MOVE SET:
     buyACD(acdAmount) {
-        return exchange.buyACD(this.id, acdAmount)
+        return exchange.buyACD(this.id, acdAmount);
     }
 
     sellACD(acdAmount) {
-        return exchange.sellACD(this.id, acdAmount)
+        return exchange.sellACD(this.id, acdAmount);
     }
 
     lockACD(acdAmount) {
@@ -98,7 +98,6 @@ class Actor {
     repayLoan(loanId) {
         return loanManager.repayLoan(this.id, loanId);
     }
-
 }
 
 module.exports = Actor;

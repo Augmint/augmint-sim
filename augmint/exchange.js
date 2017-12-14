@@ -1,4 +1,3 @@
-
 // the augmint exchange
 
 'use strict';
@@ -7,7 +6,6 @@ const augmint = require('./augmint.js');
 const orderBook = augmint.orderBook;
 
 function buyACD(actorId, acdAmount) {
-
     const totalEthAmount = acdAmount * augmint.rates.ethToAcd;
 
     if (augmint.actors[actorId].balances.eth < totalEthAmount) {
@@ -21,8 +19,7 @@ function buyACD(actorId, acdAmount) {
     const sellOrders = orderBook.sell;
 
     while (acdAmount > 0 && sellOrders[0]) {
-
-        // since we're shifted elements out of the array, as orders 
+        // since we're shifted elements out of the array, as orders
         // get fulfilled, we're always looking at the first element
         const sellOrder = sellOrders[0];
         const sellAmount = sellOrder.amount > acdAmount ? acdAmount : sellOrder.amount;
@@ -40,14 +37,13 @@ function buyACD(actorId, acdAmount) {
 
         // acd: exchange -> buyer (minus fees)
         augmint.balances.exchangeAcd -= sellAmount;
-        augmint.actors[actorId].balances.acd += (sellAmount - feesInAcd);
+        augmint.actors[actorId].balances.acd += sellAmount - feesInAcd;
         augmint.balances.acdFeesEarned += feesInAcd;
 
         if (!sellOrder.amount) {
             // the buy order has consumed all of this sell order so remove it:
             sellOrders.shift();
         }
-
     }
 
     // sanity check:
@@ -67,11 +63,9 @@ function buyACD(actorId, acdAmount) {
             actorId: actorId
         });
     }
-
 }
 
 function sellACD(actorId, acdAmount) {
-
     if (augmint.actors[actorId].balances.acd < acdAmount) {
         return false;
     }
@@ -83,8 +77,7 @@ function sellACD(actorId, acdAmount) {
     const buyOrders = orderBook.buy;
 
     while (acdAmount > 0 && buyOrders[0]) {
-
-        // since we're shifted elements out of the array, as orders 
+        // since we're shifted elements out of the array, as orders
         // get fulfilled, we're always looking at the first element
         const buyOrder = buyOrders[0];
         const buyAmount = buyOrder.amount > acdAmount ? acdAmount : buyOrder.amount;
@@ -98,7 +91,7 @@ function sellACD(actorId, acdAmount) {
 
         // eth: exchange -> seller (minus fees)
         augmint.balances.exchangeEth -= ethAmount;
-        augmint.actors[actorId].balances.eth += (ethAmount - feesInEth);
+        augmint.actors[actorId].balances.eth += ethAmount - feesInEth;
         augmint.balances.ethFeesEarned += feesInEth;
 
         // acd: exchange -> buyer
@@ -109,7 +102,6 @@ function sellACD(actorId, acdAmount) {
             // the buy order has consumed all of this sell order so remove it:
             buyOrders.shift();
         }
-
     }
 
     // sanity check:
@@ -129,7 +121,6 @@ function sellACD(actorId, acdAmount) {
             actorId: actorId
         });
     }
-
 }
 
 module.exports = {
