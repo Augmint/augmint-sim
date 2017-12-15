@@ -2,8 +2,8 @@
 Simulating the augmint system
 
 ## TO RUN:
-- `watchify lib/ui.js -o dist/bundle.js`
-- Run local server out of simulation directory
+* install: `npm install`
+* run: `npm run dev`
 
 ## TODO
 
