@@ -6,7 +6,7 @@ const augmint = require('./augmint.js');
 const clock = require('../lib/clock.js');
 
 const loanProducts = [];
-const loans = {};
+const loans = augmint.loans;
 // just gonna use a counter for id-ing loans:
 let counter = 0;
 

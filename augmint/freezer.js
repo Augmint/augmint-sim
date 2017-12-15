@@ -7,7 +7,7 @@ const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const augmint = require('./augmint.js');
 const clock = require('../lib/clock.js');
 
-const locks = {};
+const locks = augmint.locks;
 // just using a simple counter for id-ing locks:
 let counter = 0;
 

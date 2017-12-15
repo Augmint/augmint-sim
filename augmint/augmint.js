@@ -2,7 +2,6 @@
 
 'use strict';
 
-// TODO: move loan and locks state here:
 // TODO: would prefer proper setters/getters, but this is cool for now...
 module.exports = {
     actors: {},
@@ -35,6 +34,9 @@ module.exports = {
         buy: [],
         sell: []
     },
+
+    loans: {},
+    locks: {},
 
     get netAcdDemand() {
         const orderBook = this.orderBook;
