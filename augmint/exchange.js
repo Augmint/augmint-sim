@@ -6,6 +6,9 @@ const augmint = require('./augmint.js');
 const orderBook = augmint.orderBook;
 
 function buyACD(actorId, acdAmount) {
+    if (acdAmount <= 0) {
+        return false;
+    }
     const totalEthAmount = acdAmount / augmint.rates.ethToAcd;
 
     if (augmint.actors[actorId].balances.eth < totalEthAmount) {
@@ -63,10 +66,11 @@ function buyACD(actorId, acdAmount) {
             actorId: actorId
         });
     }
+    return true;
 }
 
 function sellACD(actorId, acdAmount) {
-    if (augmint.actors[actorId].balances.acd < acdAmount) {
+    if (augmint.actors[actorId].balances.acd < acdAmount || acdAmount <= 0) {
         return false;
     }
 
@@ -121,6 +125,7 @@ function sellACD(actorId, acdAmount) {
             actorId: actorId
         });
     }
+    return true;
 }
 
 function convertAcdToEth(acdAmount) {
