@@ -35,7 +35,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     const loanProduct = loanProducts[loanProductId];
 
     if (!loanProduct) {
-        return false;
+        throw new Error('takeLoan() error: Invalid loanProduct Id:' + loanProductId);
     }
 
     if (loanAmountInAcd < loanProduct.minimumLoanInAcd) {
