@@ -2,7 +2,7 @@
 
 const Actor = require('./actor.js');
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
-const RELEASE_DELAY = ONE_DAY_IN_SECS * 10;
+const RELEASE_DELAY_DAYS = 3;
 let totalAcdToConvert = 10000;
 
 class AlwaysLocker extends Actor {
@@ -23,7 +23,7 @@ class AlwaysLocker extends Actor {
             console.debug('AlwaysLocker locked: ', lockAmount, 'ACD');
         }
 
-        if (this.locks[0] && now >= this.locks[0].lockedUntil + RELEASE_DELAY) {
+        if (this.locks[0] && now >= this.locks[0].lockedUntil + RELEASE_DELAY_DAYS * ONE_DAY_IN_SECS) {
             // unlocks ACD:
             this.releaseACD(this.locks[0].id);
         }
