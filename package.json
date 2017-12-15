@@ -1,0 +1,16 @@
+{
+    "name": "augmint-sim",
+    "version": "0.0.1",
+    "description": "Augmint Simulator",
+    "homepage": ".",
+    "private": true,
+    "dependencies": {},
+    "scripts": {
+        "start": "watchify lib/ui.js -o dist/bundle.js& http-server -c -1",
+        "build": "browserify lib/ui.js -o dist/bundle.js"
+    },
+    "devDependencies": {
+        "browserify": "14.5.0",
+        "watchify": "3.9.0"
+    }
+}
