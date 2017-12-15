@@ -10,6 +10,7 @@ module.exports = {
         // acd:
         acdFeesEarned: 0,
         lockedAcdPool: 0,
+        openLoansAcd: 0,
         interestHoldingPool: 0,
         interestEarnedPool: 0,
         exchangeAcd: 0,

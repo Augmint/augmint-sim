@@ -58,6 +58,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     augmint.actors[actorId].balances.acd += loanAmountInAcd;
     augmint.balances.interestHoldingPool += premiumInAcd;
 
+    augmint.balances.openLoansAcd += loanAmountInAcd + premiumInAcd;
     const loanId = counter;
     counter++;
 
@@ -110,6 +111,9 @@ function repayLoan(actorId, loanId) {
     // move interest from holding pool -> earned
     augmint.balances.interestHoldingPool -= loan.premiumInAcd;
     augmint.balances.interestEarnedPool += loan.premiumInAcd;
+
+    augmint.balances.openLoansAcd -= repaymentDue;
+
     // sanity check
     if (augmint.balances.interestHoldingPool < 0) {
         throw new Error('interestHoldingPool has gone negative');
@@ -146,6 +150,9 @@ function collectDefaultedLoan(actorId, loanId) {
     // move interest holding pool -> reserve
     augmint.balances.interestHoldingPool -= loan.premiumInAcd;
     augmint.actors.reserve.balances.acd += loan.premiumInAcd;
+
+    augmint.balances.openLoansAcd -= loan.repaymentDue;
+
     // sanity check (NB: interestHoldingPool < 0 can only come about through an error in logic, not market forces)
     if (augmint.balances.interestHoldingPool < 0) {
         throw new Error('interestHoldingPool has gone negative');
