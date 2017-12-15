@@ -87,10 +87,6 @@ function repayLoan(actorId, loanId) {
 
     const loan = loans[actorId][loanId];
 
-    if (loan.repayBy < clock.getTime()) {
-        return false;
-    }
-
     if (augmint.actors[actorId].balances.acd < loan.repaymentDue) {
         return false;
     }
