@@ -46,6 +46,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     const collateralInEth = loanAmountInAcd * augmint.rates.ethToAcd / loanProduct.loanCollateralRatio;
     const interestPt = (1 + loanProduct.interestPt) ** (loanProduct.repaymentPeriodInDays / 365) - 1;
     const premiumInAcd = loanAmountInAcd * interestPt;
+    const repaymentDue = premiumInAcd + loanAmountInAcd;
     const repayBy = clock.getTime() + loanProduct.repaymentPeriodInDays * ONE_DAY_IN_SECS;
 
     if (augmint.actors[actorId].balances.eth < collateralInEth) {
@@ -72,6 +73,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
         repayBy,
         loanAmountInAcd,
         premiumInAcd,
+        repaymentDue,
         defaultFeePercentage: loanProduct.defaultFeePercentage
     };
 
@@ -89,14 +91,12 @@ function repayLoan(actorId, loanId) {
         return false;
     }
 
-    const repaymentDue = loan.loanAmountInAcd + loan.premiumInAcd;
-
-    if (augmint.actors[actorId].balances.acd < repaymentDue) {
+    if (augmint.actors[actorId].balances.acd < loan.repaymentDue) {
         return false;
     }
 
     // repayment acd -> BURN acd
-    augmint.actors[actorId].balances.acd -= repaymentDue;
+    augmint.actors[actorId].balances.acd -= loan.repaymentDue;
     // sanity check (NB: totalAcd is calculated on the fly by a getter)
     if (augmint.totalAcd < 0) {
         throw new Error('totalAcd has gone negative');
@@ -114,7 +114,7 @@ function repayLoan(actorId, loanId) {
     augmint.balances.interestHoldingPool -= loan.premiumInAcd;
     augmint.balances.interestEarnedPool += loan.premiumInAcd;
 
-    augmint.balances.openLoansAcd -= repaymentDue;
+    augmint.balances.openLoansAcd -= loan.repaymentDue;
 
     // sanity check
     if (augmint.balances.interestHoldingPool < 0) {
