@@ -1,7 +1,7 @@
 // stores all state for the simulation
 
 'use strict';
-
+// TODO: add transferFeePt param (and transferAcdWithFee functions)
 // TODO: would prefer proper setters/getters, but this is cool for now...
 module.exports = {
     actors: {},
