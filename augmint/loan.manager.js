@@ -77,7 +77,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
 
 function repayLoan(actorId, loanId) {
     if (!loans[actorId] || !loans[actorId][loanId]) {
-        return false;
+        throw new Error('repayLoan() error. Invalid actorId (' + actorId + ') or loanId(' + loanId + ')');
     }
 
     const loan = loans[actorId][loanId];
@@ -117,6 +117,7 @@ function repayLoan(actorId, loanId) {
 
     // remove loan
     delete loans[actorId][loanId];
+    return true;
 }
 
 function collectDefaultedLoan(actorId, loanId) {
