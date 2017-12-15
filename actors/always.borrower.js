@@ -14,49 +14,51 @@ class AlwaysBorrower extends Actor {
     }
 
     executeMoves(now) {
+        /* Get new loan if there is no loan */
         if (this.loans.length === 0) {
             let loanAmount = Math.min(this.convertEthToAcd(this.ethBalance), MAX_LOAN_AMOUNT_ACD);
             if (this.takeLoan(0, loanAmount)) {
-                console.debug('AlwaysBorrower new loan: ', loanAmount, ' ACD');
                 this.sellACD(loanAmount); // TODO: how to simulate keeping some ACD and selling at random moment?
             }
-        }
+        } else {
+            /* BUY ACD in advance for repayment */
+            const repaymentDue = this.loans[0].repaymentDue + REPAYMENT_COST_ACD;
 
-        // TODO: move this to loanManager? Unlikely that anyone would repay a loan if value below repayment
-        const collateralValueAcd = this.loans[0] && this.convertEthToAcd(this.loans[0].collateralInEth);
-        const repaymentDue = this.loans[0].repaymentDue;
-        if (
-            this.loans[0] &&
-            now >= this.loans[0].repayBy - (BUY_ACD_X_DAYS_BEFORE_REPAY + REPAY_X_DAYS_BEFORE) * ONE_DAY_IN_SECS &&
-            repaymentDue < collateralValueAcd + REPAYMENT_COST_ACD
-        ) {
-            // buys ACD for repayment
-            const buyAmount = Math.max(0, repaymentDue - this.acdBalance);
-            this.buyACD(buyAmount);
-        }
+            // TODO: move this to loanManager? Unlikely that anyone would repay a loan if value below repayment
+            const collateralValueAcd = this.loans[0] && this.convertEthToAcd(this.loans[0].collateralInEth);
 
-        if (this.loans[0] && now >= this.loans[0].repayBy - REPAY_X_DAYS_BEFORE * ONE_DAY_IN_SECS) {
-            if (this.loans[0].repaymentDue < collateralValueAcd + REPAYMENT_COST_ACD) {
-                // repays ACD:
-                if (this.repayLoan(this.loans[0].id)) {
-                    console.debug('Always borrower repaid ', repaymentDue, ' ACD');
+            if (
+                now >= this.loans[0].repayBy - (BUY_ACD_X_DAYS_BEFORE_REPAY + REPAY_X_DAYS_BEFORE) * ONE_DAY_IN_SECS &&
+                repaymentDue < collateralValueAcd &&
+                this.acdBalance < repaymentDue
+            ) {
+                // buys ACD for repayment
+                const buyAmount = Math.max(0, repaymentDue - this.acdBalance);
+                this.buyACD(buyAmount);
+            }
+
+            /* Repay REPAY_X_DAYS_BEFORE maturity  */
+            if (now >= this.loans[0].repayBy - REPAY_X_DAYS_BEFORE * ONE_DAY_IN_SECS) {
+                if (repaymentDue < collateralValueAcd) {
+                    // repays ACD:
+                    if (!this.repayLoan(this.loans[0].id)) {
+                        throw new Error(
+                            'Always borrower couldn\'t repay.\n' +
+                                'repaymentDue: ' +
+                                repaymentDue +
+                                '\nACD borrower balance: ' +
+                                this.acdBalance
+                        );
+                    }
                 } else {
-                    throw new Error(
-                        'Always borrower couldn\'t repay.\n' +
-                            'repaymentDue: ' +
-                            repaymentDue +
-                            '\nACD borrower balance: ' +
-                            this.acdBalance
-                    );
+                    // console.debug(
+                    //     'AlwaysBorrower did not repay, collateral value (',
+                    //     collateralValueAcd,
+                    //     ' ACD) is below repaymentDue + repaymentCost of',
+                    //     this.loans[0].repaymentDue + REPAYMENT_COST_ACD,
+                    //     ' ACD'
+                    // );
                 }
-            } else {
-                console.debug(
-                    'AlwaysBorrower did not repay, collateral value (',
-                    collateralValueAcd,
-                    ' ACD) is below repaymentDue + repaymentCost of',
-                    this.loans[0].repaymentDue + REPAYMENT_COST_ACD,
-                    ' ACD'
-                );
             }
         }
     }
