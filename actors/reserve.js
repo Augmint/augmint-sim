@@ -8,8 +8,14 @@ class Reserve extends Actor {
     }
 
     executeMoves(now) {
-        if (now === 0) {
-            this.sellACD(this.acdBalance);
+        // TODO: add some delay in intervention (ie intervene only after a couple of ticks)
+        const acdDemand = this.getAcdDemand();
+        if (acdDemand < 0) {
+            this.buyACD(
+                Math.min(this.convertEthToAcd(this.ethBalance), -acdDemand - this.getAugmintBalance('openLoansAcd'))
+            );
+        } else {
+            this.sellACD(Math.min(this.acdBalance, acdDemand));
         }
     }
 }
