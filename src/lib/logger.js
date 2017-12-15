@@ -5,21 +5,37 @@ let printEachIteration = false;
 let printEachMove = true;
 
 let iteration = 0;
+let logTextArea;
+
 const iterationLogHeader = [
     'day',
-    'iteration',
-    'acdReserve',
-    'acdFeesEarned',
-    'lockedAcdPool',
-    'interestHoldingPool',
-    'interestEarnedPool',
-    'ethReserve',
-    'ethFeesEarned',
-    'collateralHeld'
+    ' iteration',
+    ' acdReserve',
+    ' acdFeesEarned',
+    ' lockedAcdPool',
+    ' interestHoldingPool',
+    ' interestEarnedPool',
+    ' ethReserve',
+    ' ethFeesEarned',
+    ' collateralHeld'
 ];
 let iterationLog = new Array(iterationLogHeader);
-const movesLogHeader = ['day', 'iteration', 'move', 'actor', 'params'];
+const movesLogHeader = [' day', ' iteration', ' move', ' actor', ' params'];
 let movesLog = new Array(movesLogHeader);
+
+function init(_logTextArea) {
+    logTextArea = _logTextArea;
+}
+
+function addToLogTextArea(text) {
+    logTextArea.value += text;
+    logTextArea.scrollTop = logTextArea.scrollHeight;
+}
+
+function print(objToPrint) {
+    addToLogTextArea(JSON.stringify(objToPrint));
+    console.log(objToPrint);
+}
 
 function toCsv(_array) {
     let ret = '';
@@ -45,7 +61,10 @@ function logMove(actor, move, params) {
     const daysPassed = Math.floor(now / ONE_DAY_IN_SECS);
     const logItem = [daysPassed, iteration, move, actor, params];
     if (printEachMove) {
-        console.log('MOVE', toCsv(new Array(logItem)));
+        if (movesLog.length === 1) {
+            addToLogTextArea('MOVE, ' + movesLogHeader + '\n');
+        }
+        addToLogTextArea('MOVE, ' + toCsv(new Array(logItem)) + '\n');
     }
     movesLog.push(logItem);
 }
@@ -66,27 +85,28 @@ function logIteration(augmint) {
         augmint.balances.collateralHeld
     ];
     if (printEachIteration) {
-        console.log('ITERATION ', toCsv(new Array(logItem)));
+        if (iterationLog.length === 1) {
+            addToLogTextArea('ITERATION, ' + iterationLogHeader + '\n');
+        }
+        addToLogTextArea('ITERATION ' + toCsv(new Array(logItem)) + '\n');
     }
     iterationLog.push(logItem);
     iteration++;
 }
 
 function printIterationLog() {
-    console.log('===== ITERATION LOG =====');
-    console.log(toCsv(iterationLog));
-    console.log('===== /ITERATION LOG =====');
+    addToLogTextArea('===== ITERATION LOG =====\n' + toCsv(iterationLog) + '\n' + '===== /ITERATION LOG =====\n\n');
 }
 
 function printMovesLog() {
-    console.log('===== MOVES LOG =====');
-    console.log(toCsv(movesLog));
-    console.log('===== /MOVES LOG =====');
+    addToLogTextArea('===== MOVES LOG =====\n' + toCsv(movesLog) + '\n' + '===== /MOVES LOG =====\n\n');
 }
 
 module.exports = {
+    init,
     logIteration,
     logMove,
+    print,
     printIterationLog,
     printMovesLog
 };

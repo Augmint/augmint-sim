@@ -38,17 +38,24 @@
     <div class="error-msg"></div>
     <div class="buttons">
         <button class="btn pause-btn">Start</button>
-        <span>Dump to browser console:</span>
-        <button class="btn dumpState-btn">state</button>
-        <button class="btn dumpIterationLog-btn">iteration log</button>
-        <button class="btn dumpMovesLog-btn">actor moves log</button>
+        <button class="btn toggleLog-btn">Show log</button>
+    </div>
+    <div class="log-wrapper" style="display: none;">
+        <div>
+            <button class="btn clearLog-btn" onClick="javascript:document.getElementById('log-textarea').value = ''">clear log</button>
+            <span>Dump to log:</span>
+            <button class="btn dumpState-btn">state</button>
+            <button class="btn dumpIterationLog-btn">iteration log</button>
+            <button class="btn dumpMovesLog-btn">actor moves log</button>
+        </div>
+        <div>
+            <textarea id="log-textarea" class="textarea log-textarea" readonly cols="165" wrap="off" placeholder="nothing in the log yet. Click start." rows="20"></textarea>
+        </div>
     </div>
     <div class="sim-inputs">
         <!-- <label>Exchange Fees (%): <input type="number" value="0" data-key="exchangeFeePercentage"/></label> -->
         <label>Locked ACD Interest pa. (%): <input type="number" value="0.08" data-key="lockedAcdInterestPercentage"/></label>
         <label>Lock Time (days): <input type="number" value="30" data-key="lockTimeInDays"/></label><br/>
-
-
     </div>
     <div class="loanproduct-inputs">
         <label>Loan ACD Interest pa. (%): <input type="number" value="0.14" id="loanInterestPt"/></label>
@@ -57,7 +64,8 @@
         <label>Defaulting fee %: <input type="number" value="0.05" id="defaultFeePercentage"/></label>
         <label>Min. loan ACD amount: <input type="number" value="100" id="minimumLoanInAcd"/></label>
     </div>
-    <p>Days Passed: <span class="clock">0</span></p>
+    <p>Days Passed: <span class="clock">0</span> </p>
+
     <div class="graphs-wrapper"></div>
 
     <script src="bundle.js"></script>

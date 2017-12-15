@@ -15,12 +15,16 @@ const pauseBtn = document.querySelector('.pause-btn');
 const dumpStateBtn = document.querySelector('.dumpState-btn');
 const dumpIterationLogBtn = document.querySelector('.dumpIterationLog-btn');
 const dumpMovesLogBtn = document.querySelector('.dumpMovesLog-btn');
+const toggleLogBtn = document.querySelector('.toggleLog-btn');
+const logWrapper = document.querySelector('.log-wrapper');
+const logTextArea = document.querySelector('.log-textarea');
 const inputs = Array.from(document.querySelectorAll('.sim-inputs input'));
 const graphsWrapper = document.querySelector('.graphs-wrapper');
 const errorMsg = document.querySelector('.error-msg');
 
 let lastRender = -1;
 let paused = true;
+let logVisible = false;
 
 function updateParamsFromUI() {
     const params = {};
@@ -58,14 +62,27 @@ function togglePause() {
     }
 }
 
+function toggleLog() {
+    logVisible = !logVisible;
+
+    if (logVisible) {
+        logWrapper.style.display = 'block';
+        toggleLogBtn.innerHTML = 'Hide log';
+    } else {
+        logWrapper.style.display = 'none';
+        toggleLogBtn.innerHTML = 'Show log';
+    }
+}
+
 function init() {
     graphs.init(graphsWrapper);
+    logger.init(logTextArea);
 
     pauseBtn.addEventListener('click', togglePause);
 
     dumpStateBtn.addEventListener('click', () => {
         updateParamsFromUI();
-        console.log(simulation.getState());
+        logger.print(simulation.getState());
     });
 
     dumpIterationLogBtn.addEventListener('click', () => {
@@ -75,6 +92,8 @@ function init() {
     dumpMovesLogBtn.addEventListener('click', () => {
         logger.printMovesLog();
     });
+
+    toggleLogBtn.addEventListener('click', toggleLog);
 
     updateParamsFromUI();
 
