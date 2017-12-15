@@ -7,5 +7,6 @@ module.exports = {
     RandomLocker: require('./random.locker.js'),
     RandomBorrower: require('./random.borrower.js'),
     ExchangeTester: require('./exchange.tester.js'),
-    AlwaysLocker: require('./always.locker.js')
+    AlwaysLocker: require('./always.locker.js'),
+    AlwaysBorrower: require('./always.borrower.js')
 };
