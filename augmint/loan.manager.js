@@ -154,7 +154,8 @@ function collectDefaultedLoan(actorId, loanId) {
     augmint.actors.reserve.balances.acd += loan.premiumInAcd;
 
     augmint.balances.openLoansAcd -= loan.repaymentDue;
-
+    augmint.balances.defaultedLoansAcd += loan.repaymentDue;
+    console.debug('collectDefaultedLoan loan.repaymentDue:', loan.repaymentDue);
     // sanity check (NB: interestHoldingPool < 0 can only come about through an error in logic, not market forces)
     if (augmint.balances.interestHoldingPool < 0) {
         throw new Error('interestHoldingPool has gone negative');
