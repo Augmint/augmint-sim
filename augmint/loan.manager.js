@@ -5,6 +5,7 @@
 const augmint = require('./augmint.js');
 const clock = require('../lib/clock.js');
 
+const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const loanProducts = [];
 const loans = augmint.loans;
 // just gonna use a counter for id-ing loans:
@@ -13,16 +14,16 @@ let counter = 0;
 function createLoanProduct(
     minimumLoanInAcd,
     loanCollateralRatio,
-    premiumPercentage,
-    repaymentPeriod,
+    interestPt, // pa.
+    repaymentPeriodInDays,
     defaultFeePercentage
 ) {
     loanProducts.push({
         id: loanProducts.length,
         minimumLoanInAcd,
         loanCollateralRatio,
-        premiumPercentage,
-        repaymentPeriod,
+        interestPt,
+        repaymentPeriodInDays,
         defaultFeePercentage
     });
 }
@@ -43,8 +44,9 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     }
 
     const collateralInEth = loanAmountInAcd * augmint.rates.ethToAcd / loanProduct.loanCollateralRatio;
-    const premiumInAcd = loanAmountInAcd * loanProduct.premiumPercentage;
-    const repayBy = clock.getTime() + loanProduct.repaymentPeriod;
+    const interestPt = (1 + loanProduct.interestPt) ** (loanProduct.repaymentPeriodInDays / 365) - 1;
+    const premiumInAcd = loanAmountInAcd * interestPt;
+    const repayBy = clock.getTime() + loanProduct.repaymentPeriodInDays * ONE_DAY_IN_SECS;
 
     if (augmint.actors[actorId].balances.eth < collateralInEth) {
         return false;
