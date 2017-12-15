@@ -12,9 +12,9 @@ class Reserve extends Actor {
         const acdDemand = this.getAcdDemand();
         if (acdDemand < 0) {
             this.buyACD(
-                Math.min(this.convertEthToAcd(this.ethBalance), -acdDemand - this.getAugmintBalance('openLoansAcd'))
+                Math.min(this.convertEthToAcd(this.ethBalance), -acdDemand) //+ this.getAugmintBalance('openLoansAcd')
             );
-        } else {
+        } else if (acdDemand > 0) {
             this.sellACD(Math.min(this.acdBalance, acdDemand));
         }
     }
