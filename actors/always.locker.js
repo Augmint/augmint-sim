@@ -20,7 +20,6 @@ class AlwaysLocker extends Actor {
         //console.debug('AlwaysLocker locked: ', lockAmount, this.acdBalance, this.getMaxLockableAcd());
         if (lockAmount > 0) {
             this.lockACD(lockAmount);
-            console.debug('AlwaysLocker locked: ', lockAmount, 'ACD');
         }
 
         if (this.locks[0] && now >= this.locks[0].lockedUntil + RELEASE_DELAY_DAYS * ONE_DAY_IN_SECS) {

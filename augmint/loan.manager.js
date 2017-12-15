@@ -4,6 +4,7 @@
 
 const augmint = require('./augmint.js');
 const clock = require('../lib/clock.js');
+const logger = require('../lib/logger.js');
 
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const loanProducts = augmint.loanProducts;
@@ -50,6 +51,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     const repayBy = clock.getTime() + loanProduct.repaymentPeriodInDays * ONE_DAY_IN_SECS;
 
     if (augmint.actors[actorId].balances.eth < collateralInEth) {
+        console.error('takeLoan() eth balance below collateral', augmint.actors[actorId].balances.eth, collateralInEth);
         return false;
     }
 
@@ -88,6 +90,12 @@ function repayLoan(actorId, loanId) {
     const loan = loans[actorId][loanId];
 
     if (augmint.actors[actorId].balances.acd < loan.repaymentDue) {
+        console.error(
+            'repayLoan() ACD balance of',
+            augmint.actors[actorId].balances.acd,
+            'is not enough to repay ',
+            loan.repaymentDue
+        );
         return false;
     }
 
@@ -151,7 +159,6 @@ function collectDefaultedLoan(actorId, loanId) {
 
     augmint.balances.openLoansAcd -= loan.repaymentDue;
     augmint.balances.defaultedLoansAcd += loan.repaymentDue;
-    console.debug('collectDefaultedLoan loan.repaymentDue:', loan.repaymentDue);
     // sanity check (NB: interestHoldingPool < 0 can only come about through an error in logic, not market forces)
     if (augmint.balances.interestHoldingPool < 0) {
         throw new Error('interestHoldingPool has gone negative');
@@ -159,6 +166,7 @@ function collectDefaultedLoan(actorId, loanId) {
 
     // remove loan
     delete loans[actorId][loanId];
+    logger.logMove(actorId, 'collectDefaultedLoan', { loanId: loanId, repaymentDue: loan.repaymentDue });
 }
 
 function collectAllDefaultedLoans() {

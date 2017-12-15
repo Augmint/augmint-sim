@@ -36,8 +36,13 @@
 </head>
 <body>
     <div class="error-msg"></div>
-    <button class="btn pause-btn">Start</button>
-    <button class="btn dump-btn">Dump State</button>
+    <div class="buttons">
+        <button class="btn pause-btn">Start</button>
+        <span>Dump to browser console:</span>
+        <button class="btn dumpState-btn">state</button>
+        <button class="btn dumpIterationLog-btn">iteration log</button>
+        <button class="btn dumpMovesLog-btn">actor moves log</button>
+    </div>
     <div class="sim-inputs">
         <!-- <label>Exchange Fees (%): <input type="number" value="0" data-key="exchangeFeePercentage"/></label> -->
         <label>Locked ACD Interest pa. (%): <input type="number" value="0.08" data-key="lockedAcdInterestPercentage"/></label>
