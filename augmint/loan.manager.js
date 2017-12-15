@@ -6,7 +6,7 @@ const augmint = require('./augmint.js');
 const clock = require('../lib/clock.js');
 
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
-const loanProducts = [];
+const loanProducts = augmint.loanProducts;
 const loans = augmint.loans;
 // just gonna use a counter for id-ing loans:
 let counter = 0;

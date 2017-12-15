@@ -36,7 +36,7 @@ module.exports = {
         buy: [],
         sell: []
     },
-
+    loanProducts: [],
     loans: {},
     locks: {},
 
