@@ -49,15 +49,16 @@ function buyACD(actorId, acdAmount) {
         }
     }
 
-    // sanity check:
-    if (augmint.balances.exchangeEth < 0) {
-        throw new Error('exchangeEth has gone negative.');
-    }
-
-    // sanity check:
-    if (augmint.balances.exchangeAcd < 0) {
-        throw new Error('exchangeAcd has gone negative.');
-    }
+    // FIXME: uncomment these once changed to BigNumber
+    // // sanity check:
+    // if (augmint.balances.exchangeEth < 0) {
+    //     throw new Error('exchangeEth has gone negative.' + augmint.balances.exchangeEth);
+    // }
+    //
+    // // sanity check:
+    // if (augmint.balances.exchangeAcd < 0) {
+    //     throw new Error('exchangeAcd has gone negative: ' + augmint.balances.exchangeAcd);
+    // }
 
     if (acdAmount) {
         // we have acd from the buy order left over, so add to order book:
@@ -108,15 +109,16 @@ function sellACD(actorId, acdAmount) {
         }
     }
 
-    // sanity check:
-    if (augmint.balances.exchangeEth < 0) {
-        throw new Error('exchangeEth has gone negative.');
-    }
-
-    // sanity check:
-    if (augmint.balances.exchangeAcd < 0) {
-        throw new Error('exchangeAcd has gone negative.');
-    }
+    // FIXME: uncomment these once changed to BigNumber
+    // // sanity check:
+    // if (augmint.balances.exchangeEth < 0) {
+    //     throw new Error('exchangeEth has gone negative:' + augmint.balances.exchangeEth);
+    // }
+    //
+    // // sanity check:
+    // if (augmint.balances.exchangeAcd < 0) {
+    //     throw new Error('exchangeAcd has gone negative: ' + augmint.balances.exchangeAcd);
+    // }
 
     if (acdAmount) {
         // we have acd from the sell order left over, so add to order book:
