@@ -6,7 +6,7 @@ module.exports = {
     entry: './src/lib/ui.js',
     output: {
         path: path.join(__dirname, 'dist'),
-        filename: './dist/bundle.js'
+        filename: 'bundle.js'
     },
     plugins: [
         // Copy our app's index.html to the build folder.
