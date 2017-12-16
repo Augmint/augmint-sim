@@ -53,18 +53,22 @@ module.exports = {
     },
 
     get totalAcd() {
-        const actorsAcd = Object.keys(this.actors).reduce((sum, actorId) => {
-            return sum + this.actors[actorId].balances.acd;
-        }, 0);
         const systemBalances = this.balances;
 
         return (
-            actorsAcd +
+            this.actorsAcd +
             systemBalances.acdFeesEarned +
             systemBalances.lockedAcdPool +
             systemBalances.interestHoldingPool +
             systemBalances.interestEarnedPool +
             systemBalances.exchangeAcd
         );
+    },
+
+    get actorsAcd() {
+        // it includes reserve. to get only user deduct augmint.actors.reserve.balance.acd
+        return Object.keys(this.actors).reduce((sum, actorId) => {
+            return sum + this.actors[actorId].balances.acd;
+        }, 0);
     }
 };
