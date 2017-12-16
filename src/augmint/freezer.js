@@ -56,10 +56,12 @@ function releaseACD(actorId, lockId) {
     // move acd lock -> user
     augmint.balances.lockedAcdPool -= lock.acdValue;
     augmint.actors[actorId].balances.acd += lock.acdValue;
-    // sanity check:
-    if (augmint.balances.lockedAcdPool < 0) {
-        throw new Error('lockedAcdPool has gone negative.');
-    }
+
+    // FIXME: uncomment these once changed to BigNumber
+    // // sanity check:
+    // if (augmint.balances.lockedAcdPool < 0) {
+    //     throw new Error('lockedAcdPool has gone negative: ', augmint.balances.lockedAcdPool);
+    // }
 
     // remove lock:
     delete locks[actorId][lockId];

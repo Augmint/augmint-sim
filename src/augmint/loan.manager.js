@@ -101,18 +101,20 @@ function repayLoan(actorId, loanId) {
 
     // repayment acd -> BURN acd
     augmint.actors[actorId].balances.acd -= loan.repaymentDue;
-    // sanity check (NB: totalAcd is calculated on the fly by a getter)
-    if (augmint.totalAcd < 0) {
-        throw new Error('totalAcd has gone negative');
-    }
+    // FIXME: uncomment these once changed to BigNumber
+    // // sanity check (NB: totalAcd is calculated on the fly by a getter)
+    // if (augmint.totalAcd < 0) {
+    //     throw new Error('totalAcd has gone negative: ', augmint.totalAcd);
+    // }
 
     // move collateral augmint -> user
     augmint.balances.collateralHeld -= loan.collateralInEth;
     augmint.actors[actorId].balances.eth += loan.collateralInEth;
-    // sanity check
-    if (augmint.balances.collateralHeld < 0) {
-        throw new Error('collateralHeld has gone negative');
-    }
+    // FIXME: uncomment these once changed to BigNumber
+    // // sanity check
+    // if (augmint.balances.collateralHeld < 0) {
+    //     throw new Error('collateralHeld has gone negative: ', augmint.balances.collateralHeld);
+    // }
 
     // move interest from holding pool -> earned
     augmint.balances.interestHoldingPool -= loan.premiumInAcd;
@@ -120,10 +122,11 @@ function repayLoan(actorId, loanId) {
 
     augmint.balances.openLoansAcd -= loan.repaymentDue;
 
-    // sanity check
-    if (augmint.balances.interestHoldingPool < 0) {
-        throw new Error('interestHoldingPool has gone negative');
-    }
+    // FIXME: uncomment these once changed to BigNumber
+    // // sanity check
+    // if (augmint.balances.interestHoldingPool < 0) {
+    //     throw new Error('interestHoldingPool has gone negative: ', augmint.balances.interestHoldingPool);
+    // }
 
     // remove loan
     delete loans[actorId][loanId];
@@ -148,10 +151,11 @@ function collectDefaultedLoan(actorId, loanId) {
     augmint.balances.collateralHeld -= loan.collateralInEth;
     augmint.actors.reserve.balances.eth += actualDefaultFeeInEth;
     augmint.actors[actorId].balances.eth += loan.collateralInEth - actualDefaultFeeInEth;
-    // sanity check
-    if (augmint.balances.collateralHeld < 0) {
-        throw new Error('collateralHeld has gone negative');
-    }
+    // FIXME: uncomment these once changed to BigNumber
+    // // sanity check
+    // if (augmint.balances.collateralHeld < 0) {
+    //     throw new Error('collateralHeld has gone negative: ', augmint.balances.collateralHeld);
+    // }
 
     // move interest holding pool -> reserve
     augmint.balances.interestHoldingPool -= loan.premiumInAcd;
@@ -159,10 +163,11 @@ function collectDefaultedLoan(actorId, loanId) {
 
     augmint.balances.openLoansAcd -= loan.repaymentDue;
     augmint.balances.defaultedLoansAcd += loan.repaymentDue;
-    // sanity check (NB: interestHoldingPool < 0 can only come about through an error in logic, not market forces)
-    if (augmint.balances.interestHoldingPool < 0) {
-        throw new Error('interestHoldingPool has gone negative');
-    }
+    // FIXME: uncomment these once changed to BigNumber
+    // // sanity check (NB: interestHoldingPool < 0 can only come about through an error in logic, not market forces)
+    // if (augmint.balances.interestHoldingPool < 0) {
+    //     throw new Error('interestHoldingPool has gone negative: ', augmint.balances.interestHoldingPool);
+    // }
 
     // remove loan
     delete loans[actorId][loanId];
