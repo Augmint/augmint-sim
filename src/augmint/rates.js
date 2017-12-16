@@ -1,27 +1,34 @@
 'use strict';
-const ONE_DAY_IN_SECS = 24 * 60 * 60;
-const START = 100;
-const rates = require('./rates.json');
-const augmint = require('./augmint.js');
 
-function updateRates(now) {
-    const day = Math.floor(now / ONE_DAY_IN_SECS) + START;
+const rates = require('./rates.json');
+const clock = require('../lib/clock');
+const augmint = require('./augmint.js');
+let dayAdjust = 0;
+
+function updateRates() {
+    const day = clock.getDay() + dayAdjust;
+
     if (!rates[day]) {
         throw new Error(
             'No ETH/USD historic price available for day ' +
                 day +
                 '\nLast date available: ' +
                 rates[day - 1].date +
-                '\nStarted on day ' +
-                START +
-                ' on ' +
-                rates[START].date
+                '\ndayAdjust: ' +
+                dayAdjust
         );
     }
     augmint.rates.ethToAcd = rates[day].open;
     augmint.rates.ethToUsd = rates[day].open;
 }
 
+function setDay(day) {
+    const currentDay = clock.getDay();
+    dayAdjust = day - currentDay;
+}
+
 module.exports = {
-    updateRates
+    updateRates,
+    setDay,
+    rates
 };

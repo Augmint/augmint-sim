@@ -11,7 +11,7 @@ const actors = new Set();
 
 function incrementBy(timeStep) {
     const now = clock.getTime();
-    rates.updateRates(now);
+    rates.updateRates();
     // actors make their moves:
     actors.forEach(actor => {
         actor.executeMoves(now);

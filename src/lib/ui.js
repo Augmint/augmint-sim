@@ -5,6 +5,7 @@ const TIME_STEP = 60 * 60 * 4; // 4 hours
 const simulation = require('./simulation.js');
 const loanManager = require('../augmint/loan.manager.js');
 const logger = require('./logger.js');
+const rates = require('../augmint/rates.js');
 const graphs = require('./graphs.js');
 const AugmintError = require('../augmint/augmint.error.js');
 
@@ -17,6 +18,7 @@ const dumpMovesLogBtn = document.querySelector('.dumpMovesLog-btn');
 const toggleLogBtn = document.querySelector('.toggleLog-btn');
 const logWrapper = document.querySelector('.log-wrapper');
 const logTextArea = document.querySelector('.log-textarea');
+const ratesDropDown = document.querySelector('.rates-dropdown');
 const inputs = Array.from(document.querySelectorAll('.sim-inputs input'));
 const graphsWrapper = document.querySelector('.graphs-wrapper');
 const errorMsg = document.querySelector('.error-msg');
@@ -73,11 +75,31 @@ function toggleLog() {
     }
 }
 
+function ratesDropDownOnChange(newDay) {
+    rates.setDay(newDay);
+}
+
+function populateRatesDropDown() {
+    return new Promise(resolve => {
+        for (let i = 0; i < rates.rates.length; i += 7) {
+            let el = document.createElement('option');
+            el.textContent = rates.rates[i].date + ' | ' + Math.round(rates.rates[i].close * 10000) / 10000;
+            el.value = i;
+            ratesDropDown.appendChild(el);
+        }
+        resolve();
+    });
+}
+
 function init() {
     graphs.init(graphsWrapper);
     logger.init(logTextArea);
 
+    populateRatesDropDown();
+
     pauseBtn.addEventListener('click', togglePause);
+
+    ratesDropDown.addEventListener('change', () => ratesDropDownOnChange(ratesDropDown.value));
 
     dumpStateBtn.addEventListener('click', () => {
         updateParamsFromUI();
