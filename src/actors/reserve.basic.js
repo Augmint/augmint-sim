@@ -8,7 +8,7 @@ class ReserveBasic extends Actor {
         super(id, balances, state, Object.assign({}, defaultParams, _params));
     }
 
-    executeMoves(now) {
+    executeMoves(state) {
         // TODO: add some delay in intervention (ie intervene only after a couple of ticks)
         const acdDemand = this.getAcdDemand();
         if (acdDemand < 0 && this.ethBalance > 0) {

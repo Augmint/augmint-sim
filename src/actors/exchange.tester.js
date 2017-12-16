@@ -13,9 +13,10 @@ class ExchangeTester extends Actor {
         this.setKey('stage', 1);
     }
 
-    executeMoves(now) {
+    executeMoves(state) {
+        const { currentTime } = state.meta;
         // gonna take action every 10 days:
-        const currentStage = Math.floor(now / (10 * ONE_DAY_IN_SECS));
+        const currentStage = Math.floor(currentTime / (10 * ONE_DAY_IN_SECS));
 
         if (currentStage !== this.getKey('stage')) {
             return;

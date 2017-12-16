@@ -14,13 +14,14 @@ class LockerBasic extends Actor {
         super(id, balances, state, Object.assign({}, defaultParams, _params));
     }
 
-    executeMoves(now) {
+    executeMoves(state) {
+        const { currentTime, stepsPerDay } = state.meta;
         let acdToConvert = Math.min(
             this.convertEthToAcd(this.ethBalance),
             this.params.INITIAL_ACD_CONVERTED - acdConverted
         );
 
-        if (acdToConvert > 0 && Math.random() < this.params.CHANCE_TO_LOCK) {
+        if (acdToConvert > 0 && Math.random() < this.params.CHANCE_TO_LOCK / stepsPerDay) {
             if (this.buyACD(acdToConvert)) {
                 acdConverted += acdToConvert;
             }
@@ -31,7 +32,10 @@ class LockerBasic extends Actor {
             this.lockACD(lockAmount);
         }
 
-        if (this.locks[0] && now >= this.locks[0].lockedUntil + this.params.RELEASE_DELAY_DAYS * ONE_DAY_IN_SECS) {
+        if (
+            this.locks[0] &&
+            currentTime >= this.locks[0].lockedUntil + this.params.RELEASE_DELAY_DAYS * ONE_DAY_IN_SECS
+        ) {
             // unlocks ACD:
             this.releaseACD(this.locks[0].id);
         }

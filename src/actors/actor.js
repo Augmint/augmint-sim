@@ -24,7 +24,7 @@ class Actor {
     }
 
     // BEHAVIOUR
-    executeMoves(now) {
+    executeMoves(state) {
         // to be implemented by child classes
     }
 

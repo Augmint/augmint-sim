@@ -134,8 +134,12 @@ function init() {
             type: 'BorrowerBasic',
 
             balances: {
-                eth: 50000000 /* "unlimited" ETH, we adjust loan demand with
-                                maxLoanAcdAmount set in always.borrower.js */
+                eth: 50000000 /* "unlimited" ETH, we adjust loan demand MAX_LOAN_AMOUNT_ACD */
+            },
+            params: {
+                MAX_LOAN_AMOUNT_ACD: 1000,
+                CHANCE_TO_TAKE_LOAN: 1, // always takes a loan when there isn't one
+                CHANCE_TO_SELL_ALL_ACD: 1 // immediately sells full ACD balance
             }
         },
         randomBorrower: {
@@ -147,7 +151,8 @@ function init() {
             },
             params: {
                 MAX_LOAN_AMOUNT_ACD: 3000,
-                CHANCE_TO_TAKE_LOAN: 0.01
+                CHANCE_TO_TAKE_LOAN: 0.05, // 10% chance to take a loan
+                CHANCE_TO_SELL_ALL_ACD: 0.1 // 10% chance to sell all ACD balance (unless repayment is due soon)
             }
         }
         // actor: { type: 'ExchangeTester', balances: { eth: 10000, acd: 10000 } }

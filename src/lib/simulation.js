@@ -8,24 +8,25 @@ const rates = require('../augmint/rates.js');
 const ActorDirectory = require('../actors/actor.directory.js');
 
 const actors = new Set();
+let timeStep = 60 * 60 * 4; // 4 hours
 
 function getState() {
     return {
         meta: {
             currentTime: clock.getTime(),
             currentDay: clock.getDay(),
-            timeStep: 60 * 60 * 4 // 4 hours
+            timeStep: timeStep,
+            stepsPerDay: 24 / (timeStep / 60 / 60)
         },
         augmint: augmint
     };
 }
 
 function incrementBy(timeStep = getState().meta.timeStep) {
-    const now = clock.getTime();
     rates.updateRates();
     // actors make their moves:
     actors.forEach(actor => {
-        actor.executeMoves(now);
+        actor.executeMoves(getState());
     });
 
     // system updates:
