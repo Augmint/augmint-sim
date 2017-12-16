@@ -5,15 +5,27 @@ const ONE_DAY_IN_SECS = 24 * 60 * 60;
 
 const graphs = [
     {
-        title: 'Total ACD',
+        title: 'ETH/USD',
         func: augmint => {
-            return Math.round(augmint.totalAcd);
+            return augmint.rates.ethToUsd;
         }
     },
     {
-        title: 'Interest Earned (ACD)',
+        title: 'Net ACD Demand',
         func: augmint => {
-            return augmint.balances.interestEarnedPool;
+            return Math.round(augmint.netAcdDemand);
+        }
+    },
+    {
+        title: 'ACD Demand (% of total ACD)',
+        func: augmint => {
+            return Math.round(augmint.netAcdDemand / augmint.totalAcd * 100) / 100;
+        }
+    },
+    {
+        title: 'Total ACD',
+        func: augmint => {
+            return Math.round(augmint.totalAcd);
         }
     },
     {
@@ -26,6 +38,12 @@ const graphs = [
         title: 'ETH Reserves',
         func: augmint => {
             return augmint.actors.reserve.balances.eth;
+        }
+    },
+    {
+        title: 'Interest Earned (ACD)',
+        func: augmint => {
+            return augmint.balances.interestEarnedPool;
         }
     },
     {
@@ -46,24 +64,7 @@ const graphs = [
             return augmint.balances.defaultedLoansAcd;
         }
     },
-    {
-        title: 'Net ACD Demand',
-        func: augmint => {
-            return Math.round(augmint.netAcdDemand);
-        }
-    },
-    {
-        title: 'ACD Demand (% of total ACD)',
-        func: augmint => {
-            return Math.round(augmint.netAcdDemand / augmint.totalAcd * 100) / 100;
-        }
-    },
-    {
-        title: 'ETH/USD',
-        func: augmint => {
-            return augmint.rates.ethToUsd;
-        }
-    },
+
     {
         title: 'ACD fees earned',
         func: augmint => {
