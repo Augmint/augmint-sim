@@ -2,7 +2,7 @@
 
 const Actor = require('./actor.js');
 
-class Reserve extends Actor {
+class ReserveBasic extends Actor {
     constructor(id, balances, state) {
         super(id, balances, state);
     }
@@ -20,4 +20,4 @@ class Reserve extends Actor {
     }
 }
 
-module.exports = Reserve;
+module.exports = ReserveBasic;

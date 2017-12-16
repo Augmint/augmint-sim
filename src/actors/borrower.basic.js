@@ -8,7 +8,7 @@ const REPAYMENT_COST_ACD = 5;
 const MAX_LOAN_AMOUNT_ACD = 1000;
 // TODO: add loan forgotten chance param ( 0.1%?)
 
-class AlwaysBorrower extends Actor {
+class BorrowerBasic extends Actor {
     constructor(id, balances, state) {
         super(id, balances, state);
     }
@@ -64,4 +64,4 @@ class AlwaysBorrower extends Actor {
     }
 }
 
-module.exports = AlwaysBorrower;
+module.exports = BorrowerBasic;

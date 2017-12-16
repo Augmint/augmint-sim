@@ -5,7 +5,7 @@ const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const RELEASE_DELAY_DAYS = 3;
 let totalAcdToConvert = 10000;
 
-class AlwaysLocker extends Actor {
+class LockerBasic extends Actor {
     constructor(id, balances, state) {
         super(id, balances, state);
     }
@@ -29,4 +29,4 @@ class AlwaysLocker extends Actor {
     }
 }
 
-module.exports = AlwaysLocker;
+module.exports = LockerBasic;

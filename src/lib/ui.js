@@ -103,18 +103,28 @@ function init() {
     });
     simulation.patchAugmintParams({ exchangeFeePercentage: 0.003 });
     simulation.addActors({
-        reserve: { type: 'Reserve', balances: { acd: 50000 /* genesis acd */, eth: 0 } },
+        reserve: { type: 'ReserveBasic', balances: { acd: 50000 /* genesis acd */, eth: 0 } },
         alwaysLocker: {
-            type: 'AlwaysLocker',
+            type: 'LockerBasic',
             balances: {
                 eth: 50000000 /* "unlimited" ETH, we set an initial one-off initial conversion
                                 with maxAcdToConvert set in always.locker.js */
             }
         },
         alwaysBorrower: {
-            type: 'AlwaysBorrower',
+            type: 'BorrowerBasic',
+
             balances: {
-                eth: 50000000 /* "unlimited" ETH, we adjust loan demand with maxLoanAcdAmount set in always.locker.js */
+                eth: 50000000 /* "unlimited" ETH, we adjust loan demand with
+                                maxLoanAcdAmount set in always.borrower.js */
+            }
+        },
+        randomBorrower: {
+            type: 'RandomBorrower',
+
+            balances: {
+                eth: 50000000 /* "unlimited" ETH, we adjust loan demand with
+                                maxLoanAcdAmount & CHANCE_TO_TAKE_LOAN set in random.borrower.js */
             }
         }
         // actor: { type: 'ExchangeTester', balances: { eth: 10000, acd: 10000 } }

@@ -3,10 +3,10 @@
 'use strict';
 
 module.exports = {
-    Reserve: require('./reserve.js'),
+    ReserveBasic: require('./reserve.basic.js'),
     RandomLocker: require('./random.locker.js'),
     RandomBorrower: require('./random.borrower.js'),
     ExchangeTester: require('./exchange.tester.js'),
-    AlwaysLocker: require('./always.locker.js'),
-    AlwaysBorrower: require('./always.borrower.js')
+    LockerBasic: require('./locker.basic.js'),
+    BorrowerBasic: require('./borrower.basic.js')
 };
