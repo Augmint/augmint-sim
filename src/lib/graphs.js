@@ -80,6 +80,17 @@ const graphs = [
 ];
 
 function init(wrapper) {
+    Chart.defaults.global.responsive = false;
+    Chart.defaults.global.maintainAspectRatio = true;
+    Chart.defaults.global.title.display = true;
+    Chart.defaults.global.tooltips.enabled = false;
+    Chart.defaults.global.animation.duration = 0;
+    Chart.defaults.global.hover.mode = null;
+    Chart.defaults.global.legend.display = false;
+    Chart.defaults.global.elements.line.tension = 0;
+    Chart.defaults.global.elements.line.borderWidth = 2;
+    Chart.defaults.global.elements.line.borderColor = 'rgb(230, 88, 88)';
+    Chart.defaults.global.elements.point.radius = 0;
     graphs.forEach(graph => {
         const canvas = document.createElement('canvas');
         wrapper.appendChild(canvas);
@@ -98,20 +109,12 @@ function init(wrapper) {
                 datasets: [
                     {
                         label: graph.title,
-                        data: graph.yData,
-                        radius: 0,
-                        borderColor: 'rgb(230, 88, 88)'
+                        data: graph.yData
                     }
                 ]
             },
             options: {
-                title: { display: true, text: graph.title },
-                responsive: false,
-                maintainAspectRatio: true,
-                tooltips: { enabled: false },
-                animation: { duration: 0 },
-                hover: { mode: null },
-                legend: { display: false }
+                title: { text: graph.title }
             }
         });
     });
