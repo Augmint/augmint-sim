@@ -120,11 +120,15 @@ function init() {
             }
         },
         randomBorrower: {
-            type: 'RandomBorrower',
+            type: 'BorrowerBasic',
 
             balances: {
                 eth: 50000000 /* "unlimited" ETH, we adjust loan demand with
                                 maxLoanAcdAmount & CHANCE_TO_TAKE_LOAN set in random.borrower.js */
+            },
+            params: {
+                MAX_LOAN_AMOUNT_ACD: 3000,
+                CHANCE_TO_TAKE_LOAN: 0.01
             }
         }
         // actor: { type: 'ExchangeTester', balances: { eth: 10000, acd: 10000 } }

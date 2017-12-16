@@ -7,9 +7,10 @@ const loanManager = require('../augmint/loan.manager.js');
 const logger = require('../lib/logger.js');
 const freezer = require('../augmint/freezer.js');
 const exchange = require('../augmint/exchange.js');
+const defaultParams = {};
 
 class Actor {
-    constructor(id, balances = {}, state = null) {
+    constructor(id, balances = {}, state = null, _params) {
         this.id = id;
         augmint.actors[this.id] = {
             balances: {
@@ -17,7 +18,8 @@ class Actor {
                 acd: balances.acd || 0
             },
             state: state || {},
-            type: this.constructor.name
+            type: this.constructor.name,
+            params: Object.assign({}, defaultParams, _params)
         };
     }
 
@@ -54,6 +56,10 @@ class Actor {
         return Object.keys(locksHashMap).map(lockId => {
             return locksHashMap[lockId];
         });
+    }
+
+    get params() {
+        return augmint.actors[this.id].params;
     }
 
     // GENERAL STATE:

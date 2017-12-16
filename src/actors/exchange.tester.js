@@ -5,10 +5,11 @@
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 
 const Actor = require('./actor.js');
+const defaultParams = {};
 
 class ExchangeTester extends Actor {
-    constructor(id, balances, state) {
-        super(id, balances, state);
+    constructor(id, balances, state, _params = {}) {
+        super(id, balances, state, Object.assign({}, defaultParams, _params));
         this.setKey('stage', 1);
     }
 
