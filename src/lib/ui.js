@@ -1,6 +1,5 @@
 'use strict';
 
-const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const TIME_STEP = 60 * 60 * 4; // 4 hours
 
 const simulation = require('./simulation.js');
@@ -146,7 +145,7 @@ function init() {
 
 function render() {
     const state = simulation.getState();
-    const daysPassed = Math.floor(state.meta.currentTime / ONE_DAY_IN_SECS);
+    const daysPassed = state.meta.currentDay;
 
     // only re-render once per day:
     if (daysPassed > lastRender) {

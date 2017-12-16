@@ -26,7 +26,8 @@ function incrementBy(timeStep) {
 function getState() {
     return {
         meta: {
-            currentTime: clock.getTime()
+            currentTime: clock.getTime(),
+            currentDay: clock.getDay()
         },
         augmint: augmint
     };

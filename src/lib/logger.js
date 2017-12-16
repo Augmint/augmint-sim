@@ -1,6 +1,5 @@
 'use strict';
 const clock = require('./clock.js');
-const ONE_DAY_IN_SECS = 24 * 60 * 60;
 let printEachIteration = false;
 let printEachMove = true;
 
@@ -57,8 +56,7 @@ function toCsv(_array) {
 }
 
 function logMove(actor, move, params) {
-    const now = clock.getTime();
-    const daysPassed = Math.floor(now / ONE_DAY_IN_SECS);
+    const daysPassed = clock.getDay();
     const logItem = [daysPassed, iteration, move, actor, params];
     if (printEachMove) {
         if (movesLog.length === 1) {
@@ -70,8 +68,7 @@ function logMove(actor, move, params) {
 }
 
 function logIteration(augmint) {
-    const now = clock.getTime();
-    const daysPassed = Math.floor(now / ONE_DAY_IN_SECS);
+    const daysPassed = clock.getDay();
     const logItem = [
         daysPassed,
         iteration,
