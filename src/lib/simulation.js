@@ -27,7 +27,8 @@ function getState() {
     return {
         meta: {
             currentTime: clock.getTime(),
-            currentDay: clock.getDay()
+            currentDay: clock.getDay(),
+            timeStep: 60 * 60 * 4 // 4 hours
         },
         augmint: augmint
     };

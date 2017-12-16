@@ -1,7 +1,5 @@
 'use strict';
 
-const TIME_STEP = 60 * 60 * 4; // 4 hours
-
 const simulation = require('./simulation.js');
 const loanManager = require('../augmint/loan.manager.js');
 const logger = require('./logger.js');
@@ -180,7 +178,7 @@ function render() {
 function mainLoop() {
     if (!paused) {
         try {
-            simulation.incrementBy(TIME_STEP);
+            simulation.incrementBy(simulation.getState().meta.timeStep);
         } catch (err) {
             if (err instanceof AugmintError) {
                 console.error(err);
