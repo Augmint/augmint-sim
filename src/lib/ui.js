@@ -178,7 +178,7 @@ function render() {
 function mainLoop() {
     if (!paused) {
         try {
-            simulation.incrementBy(simulation.getState().meta.timeStep);
+            simulation.incrementBy();
         } catch (err) {
             if (err instanceof AugmintError) {
                 console.error(err);

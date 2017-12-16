@@ -9,7 +9,18 @@ const ActorDirectory = require('../actors/actor.directory.js');
 
 const actors = new Set();
 
-function incrementBy(timeStep) {
+function getState() {
+    return {
+        meta: {
+            currentTime: clock.getTime(),
+            currentDay: clock.getDay(),
+            timeStep: 60 * 60 * 4 // 4 hours
+        },
+        augmint: augmint
+    };
+}
+
+function incrementBy(timeStep = getState().meta.timeStep) {
     const now = clock.getTime();
     rates.updateRates();
     // actors make their moves:
@@ -21,17 +32,6 @@ function incrementBy(timeStep) {
     loanManager.collectAllDefaultedLoans();
     logger.logIteration(augmint);
     clock.incrementBy(timeStep);
-}
-
-function getState() {
-    return {
-        meta: {
-            currentTime: clock.getTime(),
-            currentDay: clock.getDay(),
-            timeStep: 60 * 60 * 4 // 4 hours
-        },
-        augmint: augmint
-    };
 }
 
 function patchAugmintParams(params) {
