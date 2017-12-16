@@ -1,5 +1,5 @@
 'use strict';
-/*  global Chart */
+const Chart = require('chart.js');
 
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 

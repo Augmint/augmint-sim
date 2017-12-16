@@ -4,16 +4,19 @@
     "description": "Augmint Simulator",
     "homepage": ".",
     "private": true,
-    "dependencies": {},
+    "dependencies": {
+        "chart.js": "2.7.1"
+    },
     "scripts": {
         "build": "webpack",
-        "dev": "NODE_ENV=development webpack-dev-server --progress --colors --content-base dist/  --watch --hot --inline --config  webpack.config.js"
+        "dev":
+            "NODE_ENV=development webpack-dev-server --progress --colors --content-base dist/  --watch --hot --inline --config  webpack.config.js"
     },
     "devDependencies": {
         "browserify": "14.5.0",
         "copy-webpack-plugin": "4.3.0",
         "watchify": "3.9.0",
         "webpack": "3.10.0",
-        "webpack-dev-server": "^2.9.7"
+        "webpack-dev-server": "2.9.7"
     }
 }
