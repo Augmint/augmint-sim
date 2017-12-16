@@ -9,17 +9,21 @@ let logTextArea;
 const iterationLogHeader = [
     'day',
     ' iteration',
+    ' ethUsd',
+    ' netAcdDemand',
     ' acdReserve',
+    ' ethReserve',
     ' acdFeesEarned',
     ' lockedAcdPool',
+    ' openLoansAcd',
+    ' defaultedLoansAcd',
     ' interestHoldingPool',
     ' interestEarnedPool',
-    ' ethReserve',
     ' ethFeesEarned',
     ' collateralHeld'
 ];
 let iterationLog = new Array(iterationLogHeader);
-const movesLogHeader = [' day', ' iteration', ' move', ' actor', ' params'];
+const movesLogHeader = [' day', ' iteration', ' actor', ' move', ' params'];
 let movesLog = new Array(movesLogHeader);
 
 function init(_logTextArea) {
@@ -57,7 +61,7 @@ function toCsv(_array) {
 
 function logMove(actor, move, params) {
     const daysPassed = clock.getDay();
-    const logItem = [daysPassed, iteration, move, actor, params];
+    const logItem = [daysPassed, iteration, actor, move, params];
     if (printEachMove) {
         if (movesLog.length === 1) {
             addToLogTextArea('MOVE, ' + movesLogHeader + '\n');
@@ -72,12 +76,16 @@ function logIteration(augmint) {
     const logItem = [
         daysPassed,
         iteration,
+        augmint.rates.ethToUsd,
+        augmint.netAcdDemand,
         augmint.actors.reserve.balances.acd,
+        augmint.actors.reserve.balances.eth,
         augmint.balances.acdFeesEarned,
         augmint.balances.lockedAcdPool,
+        augmint.balances.openLoansAcd,
+        augmint.balances.defaultedLoansAcd,
         augmint.balances.interestHoldingPool,
         augmint.balances.interestEarnedPool,
-        augmint.actors.reserve.balances.eth,
         augmint.balances.ethFeesEarned,
         augmint.balances.collateralHeld
     ];
