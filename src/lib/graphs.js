@@ -1,81 +1,160 @@
 'use strict';
 const Chart = require('chart.js');
+const DARKGREEN = 'rgba(3, 71, 50, 1)';
+const GREEN = 'rgba(0, 129, 72, 1)';
+const YELLOW = 'rgba(198, 192, 19, 1)';
+const ORANGE = 'rgba(239, 138, 23, 1)';
+const RED = 'rgba(239, 41, 23, 1)';
+const DARKRED = 'rgba(141, 8, 1, 1)';
 
+const GREY_OPA = 'rgb(230, 88, 88)';
+const TRANSPARENT = 'rgba(0, 0, 0, 0)';
+const DARKGREEN_OPA = 'rgba(3, 71, 50, 0.2)';
+const GREEN_OPA = 'rgba(0, 129, 72,  0.2)';
+const YELLOW_OPA = 'rgba(198, 192, 19,  0.2)';
+const ORANGE_OPA = 'rgba(239, 138, 23,  0.2)';
+const RED_OPA = 'rgba(239, 41, 23,  0.2)';
+const DARKRED_OPA = 'rgba(141, 8, 1,  0.2)';
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 
+// prettier-ignore
 const graphs = [
     {
         title: 'ETH/USD',
-        func: augmint => {
-            return augmint.rates.ethToUsd;
-        }
+        options: { scales: { yAxes: [ {ticks: { suggestedMax: 2 } } ] } },
+        datasets: [{
+            func: augmint => { return augmint.rates.ethToUsd; },
+            options: { backgroundColor: TRANSPARENT}
+        }]
     },
     {
         title: 'Net ACD Demand',
-        func: augmint => {
-            return Math.round(augmint.netAcdDemand);
-        }
+        options: { scales: { yAxes: [ {ticks: { min: undefined } } ] } },
+        datasets: [{
+            func: augmint => { return Math.round(augmint.netAcdDemand);}
+        }]
     },
     {
         title: 'ACD Demand (% of total ACD)',
-        func: augmint => {
-            return Math.round(augmint.netAcdDemand / augmint.totalAcd * 100) / 100;
-        }
+        options: { scales: { yAxes: [ {ticks: {min: undefined} }]}},
+        datasets: [{
+            func: augmint => {
+                return Math.round(augmint.netAcdDemand / augmint.totalAcd * 100);
+            },
+            options: { backgroundColor: TRANSPARENT }
+        }]
     },
     {
         title: 'Total ACD',
-        func: augmint => {
-            return Math.round(augmint.totalAcd);
-        }
+        datasets: [{
+            func: augmint => { return Math.round(augmint.totalAcd); }
+        }]
+    },
+    {
+        title: 'ACD Supply Distribution',
+        options: {
+            title: { display: false },
+            legend: { display: true },
+            scales: { yAxes: [{ stacked: true}]},
+            tooltips: { enabled: true , mode: 'index', intersect: false}
+        },
+        datasets: [
+            {
+                func: augmint => { return (augmint.actors.reserve.balances.acd); },
+                options: {
+                    label: 'Acd reserve',
+                    borderColor: DARKGREEN,
+                    backgroundColor: DARKGREEN_OPA
+                }
+            },
+            {
+                func: augmint => {
+                    return (
+                        augmint.balances.interestEarnedPool +
+                        augmint.balances.interestHoldingPool +
+                        augmint.balances.exchangeAcd
+                    );
+                },
+                options: {
+                    label: 'sys accs',
+                    borderColor: GREEN,
+                    backgroundColor: GREEN_OPA
+                }
+            },
+            {
+                func: augmint => { return augmint.balances.lockedAcdPool; },
+                options: {
+                    label: 'locked',
+                    borderColor: YELLOW,
+                    backgroundColor: YELLOW_OPA
+                }
+            },
+            {
+                func: augmint => {
+                    return augmint.actorsAcd - augmint.actors.reserve.balances.acd;
+                },
+                options: {
+                    label: 'user accs',
+                    borderColor: RED,
+                    backgroundColor: RED_OPA
+                }
+            }
+        ]
+    },
+    {
+        title: 'ACD on user accs',
+        datasets: [{
+            func: augmint => { return augmint.actorsAcd - augmint.actors.reserve.balances.acd; }
+        }]
     },
     {
         title: 'ACD Reserves',
-        func: augmint => {
-            return augmint.actors.reserve.balances.acd;
-        }
+        datasets: [{
+            func: augmint => { return augmint.actors.reserve.balances.acd; }
+        }]
     },
     {
         title: 'ETH Reserves',
-        func: augmint => {
-            return augmint.actors.reserve.balances.eth;
-        }
+        datasets: [{
+            func: augmint => { return augmint.actors.reserve.balances.eth; }
+        }]
     },
     {
         title: 'Interest Earned (ACD)',
-        func: augmint => {
-            return augmint.balances.interestEarnedPool;
-        }
+        datasets: [{
+            func: augmint => { return augmint.balances.interestEarnedPool; }
+        }]
     },
     {
         title: 'ACD Locked',
-        func: augmint => {
-            return augmint.balances.lockedAcdPool;
-        }
+        datasets: [{
+            func: augmint => { return augmint.balances.lockedAcdPool; }
+        }]
     },
     {
         title: 'ACD in open Loans',
-        func: augmint => {
-            return augmint.balances.openLoansAcd;
-        }
+        datasets: [{
+            func: augmint => { return augmint.balances.openLoansAcd; }
+        }]
     },
     {
         title: 'Total default Loans (ACD)',
-        func: augmint => {
-            return augmint.balances.defaultedLoansAcd;
-        }
+        datasets: [{
+            func: augmint => { return augmint.balances.defaultedLoansAcd; }
+        }]
     },
 
     {
         title: 'ACD fees earned',
-        func: augmint => {
-            return augmint.balances.acdFeesEarned;
-        }
+        datasets: [{
+            func: augmint => { return augmint.balances.acdFeesEarned; }
+        }]
     },
     {
         title: 'ETH fees earned',
-        func: augmint => {
-            return augmint.balances.ethFeesEarned;
-        }
+        datasets: [{
+            func: augmint => { return augmint.balances.ethFeesEarned; }
+        }]
     }
 ];
 
@@ -89,8 +168,15 @@ function init(wrapper) {
     Chart.defaults.global.legend.display = false;
     Chart.defaults.global.elements.line.tension = 0;
     Chart.defaults.global.elements.line.borderWidth = 2;
-    Chart.defaults.global.elements.line.borderColor = 'rgb(230, 88, 88)';
+    Chart.defaults.global.elements.line.borderColor = GREY_OPA;
     Chart.defaults.global.elements.point.radius = 0;
+    Chart.scaleService.updateScaleDefaults('linear', {
+        ticks: {
+            min: 0,
+            suggestedMax: 10
+        }
+    });
+
     graphs.forEach(graph => {
         const canvas = document.createElement('canvas');
         wrapper.appendChild(canvas);
@@ -101,21 +187,31 @@ function init(wrapper) {
         graph.canvas = canvas;
         graph.ctx = canvas.getContext('2d');
         graph.xData = [];
-        graph.yData = [];
+        graph.datasetsPassed = [];
+        graph.datasets.forEach(dataset => {
+            dataset.yData = [];
+            graph.datasetsPassed.push(
+                Object.assign(
+                    {
+                        label: dataset.options ? dataset.options.label || graph.title : 'NA',
+                        data: dataset.yData
+                    },
+                    dataset.options
+                )
+            );
+        });
         graph.chart = new Chart(graph.ctx, {
-            type: 'line',
+            type: graph.type || 'line',
             data: {
                 labels: graph.xData,
-                datasets: [
-                    {
-                        label: graph.title,
-                        data: graph.yData
-                    }
-                ]
+                datasets: graph.datasetsPassed
             },
-            options: {
-                title: { text: graph.title }
-            }
+            options: Object.assign(
+                {
+                    title: { text: graph.title }
+                },
+                graph.options
+            )
         });
     });
 }
@@ -124,14 +220,15 @@ function update(timeInSecs, augmint) {
     graphs.forEach(graph => {
         // update data for graphs:
         graph.xData.push(Math.floor(timeInSecs / ONE_DAY_IN_SECS));
-        graph.yData.push(graph.func(augmint));
+        graph.datasets.forEach(dataset => {
+            dataset.yData.push(dataset.func(augmint));
+            if (dataset.yData.length > 365) {
+                dataset.yData.shift();
+            }
+        });
 
         if (graph.xData.length > 365) {
             graph.xData.shift();
-        }
-
-        if (graph.yData.length > 365) {
-            graph.yData.shift();
         }
 
         // redraw:
