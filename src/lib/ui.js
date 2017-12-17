@@ -118,7 +118,7 @@ function init() {
 
     // TODO: have proper start up stuff:
     simulation.patchAugmintBalances({
-        interestEarnedPool: 500 /* genesis */
+        interestEarnedPool: 3000 /* genesis */
     });
     simulation.patchAugmintParams({ exchangeFeePercentage: 0.003 });
     simulation.addActors({
@@ -126,15 +126,22 @@ function init() {
         alwaysLocker: {
             type: 'LockerBasic',
             balances: {
-                eth: 50000000 /* "unlimited" ETH, we set an initial one-off initial conversion
-                                with maxAcdToConvert set in always.locker.js */
+                eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_LOCK & INITIAL_ACD_CONVERTED */
+            }
+        },
+        randomLocker: {
+            type: 'LockerBasic',
+            count: 2,
+            balances: {
+                eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_LOCK & INITIAL_ACD_CONVERTED */,
+                CHANCE_TO_LOCK: 0.1
             }
         },
         alwaysBorrower: {
             type: 'BorrowerBasic',
 
             balances: {
-                eth: 50000000 /* "unlimited" ETH, we adjust loan demand MAX_LOAN_AMOUNT_ACD */
+                eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_TAKE_LOAN & CHANCE_TO_TAKE_LOAN  */
             },
             params: {
                 MAX_LOAN_AMOUNT_ACD: 1000,
@@ -144,15 +151,14 @@ function init() {
         },
         randomBorrower: {
             type: 'BorrowerBasic',
-
+            count: 2,
             balances: {
-                eth: 50000000 /* "unlimited" ETH, we adjust loan demand with
-                                maxLoanAcdAmount & CHANCE_TO_TAKE_LOAN set in random.borrower.js */
+                eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_TAKE_LOAN & CHANCE_TO_TAKE_LOAN  */
             },
             params: {
                 MAX_LOAN_AMOUNT_ACD: 3000,
-                CHANCE_TO_TAKE_LOAN: 0.05, // 10% chance to take a loan
-                CHANCE_TO_SELL_ALL_ACD: 0.1 // 10% chance to sell all ACD balance (unless repayment is due soon)
+                CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan
+                CHANCE_TO_SELL_ALL_ACD: 0.1 // % chance to sell all ACD balance (unless repayment is due soon)
             }
         }
         // actor: { type: 'ExchangeTester', balances: { eth: 10000, acd: 10000 } }

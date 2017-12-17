@@ -46,7 +46,11 @@ function patchAugmintBalances(balances) {
 function addActors(newActors) {
     Object.keys(newActors).forEach(actorId => {
         const actor = newActors[actorId];
-        actors.add(new ActorDirectory[actor.type](actorId, actor.balances, actor.state, actor.params));
+        let count = actor.count ? actor.count : 1;
+        for (let i = 0; i < count; i++) {
+            let name = count > 1 ? actorId + '_' + (i + 1) : actorId;
+            actors.add(new ActorDirectory[actor.type](name, actor.balances, actor.state, actor.params));
+        }
     });
 }
 

@@ -91,7 +91,9 @@ function repayLoan(actorId, loanId) {
 
     if (augmint.actors[actorId].balances.acd < loan.repaymentDue) {
         console.error(
-            'repayLoan() ACD balance of',
+            'repayLoan() ACD balance of ',
+            actorId,
+            ' balance: ',
             augmint.actors[actorId].balances.acd,
             'is not enough to repay ',
             loan.repaymentDue

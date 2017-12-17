@@ -3,27 +3,27 @@
 const Actor = require('./actor.js');
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const defaultParams = {
-    RELEASE_DELAY_DAYS: 3,
+    RELEASE_DELAY_DAYS: 2,
     CHANCE_TO_LOCK: 1,
     INITIAL_ACD_CONVERTED: 10000
 };
-let acdConverted = 0;
 
 class LockerBasic extends Actor {
     constructor(id, balances, state, _params = {}) {
         super(id, balances, state, Object.assign({}, defaultParams, _params));
+        this.acdConverted = 0;
     }
 
     executeMoves(state) {
         const { currentTime, stepsPerDay } = state.meta;
         let acdToConvert = Math.min(
             this.convertEthToAcd(this.ethBalance),
-            this.params.INITIAL_ACD_CONVERTED - acdConverted
+            this.params.INITIAL_ACD_CONVERTED - this.acdConverted
         );
 
         if (acdToConvert > 0 && Math.random() < this.params.CHANCE_TO_LOCK / stepsPerDay) {
             if (this.buyACD(acdToConvert)) {
-                acdConverted += acdToConvert;
+                this.acdConverted += acdToConvert;
             }
         }
         let lockAmount = Math.min(this.acdBalance, this.getMaxLockableAcd());
