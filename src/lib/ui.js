@@ -24,6 +24,8 @@ const errorMsg = document.querySelector('.error-msg');
 let lastRender = -1;
 let paused = true;
 let logVisible = false;
+let benchmarkStart;
+let benchmarkItCt;
 
 function updateParamsFromUI() {
     const params = {};
@@ -47,12 +49,21 @@ function togglePause() {
 
     if (paused) {
         // pausing sim:
+        let runTime = Date.now() - benchmarkStart;
         pauseBtn.innerHTML = 'Continue';
         inputs.forEach(input => {
             input.disabled = false;
         });
+
+        console.debug(
+            'Benchmark: iterations/sec: ',
+            benchmarkItCt / (runTime / 1000),
+            'iteration count:' + benchmarkItCt + ' running time: ' + runTime + 'ms'
+        );
     } else {
         // restarting sim:
+        benchmarkStart = Date.now();
+        benchmarkItCt = 0;
         pauseBtn.innerHTML = 'Pause';
         inputs.forEach(input => {
             input.disabled = true;
@@ -197,6 +208,7 @@ function render() {
 
 function mainLoop() {
     if (!paused) {
+        benchmarkItCt++;
         try {
             simulation.incrementBy();
         } catch (err) {
