@@ -109,7 +109,16 @@ function init() {
     });
 
     dumpMovesLogBtn.addEventListener('click', () => {
+        let startPos = logTextArea.textLength;
         logger.printMovesLog();
+        logTextArea.focus();
+        let endPos = logTextArea.textLength;
+        startPos += logTextArea.value.substring(startPos, endPos).indexOf('\n') + 1;
+        endPos = startPos + logTextArea.value.substring(startPos, endPos - 2).lastIndexOf('\n');
+        logTextArea.selectionStart = startPos;
+        logTextArea.selectionEnd = endPos;
+        document.execCommand('copy');
+        alert('Moves log CSV copied to clipboard');
     });
 
     toggleLogBtn.addEventListener('click', toggleLog);
