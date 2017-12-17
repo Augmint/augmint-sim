@@ -207,7 +207,9 @@ function render() {
 }
 
 function mainLoop() {
-    if (!paused) {
+    let doFrame = false;
+    let start = Date.now();
+    while (!paused && !doFrame) {
         benchmarkItCt++;
         try {
             simulation.incrementBy();
@@ -221,8 +223,8 @@ function mainLoop() {
             }
         }
         render();
+        doFrame = Date.now() - start > 10;
     }
-
     requestAnimationFrame(mainLoop);
 }
 
