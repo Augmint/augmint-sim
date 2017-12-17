@@ -32,8 +32,11 @@ function init(_logTextArea) {
 }
 
 function addToLogTextArea(text) {
-    logTextArea.value += text;
-    logTextArea.scrollTop = logTextArea.scrollHeight;
+    return new Promise(resolve => {
+        logTextArea.value += text;
+        logTextArea.scrollTop = logTextArea.scrollHeight;
+        resolve();
+    });
 }
 
 function print(objToPrint) {
@@ -50,9 +53,9 @@ function toCsv(_array) {
         let line = _array[i][0];
         for (let j = 1; j < _array[i].length; j++) {
             if (typeof _array[i][j] === 'object') {
-                line += ', ' + JSON.stringify(_array[i][j]);
+                line += '\t ' + JSON.stringify(_array[i][j]);
             } else {
-                line += ', ' + _array[i][j];
+                line += '\t ' + _array[i][j];
             }
         }
         ret += line;
@@ -98,6 +101,7 @@ function logIteration(augmint) {
         }
         addToLogTextArea('ITERATION ' + toCsv(new Array(logItem)) + '\n');
     }
+    logMove(augmint, 'simulation', 'New iteration', '');
     iterationLog.push(logItem);
     iteration++;
 }

@@ -46,6 +46,7 @@ function setParams(_params) {
 }
 
 function incrementBy(_timeStep = params.timeStep) {
+    logger.logIteration(augmint);
     rates.updateRates();
     // actors make their moves:
     actors.forEach(actor => {
@@ -54,7 +55,6 @@ function incrementBy(_timeStep = params.timeStep) {
 
     // system updates:
     loanManager.collectAllDefaultedLoans();
-    logger.logIteration(augmint);
     clock.incrementBy(_timeStep);
 }
 

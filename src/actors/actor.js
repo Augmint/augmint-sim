@@ -103,36 +103,42 @@ class Actor {
 
     // MOVE SET:
     buyACD(acdAmount) {
+        let ret = exchange.buyACD(this.id, acdAmount);
         logger.logMove(augmint, this.id, 'buyAcd order', { acdAmount: acdAmount });
-        return exchange.buyACD(this.id, acdAmount);
+        return ret;
     }
 
     sellACD(acdAmount) {
+        let ret = exchange.sellACD(this.id, acdAmount);
         logger.logMove(augmint, this.id, 'sellAcd order', { acdAmount: acdAmount });
-        return exchange.sellACD(this.id, acdAmount);
+        return ret;
     }
 
     lockACD(acdAmount) {
+        let ret = freezer.lockACD(this.id, acdAmount);
         logger.logMove(augmint, this.id, 'lockACD', { acdAmount: acdAmount });
-        return freezer.lockACD(this.id, acdAmount);
+        return ret;
     }
 
     releaseACD(lockId) {
+        let ret = freezer.releaseACD(this.id, lockId);
         logger.logMove(augmint, this.id, 'releaseACD', { lockId: lockId });
-        return freezer.releaseACD(this.id, lockId);
+        return ret;
     }
 
     takeLoan(loanProductId, loanAmountInAcd) {
+        let ret = loanManager.takeLoan(this.id, loanProductId, loanAmountInAcd);
         logger.logMove(augmint, this.id, 'takeLoan', {
             loanProductId: loanProductId,
             loanAmountInAcd: loanAmountInAcd
         });
-        return loanManager.takeLoan(this.id, loanProductId, loanAmountInAcd);
+        return ret;
     }
 
     repayLoan(loanId) {
+        let ret = loanManager.repayLoan(this.id, loanId);
         logger.logMove(augmint, this.id, 'repayLoan', { loanId: loanId });
-        return loanManager.repayLoan(this.id, loanId);
+        return ret;
     }
 }
 
