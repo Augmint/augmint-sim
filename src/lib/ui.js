@@ -47,7 +47,7 @@ function togglePause() {
 
     if (paused) {
         // pausing sim:
-        pauseBtn.innerHTML = 'Start';
+        pauseBtn.innerHTML = 'Continue';
         inputs.forEach(input => {
             input.disabled = false;
         });
