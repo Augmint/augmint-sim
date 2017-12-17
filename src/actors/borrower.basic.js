@@ -1,5 +1,6 @@
 'use strict';
 
+const AugmintError = require('../augmint/augmint.error.js');
 const Actor = require('./actor.js');
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const defaultParams = {
@@ -58,7 +59,7 @@ class BorrowerBasic extends Actor {
             ) {
                 // repays ACD:
                 if (!this.repayLoan(this.loans[0].id)) {
-                    throw new Error(
+                    throw new AugmintError(
                         'Always borrower couldn\'t repay.\n' +
                             'repaymentDue: ' +
                             repaymentDue +

@@ -2,11 +2,11 @@
 
 'use strict';
 
-const ONE_DAY_IN_SECS = 24 * 60 * 60;
-
+//const AugmintError = require('../augmint/augmint.error.js');
 const augmint = require('./augmint.js');
 const clock = require('../lib/clock.js');
 
+const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const locks = augmint.locks;
 // just using a simple counter for id-ing locks:
 let counter = 0;
@@ -60,7 +60,7 @@ function releaseACD(actorId, lockId) {
     // FIXME: uncomment these once changed to BigNumber
     // // sanity check:
     // if (augmint.balances.lockedAcdPool < 0) {
-    //     throw new Error('lockedAcdPool has gone negative: ', augmint.balances.lockedAcdPool);
+    //     throw new AugmintError('lockedAcdPool has gone negative: ', augmint.balances.lockedAcdPool);
     // }
 
     // remove lock:

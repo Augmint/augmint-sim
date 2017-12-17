@@ -2,6 +2,7 @@
 
 'use strict';
 
+const AugmintError = require('../augmint/augmint.error.js');
 const augmint = require('./augmint.js');
 const clock = require('../lib/clock.js');
 const logger = require('../lib/logger.js');
@@ -37,7 +38,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     const loanProduct = loanProducts[loanProductId];
 
     if (!loanProduct) {
-        throw new Error('takeLoan() error: Invalid loanProduct Id:' + loanProductId);
+        throw new AugmintError('takeLoan() error: Invalid loanProduct Id:' + loanProductId);
     }
 
     if (loanAmountInAcd < loanProduct.minimumLoanInAcd) {
@@ -84,7 +85,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
 
 function repayLoan(actorId, loanId) {
     if (!loans[actorId] || !loans[actorId][loanId]) {
-        throw new Error('repayLoan() error. Invalid actorId (' + actorId + ') or loanId(' + loanId + ')');
+        throw new AugmintError('repayLoan() error. Invalid actorId (' + actorId + ') or loanId(' + loanId + ')');
     }
 
     const loan = loans[actorId][loanId];
@@ -106,7 +107,7 @@ function repayLoan(actorId, loanId) {
     // FIXME: uncomment these once changed to BigNumber
     // // sanity check (NB: totalAcd is calculated on the fly by a getter)
     // if (augmint.totalAcd < 0) {
-    //     throw new Error('totalAcd has gone negative: ', augmint.totalAcd);
+    //     throw new AugmintError('totalAcd has gone negative: ', augmint.totalAcd);
     // }
 
     // move collateral augmint -> user
@@ -115,7 +116,7 @@ function repayLoan(actorId, loanId) {
     // FIXME: uncomment these once changed to BigNumber
     // // sanity check
     // if (augmint.balances.collateralHeld < 0) {
-    //     throw new Error('collateralHeld has gone negative: ', augmint.balances.collateralHeld);
+    //     throw new AugmintError('collateralHeld has gone negative: ', augmint.balances.collateralHeld);
     // }
 
     // move interest from holding pool -> earned
@@ -127,7 +128,7 @@ function repayLoan(actorId, loanId) {
     // FIXME: uncomment these once changed to BigNumber
     // // sanity check
     // if (augmint.balances.interestHoldingPool < 0) {
-    //     throw new Error('interestHoldingPool has gone negative: ', augmint.balances.interestHoldingPool);
+    //     throw new AugmintError('interestHoldingPool has gone negative: ', augmint.balances.interestHoldingPool);
     // }
 
     // remove loan
@@ -156,7 +157,7 @@ function collectDefaultedLoan(actorId, loanId) {
     // FIXME: uncomment these once changed to BigNumber
     // // sanity check
     // if (augmint.balances.collateralHeld < 0) {
-    //     throw new Error('collateralHeld has gone negative: ', augmint.balances.collateralHeld);
+    //     throw new AugmintError('collateralHeld has gone negative: ', augmint.balances.collateralHeld);
     // }
 
     // move interest holding pool -> reserve
@@ -168,7 +169,7 @@ function collectDefaultedLoan(actorId, loanId) {
     // FIXME: uncomment these once changed to BigNumber
     // // sanity check (NB: interestHoldingPool < 0 can only come about through an error in logic, not market forces)
     // if (augmint.balances.interestHoldingPool < 0) {
-    //     throw new Error('interestHoldingPool has gone negative: ', augmint.balances.interestHoldingPool);
+    //     throw new AugmintError('interestHoldingPool has gone negative: ', augmint.balances.interestHoldingPool);
     // }
 
     // remove loan

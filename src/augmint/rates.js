@@ -3,13 +3,14 @@
 const rates = require('./rates.json');
 const clock = require('../lib/clock');
 const augmint = require('./augmint.js');
+const AugmintError = require('../augmint/augmint.error.js');
 let dayAdjust = 0;
 
 function updateRates() {
     const day = clock.getDay() + dayAdjust;
 
     if (!rates[day]) {
-        throw new Error(
+        throw new AugmintError(
             'No ETH/USD historic price available for day ' +
                 day +
                 '\nLast date available: ' +

@@ -2,6 +2,7 @@
 
 'use strict';
 
+//const AugmintError = require('../augmint/augmint.error.js');
 const augmint = require('./augmint.js');
 const logger = require('../lib/logger.js');
 const orderBook = augmint.orderBook;
@@ -60,12 +61,12 @@ function buyACD(actorId, acdAmount) {
     // FIXME: uncomment these once changed to BigNumber
     // // sanity check:
     // if (augmint.balances.exchangeEth < 0) {
-    //     throw new Error('exchangeEth has gone negative.' + augmint.balances.exchangeEth);
+    //     throw new AugmintError('exchangeEth has gone negative.' + augmint.balances.exchangeEth);
     // }
     //
     // // sanity check:
     // if (augmint.balances.exchangeAcd < 0) {
-    //     throw new Error('exchangeAcd has gone negative: ' + augmint.balances.exchangeAcd);
+    //     throw new AugmintError('exchangeAcd has gone negative: ' + augmint.balances.exchangeAcd);
     // }
 
     if (acdAmount) {
@@ -127,12 +128,12 @@ function sellACD(actorId, acdAmount) {
     // FIXME: uncomment these once changed to BigNumber
     // // sanity check:
     // if (augmint.balances.exchangeEth < 0) {
-    //     throw new Error('exchangeEth has gone negative:' + augmint.balances.exchangeEth);
+    //     throw new AugmintError('exchangeEth has gone negative:' + augmint.balances.exchangeEth);
     // }
     //
     // // sanity check:
     // if (augmint.balances.exchangeAcd < 0) {
-    //     throw new Error('exchangeAcd has gone negative: ' + augmint.balances.exchangeAcd);
+    //     throw new AugmintError('exchangeAcd has gone negative: ' + augmint.balances.exchangeAcd);
     // }
 
     if (acdAmount) {
