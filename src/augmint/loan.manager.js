@@ -173,7 +173,7 @@ function collectDefaultedLoan(actorId, loanId) {
 
     // remove loan
     delete loans[actorId][loanId];
-    logger.logMove(actorId, 'collectDefaultedLoan', { loanId: loanId, repaymentDue: loan.repaymentDue });
+    logger.logMove(augmint, actorId, 'collectDefaultedLoan', { loanId: loanId, repaymentDue: loan.repaymentDue });
 }
 
 function collectAllDefaultedLoans() {

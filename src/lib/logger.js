@@ -6,9 +6,7 @@ let printEachMove = true;
 let iteration = 0;
 let logTextArea;
 
-const iterationLogHeader = [
-    'day',
-    ' iteration',
+const augmintStatusHeader = [
     ' ethUsd',
     ' netAcdDemand',
     ' acdReserve',
@@ -22,8 +20,11 @@ const iterationLogHeader = [
     ' ethFeesEarned',
     ' collateralHeld'
 ];
+const iterationLogHeader = ['day', ' iteration'].concat(augmintStatusHeader);
 let iterationLog = new Array(iterationLogHeader);
-const movesLogHeader = [' day', ' iteration', ' actor', ' move', ' params'];
+
+const movesConsoleLogHeader = [' day', ' iteration', ' actor', ' move', ' params'];
+const movesLogHeader = movesConsoleLogHeader.concat(augmintStatusHeader);
 let movesLog = new Array(movesLogHeader);
 
 function init(_logTextArea) {
@@ -59,23 +60,8 @@ function toCsv(_array) {
     return ret;
 }
 
-function logMove(actor, move, params) {
-    const daysPassed = clock.getDay();
-    const logItem = [daysPassed, iteration, actor, move, params];
-    if (printEachMove) {
-        if (movesLog.length === 1) {
-            addToLogTextArea('MOVE, ' + movesLogHeader + '\n');
-        }
-        addToLogTextArea('MOVE, ' + toCsv(new Array(logItem)) + '\n');
-    }
-    movesLog.push(logItem);
-}
-
-function logIteration(augmint) {
-    const daysPassed = clock.getDay();
-    const logItem = [
-        daysPassed,
-        iteration,
+function getAugmintStatusLog(augmint) {
+    return [
         augmint.rates.ethToUsd,
         augmint.netAcdDemand,
         augmint.actors.reserve.balances.acd,
@@ -89,6 +75,23 @@ function logIteration(augmint) {
         augmint.balances.ethFeesEarned,
         augmint.balances.collateralHeld
     ];
+}
+
+function logMove(augmint, actor, move, params) {
+    const daysPassed = clock.getDay();
+    const logItem = [daysPassed, iteration, actor, move, params];
+    if (printEachMove) {
+        if (movesLog.length === 1) {
+            addToLogTextArea('MOVE, ' + movesConsoleLogHeader + '\n');
+        }
+        addToLogTextArea('MOVE, ' + toCsv(new Array(logItem)) + '\n');
+    }
+    movesLog.push(logItem.concat(getAugmintStatusLog(augmint)));
+}
+
+function logIteration(augmint) {
+    const daysPassed = clock.getDay();
+    const logItem = [daysPassed, iteration].concat(getAugmintStatusLog(augmint));
     if (printEachIteration) {
         if (iterationLog.length === 1) {
             addToLogTextArea('ITERATION, ' + iterationLogHeader + '\n');
