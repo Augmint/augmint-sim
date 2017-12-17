@@ -18,7 +18,7 @@ class BorrowerBasic extends Actor {
     }
 
     executeMoves(state) {
-        const { currentTime, stepsPerDay } = state.meta;
+        const { currentTime } = state.meta;
         const repaymentDue = this.loans[0] ? this.loans[0].repaymentDue + this.params.REPAYMENT_COST_ACD : 0;
         // TODO: move this to loanManager? Unlikely that anyone would repay a loan if value below repayment
         const collateralValueAcd = this.loans[0]
@@ -32,13 +32,13 @@ class BorrowerBasic extends Actor {
             repaymentDue < collateralValueAcd;
 
         /* Get new loan if there is no loan */
-        if (this.loans.length === 0 && Math.random() < this.params.CHANCE_TO_TAKE_LOAN / stepsPerDay) {
+        if (this.loans.length === 0 && state.utils.byChanceInADay(this.params.CHANCE_TO_TAKE_LOAN)) {
             let loanAmount = Math.min(this.convertEthToAcd(this.ethBalance), this.params.MAX_LOAN_AMOUNT_ACD);
             this.takeLoan(0, loanAmount);
         }
 
         /* Sell all ACD (CHANCE_TO_SELL_ALL_ACD) unless repayment is due soon */
-        if (this.acdBalance && !willRepaySoon && Math.random() < this.params.CHANCE_TO_SELL_ALL_ACD / stepsPerDay) {
+        if (this.acdBalance && !willRepaySoon && state.utils.byChanceInADay(this.params.CHANCE_TO_SELL_ALL_ACD)) {
             this.sellACD(this.acdBalance); // TODO: how to simulate keeping some ACD and selling at random moment?
         }
 

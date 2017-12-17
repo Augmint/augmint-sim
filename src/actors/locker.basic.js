@@ -15,13 +15,13 @@ class LockerBasic extends Actor {
     }
 
     executeMoves(state) {
-        const { currentTime, stepsPerDay } = state.meta;
+        const { currentTime } = state.meta;
         let acdToConvert = Math.min(
             this.convertEthToAcd(this.ethBalance),
             this.params.INITIAL_ACD_CONVERTED - this.acdConverted
         );
 
-        if (acdToConvert > 0 && Math.random() < this.params.CHANCE_TO_LOCK / stepsPerDay) {
+        if (acdToConvert > 0 && state.utils.byChanceInADay(this.params.CHANCE_TO_LOCK)) {
             if (this.buyACD(acdToConvert)) {
                 this.acdConverted += acdToConvert;
             }

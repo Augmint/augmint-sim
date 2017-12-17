@@ -6,23 +6,46 @@ const logger = require('./logger.js');
 const clock = require('./clock.js');
 const rates = require('../augmint/rates.js');
 const ActorDirectory = require('../actors/actor.directory.js');
+const RandomSeed = require('random-seed');
+
+let params = {
+    randomSeed: 'change this for different repeatable results. or do not pass for a random seed',
+    timeStep: 60 * 60 * 4 // 4 hours
+};
+params.stepsPerDay = 24 / (params.timeStep / 60 / 60);
+
+let random = new RandomSeed(params.randomSeed);
 
 const actors = new Set();
-let timeStep = 60 * 60 * 4; // 4 hours
+
+function byChanceInADay(dailyChance) {
+    return random.random() < dailyChance / params.stepsPerDay;
+}
 
 function getState() {
     return {
         meta: {
             currentTime: clock.getTime(),
             currentDay: clock.getDay(),
-            timeStep: timeStep,
-            stepsPerDay: 24 / (timeStep / 60 / 60)
+            timeStep: params.timeStep,
+            stepsPerDay: params.stepsPerDay
         },
-        augmint: augmint
+        augmint: augmint,
+        utils: { byChanceInADay: byChanceInADay } // TODO: do it nicer. maybe make simulation a class
     };
 }
 
-function incrementBy(timeStep = getState().meta.timeStep) {
+function setParams(_params) {
+    if (_params.randomSeed != params.randomSeed) {
+        // new seed, to be tested...
+        random = new RandomSeed(_params.randomSeed);
+    }
+    Object.assign(params, _params);
+    params = _params;
+    params.stepsPerDay = 24 / (params.timeStep / 60 / 60);
+}
+
+function incrementBy(_timeStep = params.timeStep) {
     rates.updateRates();
     // actors make their moves:
     actors.forEach(actor => {
@@ -32,7 +55,7 @@ function incrementBy(timeStep = getState().meta.timeStep) {
     // system updates:
     loanManager.collectAllDefaultedLoans();
     logger.logIteration(augmint);
-    clock.incrementBy(timeStep);
+    clock.incrementBy(_timeStep);
 }
 
 function patchAugmintParams(params) {
@@ -68,8 +91,10 @@ function setState(state) {
 module.exports = {
     incrementBy,
     addActors,
+    setParams,
     getState,
     patchAugmintParams,
     patchAugmintBalances,
-    setState
+    setState,
+    byChanceInADay
 };
