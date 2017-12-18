@@ -21,7 +21,6 @@ const actors = new Set();
 
 function init() {
     // TODO: dirty hack. make this and/or augmint a class?
-    console.log('init', exchange);
     augmint.exchange = exchange;
 }
 

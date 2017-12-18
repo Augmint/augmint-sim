@@ -54,7 +54,7 @@ const graphs = [
         }]
     },
     {
-        title: 'ACD Demand (% of total ACD)',
+        title: 'ACD user demand (% of total ACD)',
         options: { scales: { yAxes: [ {ticks: {min: undefined} }]}},
         datasets: [{
             func: augmint => {
@@ -111,9 +111,9 @@ const graphs = [
         ]
     },
     {
-        title: 'users\' ACD (accs + orders)',
+        title: 'floating ACD (accs + orders)',
         datasets: [{
-            func: augmint => { return augmint.usersAcd; },
+            func: augmint => { return augmint.floatingAcd; },
             options: {
                 label: 'user',
                 borderColor: USER_ACD_COLOR,

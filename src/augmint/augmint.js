@@ -64,7 +64,7 @@ module.exports = {
             return sum + order.amount;
         }, 0);
 
-        return totalBuyAmount - totalSellAmount;
+        return totalBuyAmount - totalSellAmount + this.reserveAcdOnExchange;
     },
 
     get totalAcd() {
@@ -87,9 +87,14 @@ module.exports = {
         }, 0);
     },
 
-    get usersAcd() {
+    get floatingAcd() {
         // all ACD on user accounts and in open orders
         return this.actorsAcd - this.reserveAcd + this.balances.exchangeAcd - this.reserveAcdOnExchange;
+    },
+
+    get usersAcd() {
+        // all ACD owned by users
+        return this.totalAcd - this.systemAcd;
     },
 
     get systemAcd() {
