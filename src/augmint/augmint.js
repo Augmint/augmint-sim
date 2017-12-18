@@ -3,6 +3,7 @@
 'use strict';
 // TODO: add transferFeePt param (and transferAcdWithFee functions)
 // TODO: would prefer proper setters/getters, but this is cool for now...
+
 module.exports = {
     actors: {},
 
@@ -40,6 +41,14 @@ module.exports = {
     loans: {},
     locks: {},
 
+    // TODO: move these under balances.
+    get reserveAcd() {
+        return this.actors ? this.actors.reserve.balances.acd : 0;
+    },
+    get reserveEth() {
+        return this.actors && this.actors.reserve ? this.actors.reserve.balances.eth : 0;
+    },
+
     get netAcdDemand() {
         const orderBook = this.orderBook;
         const totalBuyAmount = orderBook.buy.reduce((sum, order) => {
@@ -66,9 +75,32 @@ module.exports = {
     },
 
     get actorsAcd() {
-        // it includes reserve. to get only user deduct augmint.actors.reserve.balance.acd
+        // it includes reserve balance but not acd in orders. to get only user's balances use usersAcd()
         return Object.keys(this.actors).reduce((sum, actorId) => {
             return sum + this.actors[actorId].balances.acd;
         }, 0);
+    },
+
+    get usersAcd() {
+        // all ACD on user accounts and in open orders
+        return this.actorsAcd - this.reserveAcd + this.balances.exchangeAcd - this.balances.reserveAcdOnExchange; //exchange.getActorSellAcdOrders('reserve') // .reserveSellAcdOrdersSum
+    },
+
+    get systemAcd() {
+        // all ACD in control of Augmint system
+        console.log(
+            this.balances.acdFeesEarned,
+            this.balances.interestHoldingPool,
+            this.balances.interestEarnedPool,
+            this.reserveAcd,
+            this.balances.exchangeSellAcdFromReserve
+        );
+        return (
+            this.balances.acdFeesEarned +
+            this.balances.interestHoldingPool +
+            this.balances.interestEarnedPool +
+            this.reserveAcd +
+            this.balances.reserveAcdOnExchange //exchange.getActorSellAcdOrders('reserve')
+        );
     }
 };

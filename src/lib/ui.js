@@ -142,6 +142,12 @@ function init() {
     });
     simulation.patchAugmintParams({ exchangeFeePercentage: 0.003 });
     simulation.addActors({
+        /* ReserveBasic is continuosly intervening by buying/selling ACD from/to reserve accounts
+            as long there is any ETH/ACD in the reserves
+            The behaviour of reserve can be changed by params and initial balances
+            or changing the actor type.
+            It's is special actor, don't change the name of it ('reserve').
+        */
         reserve: { type: 'ReserveBasic', balances: { acd: 50000 /* genesis acd */, eth: 0 } },
         alwaysLocker: {
             type: 'LockerBasic',

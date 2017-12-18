@@ -60,25 +60,11 @@ const graphs = [
         },
         datasets: [
             {
-                func: augmint => { return (augmint.actors.reserve.balances.acd); },
+                func: augmint => { return (augmint.systemAcd); },
                 options: {
-                    label: 'Acd reserve',
+                    label: 'system',
                     borderColor: DARKGREEN,
-                    backgroundColor: DARKGREEN_OPA
-                }
-            },
-            {
-                func: augmint => {
-                    return (
-                        augmint.balances.interestEarnedPool +
-                        augmint.balances.interestHoldingPool +
-                        augmint.balances.exchangeAcd
-                    );
-                },
-                options: {
-                    label: 'sys accs',
-                    borderColor: GREEN,
-                    backgroundColor: GREEN_OPA
+                    backgroundColor: DARKGREEN
                 }
             },
             {
@@ -86,37 +72,37 @@ const graphs = [
                 options: {
                     label: 'locked',
                     borderColor: YELLOW,
-                    backgroundColor: YELLOW_OPA
+                    backgroundColor: YELLOW
                 }
             },
             {
                 func: augmint => {
-                    return augmint.actorsAcd - augmint.actors.reserve.balances.acd;
+                    return augmint.usersAcd;
                 },
                 options: {
-                    label: 'user accs',
+                    label: 'user',
                     borderColor: RED,
-                    backgroundColor: RED_OPA
+                    backgroundColor: RED
                 }
             }
         ]
     },
     {
-        title: 'ACD on user accs',
+        title: 'users\' ACD (accs + orders)',
         datasets: [{
-            func: augmint => { return augmint.actorsAcd - augmint.actors.reserve.balances.acd; }
+            func: augmint => { return augmint.usersAcd; }
         }]
     },
     {
         title: 'ACD Reserves',
         datasets: [{
-            func: augmint => { return augmint.actors.reserve.balances.acd; }
+            func: augmint => { return augmint.reserveAcd; }
         }]
     },
     {
         title: 'ETH Reserves',
         datasets: [{
-            func: augmint => { return augmint.actors.reserve.balances.eth; }
+            func: augmint => { return augmint.reserveEth; }
         }]
     },
     {

@@ -67,8 +67,8 @@ function getAugmintStatusLog(augmint) {
     return [
         augmint.rates.ethToUsd,
         augmint.netAcdDemand,
-        augmint.actors.reserve.balances.acd,
-        augmint.actors.reserve.balances.eth,
+        augmint.reserveAcd,
+        augmint.reserveEth,
         augmint.balances.acdFeesEarned,
         augmint.balances.lockedAcdPool,
         augmint.balances.openLoansAcd,
