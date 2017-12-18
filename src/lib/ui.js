@@ -27,7 +27,7 @@ let logVisible = false;
 let benchmarkStart;
 let benchmarkItCt;
 
-function updateParamsFromUI() {
+function getParamsFromUI() {
     const params = {};
 
     inputs.forEach(input => {
@@ -41,7 +41,15 @@ function updateParamsFromUI() {
         params[key] = value;
     });
 
-    simulation.patchAugmintParams(params);
+    // TODO: do this nicer
+    params.loanProduct = {
+        minimumLoanInAcd: Number.parseFloat(document.getElementById('minimumLoanInAcd').value),
+        loanCollateralRatio: Number.parseFloat(document.getElementById('loanCollateralRatio').value),
+        interestPt: Number.parseFloat(document.getElementById('loanInterestPt').value), // p.a.
+        repaymentPeriodInDays: Number.parseFloat(document.getElementById('repaymentPeriodInDays').value),
+        defaultFeePercentage: Number.parseFloat(document.getElementById('defaultFeePercentage').value)
+    };
+    return params;
 }
 
 function togglePause() {
@@ -68,7 +76,7 @@ function togglePause() {
         inputs.forEach(input => {
             input.disabled = true;
         });
-        updateParamsFromUI();
+        simulation.patchAugmintParams(getParamsFromUI());
     }
 }
 
@@ -111,7 +119,7 @@ function init() {
     ratesDropDown.addEventListener('change', () => ratesDropDownOnChange(ratesDropDown.value));
 
     dumpStateBtn.addEventListener('click', () => {
-        updateParamsFromUI();
+        simulation.patchAugmintParams(getParamsFromUI());
         logger.print(simulation.getState());
     });
 
@@ -134,13 +142,19 @@ function init() {
 
     toggleLogBtn.addEventListener('click', toggleLog);
 
-    updateParamsFromUI();
-    simulation.init();
-    // TODO: have proper start up stuff:
-    simulation.patchAugmintBalances({
-        interestEarnedPool: 3000 /* genesis */
+    let uiParams = getParamsFromUI();
+    simulation.init({
+        simulationParams: {
+            randomSeed: 'change this for different repeatable results. or do not pass for a random seed',
+            timeStep: 60 * 60 * 4 // 4 hours
+        },
+        // TODO: move all balances and params to UI
+        augmintOptions: {
+            balances: { interestEarnedPool: 3000 /* genesis */ },
+            params: Object.assign({ exchangeFeePercentage: 0.003 }, uiParams)
+        }
     });
-    simulation.patchAugmintParams({ exchangeFeePercentage: 0.003 });
+
     simulation.addActors({
         /* ReserveBasic is continuosly intervening by buying/selling ACD from/to reserve accounts
             as long there is any ETH/ACD in the reserves
@@ -196,15 +210,6 @@ function init() {
         }
         // actor: { type: 'ExchangeTester', balances: { eth: 10000, acd: 10000 } }
     });
-
-    // TODO: do this nicer
-    loanManager.createLoanProduct(
-        Number.parseFloat(document.getElementById('minimumLoanInAcd').value), // minimumLoanInAcd
-        Number.parseFloat(document.getElementById('loanCollateralRatio').value), // loanCollateralRatio
-        Number.parseFloat(document.getElementById('loanInterestPt').value), // interestPt pa.
-        Number.parseFloat(document.getElementById('repaymentPeriodInDays').value), // repaymentPeriodInDays
-        Number.parseFloat(document.getElementById('defaultFeePercentage').value) // defaultFeePercentage
-    );
 }
 
 function render() {

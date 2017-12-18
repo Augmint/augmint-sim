@@ -9,19 +9,35 @@ const rates = require('../augmint/rates.js');
 const ActorDirectory = require('../actors/actor.directory.js');
 const RandomSeed = require('random-seed');
 
-let params = {
-    randomSeed: 'change this for different repeatable results. or do not pass for a random seed',
-    timeStep: 60 * 60 * 4 // 4 hours
-};
-params.stepsPerDay = 24 / (params.timeStep / 60 / 60);
+let params = {};
 
 let random = new RandomSeed(params.randomSeed);
 
 const actors = new Set();
 
-function init() {
-    // TODO: dirty hack. make this and/or augmint a class?
-    augmint.exchange = exchange;
+function setSimulationParams(_params) {
+    if (_params.randomSeed != params.randomSeed) {
+        // new seed, to be tested...
+        random = new RandomSeed(_params.randomSeed);
+    }
+    Object.assign(params, _params);
+    params.stepsPerDay = 24 / (params.timeStep / 60 / 60);
+}
+
+function patchAugmintParams(params) {
+    loanManager.updateLoanProduct(params.loanProduct); // it will create if it doesn't exists yet
+    Object.assign(augmint.params, params);
+}
+
+function patchAugmintBalances(balances) {
+    Object.assign(augmint.balances, balances);
+}
+
+function init(initParams) {
+    augmint.exchange = exchange; // TODO: dirty hack. make this and/or augmint a class?
+    setSimulationParams(initParams.simulationParams);
+    patchAugmintBalances(initParams.augmintOptions.balances);
+    patchAugmintParams(initParams.augmintOptions.params);
 }
 
 function byChanceInADay(dailyChance) {
@@ -38,18 +54,9 @@ function getState() {
         },
         augmint: augmint,
         exchange: exchange,
-        utils: { byChanceInADay: byChanceInADay } // TODO: do it nicer. maybe make simulation a class
+        utils: { byChanceInADay: byChanceInADay }, // TODO: do it nicer. maybe make simulation a class
+        params: params
     };
-}
-
-function setParams(_params) {
-    if (_params.randomSeed != params.randomSeed) {
-        // new seed, to be tested...
-        random = new RandomSeed(_params.randomSeed);
-    }
-    Object.assign(params, _params);
-    params = _params;
-    params.stepsPerDay = 24 / (params.timeStep / 60 / 60);
 }
 
 function incrementBy(_timeStep = params.timeStep) {
@@ -63,14 +70,6 @@ function incrementBy(_timeStep = params.timeStep) {
     // system updates:
     loanManager.collectAllDefaultedLoans();
     clock.incrementBy(_timeStep);
-}
-
-function patchAugmintParams(params) {
-    Object.assign(augmint.params, params);
-}
-
-function patchAugmintBalances(balances) {
-    Object.assign(augmint.balances, balances);
 }
 
 function addActors(newActors) {
@@ -99,7 +98,7 @@ module.exports = {
     init,
     incrementBy,
     addActors,
-    setParams,
+    setSimulationParams,
     getState,
     patchAugmintParams,
     patchAugmintBalances,

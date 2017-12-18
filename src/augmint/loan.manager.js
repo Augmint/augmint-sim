@@ -13,21 +13,22 @@ const loans = augmint.loans;
 // just gonna use a counter for id-ing loans:
 let counter = 0;
 
-function createLoanProduct(
-    minimumLoanInAcd,
-    loanCollateralRatio,
-    interestPt, // pa.
-    repaymentPeriodInDays,
-    defaultFeePercentage
-) {
+function createLoanProduct(prod) {
     loanProducts.push({
-        id: loanProducts.length,
-        minimumLoanInAcd,
-        loanCollateralRatio,
-        interestPt,
-        repaymentPeriodInDays,
-        defaultFeePercentage
+        id: prod.id ? prod.id : loanProducts.length,
+        minimumLoanInAcd: prod.minimumLoanInAcd,
+        loanCollateralRatio: prod.loanCollateralRatio,
+        interestPt: prod.interestPt,
+        repaymentPeriodInDays: prod.repaymentPeriodInDays,
+        defaultFeePercentage: prod.defaultFeePercentage
     });
+}
+
+function updateLoanProduct(prod) {
+    // TODO: it works with only one loan product but we are fine with that for now
+    prod.id = loanProducts.length;
+    loanProducts.pop();
+    createLoanProduct(prod);
 }
 
 function getLoanProducts() {
@@ -197,6 +198,7 @@ function getLoansForActor(actorId) {
 
 module.exports = {
     createLoanProduct,
+    updateLoanProduct,
     getLoanProducts,
     takeLoan,
     repayLoan,
