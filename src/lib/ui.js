@@ -146,39 +146,46 @@ function init() {
         alwaysLocker: {
             type: 'LockerBasic',
             balances: {
-                eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_LOCK & INITIAL_ACD_CONVERTED */
+                eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_LOCK & INITIAL_ACD_TO_CONVERT */
+            },
+            params: {
+                INITIAL_ACD_TO_CONVERT: 10000,
+                CHANCE_TO_LOCK: 1 // always relock all ACD balance (initial liquidity provider)
             }
         },
         randomLocker: {
             type: 'LockerBasic',
-            count: 2,
+            count: 10,
             balances: {
-                eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_LOCK & INITIAL_ACD_CONVERTED */,
-                CHANCE_TO_LOCK: 0.1
+                eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_LOCK & INITIAL_ACD_TO_CONVERT */
+            },
+            params: {
+                INITIAL_ACD_TO_CONVERT: 1000,
+                CHANCE_TO_LOCK: 0.05 // relock by chance % of days when no lock
             }
         },
-        alwaysBorrower: {
+        randomAllSellBorrower: {
             type: 'BorrowerBasic',
-
+            count: 5,
             balances: {
                 eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_TAKE_LOAN & CHANCE_TO_TAKE_LOAN  */
             },
             params: {
                 MAX_LOAN_AMOUNT_ACD: 1000,
-                CHANCE_TO_TAKE_LOAN: 1, // always takes a loan when there isn't one
+                CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan
                 CHANCE_TO_SELL_ALL_ACD: 1 // immediately sells full ACD balance
             }
         },
-        randomBorrower: {
+        randomKeeperBorrower: {
             type: 'BorrowerBasic',
-            count: 2,
+            count: 5,
             balances: {
                 eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_TAKE_LOAN & CHANCE_TO_TAKE_LOAN  */
             },
             params: {
-                MAX_LOAN_AMOUNT_ACD: 3000,
+                MAX_LOAN_AMOUNT_ACD: 1000,
                 CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan
-                CHANCE_TO_SELL_ALL_ACD: 0.1 // % chance to sell all ACD balance (unless repayment is due soon)
+                CHANCE_TO_SELL_ALL_ACD: 0.05 // % chance to sell all ACD balance (unless repayment is due soon)
             }
         }
         // actor: { type: 'ExchangeTester', balances: { eth: 10000, acd: 10000 } }
