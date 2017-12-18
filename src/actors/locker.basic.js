@@ -25,10 +25,10 @@ class LockerBasic extends Actor {
         const { currentTime } = state.meta;
 
         const augmintInterest = state.augmint.params.lockedAcdInterestPercentage;
-        const marketInterest = state.augmint.params.marketLoanInterestRate;
+        const marketInterest = state.augmint.params.marketLockInterestRate;
 
         const interestAdvantagePt =
-            (marketInterest - augmintInterest) / marketInterest + this.params.INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT;
+            (augmintInterest - marketInterest) / marketInterest + this.params.INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT;
         const marketChance = Math.min(1, interestAdvantagePt * this.params.INTEREST_SENSITIVITY);
 
         //console.log(marketInterest, augmintInterest, interestAdvantagePt, marketChance * state.meta.stepsPerDay);
