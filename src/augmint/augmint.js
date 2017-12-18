@@ -1,6 +1,7 @@
 // stores all state for the simulation
 
 'use strict';
+
 // TODO: add transferFeePt param (and transferAcdWithFee functions)
 // TODO: would prefer proper setters/getters, but this is cool for now...
 
@@ -40,6 +41,7 @@ module.exports = {
     loanProducts: [],
     loans: {},
     locks: {},
+    exchange: null, // set by simulation.init()
 
     // TODO: move these under balances.
     get reserveAcd() {
@@ -47,6 +49,10 @@ module.exports = {
     },
     get reserveEth() {
         return this.actors && this.actors.reserve ? this.actors.reserve.balances.eth : 0;
+    },
+
+    get reserveAcdOnExchange() {
+        return this.exchange.getActorSellAcdOrdersSum('reserve');
     },
 
     get netAcdDemand() {
@@ -83,24 +89,17 @@ module.exports = {
 
     get usersAcd() {
         // all ACD on user accounts and in open orders
-        return this.actorsAcd - this.reserveAcd + this.balances.exchangeAcd - this.balances.reserveAcdOnExchange; //exchange.getActorSellAcdOrders('reserve') // .reserveSellAcdOrdersSum
+        return this.actorsAcd - this.reserveAcd + this.balances.exchangeAcd - this.reserveAcdOnExchange;
     },
 
     get systemAcd() {
         // all ACD in control of Augmint system
-        console.log(
-            this.balances.acdFeesEarned,
-            this.balances.interestHoldingPool,
-            this.balances.interestEarnedPool,
-            this.reserveAcd,
-            this.balances.exchangeSellAcdFromReserve
-        );
         return (
             this.balances.acdFeesEarned +
             this.balances.interestHoldingPool +
             this.balances.interestEarnedPool +
             this.reserveAcd +
-            this.balances.reserveAcdOnExchange //exchange.getActorSellAcdOrders('reserve')
+            this.reserveAcdOnExchange
         );
     }
 };

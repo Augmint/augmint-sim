@@ -1,6 +1,7 @@
 'use strict';
 
 const augmint = require('../augmint/augmint.js');
+const exchange = require('../augmint/exchange.js');
 const loanManager = require('../augmint/loan.manager.js');
 const logger = require('./logger.js');
 const clock = require('./clock.js');
@@ -18,6 +19,12 @@ let random = new RandomSeed(params.randomSeed);
 
 const actors = new Set();
 
+function init() {
+    // TODO: dirty hack. make this and/or augmint a class?
+    console.log('init', exchange);
+    augmint.exchange = exchange;
+}
+
 function byChanceInADay(dailyChance) {
     return random.random() < dailyChance / params.stepsPerDay;
 }
@@ -31,6 +38,7 @@ function getState() {
             stepsPerDay: params.stepsPerDay
         },
         augmint: augmint,
+        exchange: exchange,
         utils: { byChanceInADay: byChanceInADay } // TODO: do it nicer. maybe make simulation a class
     };
 }
@@ -89,6 +97,7 @@ function setState(state) {
 }
 
 module.exports = {
+    init,
     incrementBy,
     addActors,
     setParams,

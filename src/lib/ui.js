@@ -135,7 +135,7 @@ function init() {
     toggleLogBtn.addEventListener('click', toggleLog);
 
     updateParamsFromUI();
-
+    simulation.init();
     // TODO: have proper start up stuff:
     simulation.patchAugmintBalances({
         interestEarnedPool: 3000 /* genesis */

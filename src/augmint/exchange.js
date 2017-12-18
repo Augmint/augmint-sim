@@ -154,9 +154,17 @@ function convertEthToAcd(ethAmount) {
     return ethAmount * augmint.rates.ethToAcd;
 }
 
+function getActorSellAcdOrdersSum(actorId) {
+    return orderBook.sell.reduce((sum, sellOrder) => {
+        let reserveAmount = sellOrder.actorId == actorId ? sellOrder.amount : 0;
+        return sum + reserveAmount;
+    }, 0);
+}
+
 module.exports = {
     buyACD,
     sellACD,
     convertAcdToEth,
-    convertEthToAcd
+    convertEthToAcd,
+    getActorSellAcdOrdersSum
 };
