@@ -44,6 +44,10 @@ function byChanceInADay(dailyChance) {
     return random.random() < dailyChance / params.stepsPerDay;
 }
 
+function byChance(chance) {
+    return random.random() < chance;
+}
+
 function getState() {
     return {
         meta: {
@@ -54,7 +58,7 @@ function getState() {
         },
         augmint: augmint,
         exchange: exchange,
-        utils: { byChanceInADay: byChanceInADay }, // TODO: do it nicer. maybe make simulation a class
+        utils: { byChanceInADay: byChanceInADay, byChance: byChance }, // TODO: do it nicer. maybe make simulation a class
         params: params
     };
 }

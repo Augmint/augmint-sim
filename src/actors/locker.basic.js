@@ -5,7 +5,14 @@ const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const defaultParams = {
     RELEASE_DELAY_DAYS: 10,
     CHANCE_TO_LOCK: 1,
-    INITIAL_ACD_TO_CONVERT: 1000
+    INITIAL_ACD_TO_CONVERT: 1000,
+    INTEREST_SENSITIVITY: 0.5 /* how sensitive is the locker for marketLockInterestRate ?
+                                linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
+                                TODO: make this a curve and to a param which makes more sense
+                                        + do we need CHANCE_TO_LOCK since we have this?    */,
+    INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: 0.05 /* locks with a small chance even when interestadvantage is 0 or less.
+                                                    e.g. 0.01 then it calculates with 1% adv. when 0% advantage
+                                                     TODO: make it better */
 };
 
 class LockerBasic extends Actor {
@@ -16,7 +23,17 @@ class LockerBasic extends Actor {
 
     executeMoves(state) {
         const { currentTime } = state.meta;
-        const wantToLock = state.utils.byChanceInADay(this.params.CHANCE_TO_LOCK);
+
+        const augmintInterest = state.augmint.params.lockedAcdInterestPercentage;
+        const marketInterest = state.augmint.params.marketLoanInterestRate;
+
+        const interestAdvantagePt =
+            (marketInterest - augmintInterest) / marketInterest + this.params.INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT;
+        const marketChance = Math.min(1, interestAdvantagePt * this.params.INTEREST_SENSITIVITY);
+
+        //console.log(marketInterest, augmintInterest, interestAdvantagePt, marketChance * state.meta.stepsPerDay);
+
+        const wantToLock = state.utils.byChanceInADay(this.params.CHANCE_TO_LOCK * marketChance);
 
         /* Buy a total of INITIAL_ACD_CONVERTED */
         let acdToConvert = Math.min(

@@ -34,6 +34,8 @@ const DEFAULTED_COLOR_OPA = DARKRED_OPA;
 const OPEN_LOANS_COLOR = PURPLE;
 const OPEN_LOANS_COLOR_OPA = PURPLE_OPA;
 
+const DASHED_LINE = [5, 5];
+
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 
 // prettier-ignore
@@ -140,6 +142,51 @@ const graphs = [
                 backgroundColor: SYSTEM_ACC_COLOR_OPA
             }
         }]
+    },
+    {
+        title: 'Interest rates',
+        options: {
+            title: { display: false },
+            scales: { yAxes: [ {ticks: {suggestedMax: 10} }]},
+            legend: { display: true },
+            tooltips: { enabled: true , mode: 'index', intersect: false}
+        },
+
+        datasets: [{
+            func: augmint => { return augmint.params.lockedAcdInterestPercentage * 100; },
+            options: {
+                    label: 'lock interest %',
+                    borderColor: LOCKED_ACD_COLOR,
+                    backgroundColor: TRANSPARENT
+                }
+            },
+            {
+            func: augmint => { return augmint.loanProducts[0].interestPt * 100; },
+                options: {
+                        label: 'loan interest %',
+                        borderColor: OPEN_LOANS_COLOR,
+                        backgroundColor: TRANSPARENT
+                    }
+            },
+            {
+            func: augmint => { return augmint.params.marketLockInterestRate * 100; },
+                options: {
+                    label: 'mkt lock %',
+                    borderDash: DASHED_LINE,
+                    borderColor: LOCKED_ACD_COLOR,
+                    backgroundColor: TRANSPARENT
+                }
+            },
+            {
+            func: augmint => { return augmint.params.marketLoanInterestRate * 100; },
+                options: {
+                        label: 'mkt loan %',
+                        borderDash: DASHED_LINE,
+                        borderColor: OPEN_LOANS_COLOR,
+                        backgroundColor: TRANSPARENT
+                    }
+            }
+        ]
     },
     {
         title: 'Interest Earned (ACD)',

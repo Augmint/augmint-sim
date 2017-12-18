@@ -24,6 +24,8 @@ module.exports = {
     },
 
     params: {
+        marketLoanInterestRate: 0.18, // what do we compete with?  actor's demand for loans depends on it
+        marketLockInterestRate: 0.04, // what do we compete with? actor's demand for locks depends on it
         exchangeFeePercentage: 0.1,
         lockedAcdInterestPercentage: 0.5,
         lockTimeInDays: 365

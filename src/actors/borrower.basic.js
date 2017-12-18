@@ -9,13 +9,22 @@ const defaultParams = {
     REPAYMENT_COST_ACD: 5, // TODO: this should be global
     MAX_LOAN_AMOUNT_ACD: 1000,
     CHANCE_TO_TAKE_LOAN: 1, // % chance to take loan on a day (when there is no open loan)
-    CHANCE_TO_SELL_ALL_ACD: 1 // % chance to sell all acd on a day (unless repayment is due soon)
+    CHANCE_TO_SELL_ALL_ACD: 1, // % chance to sell all acd on a day (unless repayment is due soon)
+
+    INTEREST_SENSITIVITY: 0.5 /* how sensitive is the borrower for marketLoanInterestRate ?
+                                linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
+                                TODO: make this a curve and to a param which makes more sense
+                                        + do we need CHANCE_TO_TAKE_LOAN since we have this?   */,
+    INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: 0.05 /* takes loan with a small chance even when interestadvantage is 0 or less.
+                                                    e.g. 0.01 then it calculates with 1% adv. when 0% advantage
+                                                     TODO: make it better :/*/
     // TODO: add loan forgotten chance param ( 0.1%?)
 };
 
 class BorrowerBasic extends Actor {
     constructor(id, balances, state, _params = {}) {
         super(id, balances, state, Object.assign({}, defaultParams, _params));
+        this.doesLikeLoanInterestRate;
     }
 
     executeMoves(state) {
@@ -33,9 +42,21 @@ class BorrowerBasic extends Actor {
             repaymentDue < collateralValueAcd;
 
         /* Get new loan if there is no loan */
-        if (this.loans.length === 0 && state.utils.byChanceInADay(this.params.CHANCE_TO_TAKE_LOAN)) {
-            let loanAmount = Math.min(this.convertEthToAcd(this.ethBalance), this.params.MAX_LOAN_AMOUNT_ACD);
-            this.takeLoan(0, loanAmount);
+        if (this.loans.length === 0) {
+            const augmintInterest = state.augmint.loanProducts[0].interestPt;
+            const marketInterest = state.augmint.params.marketLoanInterestRate;
+
+            const interestAdvantagePt =
+                (marketInterest - augmintInterest) / marketInterest +
+                this.params.INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT;
+            const marketChance = Math.min(1, interestAdvantagePt * this.params.INTEREST_SENSITIVITY);
+
+            //console.log(marketInterest, augmintInterest, interestAdvantagePt, marketChance * state.meta.stepsPerDay);
+
+            if (state.utils.byChanceInADay(this.params.CHANCE_TO_TAKE_LOAN * marketChance)) {
+                let loanAmount = Math.min(this.convertEthToAcd(this.ethBalance), this.params.MAX_LOAN_AMOUNT_ACD);
+                this.takeLoan(0, loanAmount);
+            }
         }
 
         /* Sell all ACD (CHANCE_TO_SELL_ALL_ACD) unless repayment is due soon */

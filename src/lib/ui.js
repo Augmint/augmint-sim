@@ -1,7 +1,6 @@
 'use strict';
 
 const simulation = require('./simulation.js');
-const loanManager = require('../augmint/loan.manager.js');
 const logger = require('./logger.js');
 const rates = require('../augmint/rates.js');
 const graphs = require('./graphs.js');
@@ -170,7 +169,14 @@ function init() {
             },
             params: {
                 INITIAL_ACD_TO_CONVERT: 10000,
-                CHANCE_TO_LOCK: 1 // always relock all ACD balance (initial liquidity provider)
+                CHANCE_TO_LOCK: 1, // always relock all ACD balance (initial liquidity provider)
+                INTEREST_SENSITIVITY: 0.5 /* how sensitive is the locker for marketLockInterestRate ?
+                                            linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
+                                            TODO: make this a curve and to a param which makes more sense
+                                                    + do we need CHANCE_TO_LOCK since we have this?   */,
+                INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: 0.05 /* locks with a small chance even when interestadvantage is 0 or less.
+                                                                e.g. 0.01 then it calculates with 1% adv. when 0% advantage
+                                                                 TODO: make it better */
             }
         },
         randomLocker: {
@@ -181,7 +187,14 @@ function init() {
             },
             params: {
                 INITIAL_ACD_TO_CONVERT: 1000,
-                CHANCE_TO_LOCK: 0.05 // relock by chance % of days when no lock
+                CHANCE_TO_LOCK: 0.05, // relock by chance % of days when no lock
+                INTEREST_SENSITIVITY: 0.5 /* how sensitive is the locker for marketLockInterestRate ?
+                                            linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
+                                            TODO: make this a curve and to a param which makes more sense
+                                                    + do we need CHANCE_TO_LOCK since we have this?   */,
+                INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: 0.05 /* locks with a small chance even when interestadvantage is 0 or less.
+                                                                e.g. 0.01 then it calculates with 1% adv. when 0% advantage
+                                                                 TODO: make it better */
             }
         },
         randomAllSellBorrower: {
@@ -192,8 +205,15 @@ function init() {
             },
             params: {
                 MAX_LOAN_AMOUNT_ACD: 1000,
-                CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan
-                CHANCE_TO_SELL_ALL_ACD: 1 // immediately sells full ACD balance
+                CHANCE_TO_TAKE_LOAN: 1, // % chance to take a loan (on top of chances based on marketrates
+                CHANCE_TO_SELL_ALL_ACD: 1, // immediately sells full ACD balance
+                INTEREST_SENSITIVITY: 0.5 /* how sensitive is the borrower for marketLoanInterestRate ?
+                                            linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
+                                            TODO: make this a curve and to a param which makes more sense
+                                                    + do we need CHANCE_TO_TAKE_LOAN since we have this? */,
+                INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: 0.05 /* takes loan with a small chance even when interestadvantage is 0 or less.
+                                                                e.g. 0.01 then it calculates with 1% adv. when 0% advantage
+                                                                 TODO: make it better :/*/
             }
         },
         randomKeeperBorrower: {
@@ -205,7 +225,14 @@ function init() {
             params: {
                 MAX_LOAN_AMOUNT_ACD: 1000,
                 CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan
-                CHANCE_TO_SELL_ALL_ACD: 0.05 // % chance to sell all ACD balance (unless repayment is due soon)
+                CHANCE_TO_SELL_ALL_ACD: 0.05, // % chance to sell all ACD balance (unless repayment is due soon)
+                INTEREST_SENSITIVITY: 0.5 /* how sensitive is the borrower for marketLoanInterestRate ?
+                                            linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
+                                            TODO: make this a curve and to a param which makes more sense
+                                                    + do we need CHANCE_TO_TAKE_LOAN since we have this?  */,
+                INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: 0.05 /* takes loan with a small chance even when interestadvantage is 0 or less.
+                                                                e.g. 0.01 then it calculates with 1% adv. when 0% advantage
+                                                                 TODO: make it better :/*/
             }
         }
         // actor: { type: 'ExchangeTester', balances: { eth: 10000, acd: 10000 } }
