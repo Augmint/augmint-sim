@@ -46,14 +46,21 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
         return false;
     }
 
-    const collateralInEth = loanAmountInAcd * augmint.rates.ethToAcd / loanProduct.loanCollateralRatio;
+    const collateralInEth = augmint.exchange.convertAcdToEth(loanAmountInAcd) / loanProduct.loanCollateralRatio;
     const interestPt = (1 + loanProduct.interestPt) ** (loanProduct.repaymentPeriodInDays / 365) - 1;
     const premiumInAcd = loanAmountInAcd * interestPt;
     const repaymentDue = premiumInAcd + loanAmountInAcd;
     const repayBy = clock.getTime() + loanProduct.repaymentPeriodInDays * ONE_DAY_IN_SECS;
 
     if (augmint.actors[actorId].balances.eth < collateralInEth) {
-        console.error('takeLoan() eth balance below collateral', augmint.actors[actorId].balances.eth, collateralInEth);
+        console.error(
+            'takeLoan() eth balance below collateral required ',
+            actorId,
+            'Balance (ETH) ' + augmint.actors[actorId].balances.eth,
+            'Collateral required (ETH): ' + collateralInEth,
+            'Loan wanted (ACD): ' + loanAmountInAcd,
+            'ethToAcd: ' + augmint.rates.ethToAcd
+        );
         return false;
     }
 
