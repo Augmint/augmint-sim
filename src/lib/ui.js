@@ -40,7 +40,6 @@ function getParamsFromUI() {
         params[key] = value;
     });
 
-    // TODO: do this nicer
     params.loanProduct = {
         minimumLoanInAcd: Number.parseFloat(document.getElementById('minimumLoanInAcd').value),
         loanCollateralRatio: Number.parseFloat(document.getElementById('loanCollateralRatio').value),
@@ -51,6 +50,20 @@ function getParamsFromUI() {
     return params;
 }
 
+function updateUIFromParams() {
+    const augmint = simulation.getState().augmint;
+    inputs.forEach(input => {
+        const key = input.dataset.key;
+        input.value = augmint.params[key];
+    });
+    // we assume there is only 1 loanProduct but it's fine for now
+    document.getElementById('minimumLoanInAcd').value = augmint.loanProducts[0].minimumLoanInAcd;
+    document.getElementById('loanCollateralRatio').value = augmint.loanProducts[0].loanCollateralRatio;
+    document.getElementById('loanInterestPt').value = augmint.loanProducts[0].interestPt;
+    document.getElementById('repaymentPeriodInDays').value = augmint.loanProducts[0].repaymentPeriodInDays;
+    document.getElementById('defaultFeePercentage').value = augmint.loanProducts[0].defaultFeePercentage;
+}
+
 function togglePause() {
     paused = !paused;
 
@@ -58,6 +71,7 @@ function togglePause() {
         // pausing sim:
         let runTime = Date.now() - benchmarkStart;
         pauseBtn.innerHTML = 'Continue';
+        updateUIFromParams();
         inputs.forEach(input => {
             input.disabled = false;
         });
@@ -114,18 +128,14 @@ function init() {
     populateRatesDropDown();
 
     pauseBtn.addEventListener('click', togglePause);
-
     ratesDropDown.addEventListener('change', () => ratesDropDownOnChange(ratesDropDown.value));
-
     dumpStateBtn.addEventListener('click', () => {
         simulation.patchAugmintParams(getParamsFromUI());
         logger.print(simulation.getState());
     });
-
     dumpIterationLogBtn.addEventListener('click', () => {
         logger.printIterationLog();
     });
-
     dumpMovesLogBtn.addEventListener('click', () => {
         let startPos = logTextArea.textLength;
         logger.printMovesLog();
@@ -138,10 +148,8 @@ function init() {
         document.execCommand('copy');
         alert('Moves log CSV copied to clipboard');
     });
-
     toggleLogBtn.addEventListener('click', toggleLog);
 
-    let uiParams = getParamsFromUI();
     simulation.init({
         simulationParams: {
             randomSeed: 'change this for different repeatable results. or do not pass for a random seed',
@@ -150,9 +158,23 @@ function init() {
         // TODO: move all balances and params to UI
         augmintOptions: {
             balances: { interestEarnedPool: 3000 /* genesis */ },
-            params: Object.assign({ exchangeFeePercentage: 0.003 }, uiParams)
+            params: {
+                exchangeFeePercentage: 0.003,
+                marketLoanInterestRate: 0.14, // what do we compete with?  actor's demand for loans depends on it
+                marketLockInterestRate: 0.06, // what do we compete with? actor's demand for locks depends on it
+                lockedAcdInterestPercentage: 0.08,
+                lockTimeInDays: 30,
+                loanProduct: {
+                    minimumLoanInAcd: 100,
+                    loanCollateralRatio: 0.6,
+                    interestPt: 0.12, // p.a.
+                    repaymentPeriodInDays: 60,
+                    defaultFeePercentage: 0.05
+                }
+            }
         }
     });
+    updateUIFromParams();
 
     simulation.addActors({
         /* ReserveBasic is continuosly intervening by buying/selling ACD from/to reserve accounts
@@ -162,49 +184,50 @@ function init() {
             It's is special actor, don't change the name of it ('reserve').
         */
         reserve: { type: 'ReserveBasic', balances: { acd: 50000 /* genesis acd */, eth: 0 } },
+        monetaryBoard: { type: 'MonetaryBoardBasic', balances: {} },
         alwaysLocker: {
             type: 'LockerBasic',
             balances: {
-                eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_LOCK & INITIAL_ACD_TO_CONVERT */
+                eth: 5000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_LOCK & INITIAL_ACD_TO_CONVERT */
             },
             params: {
-                INITIAL_ACD_TO_CONVERT: 10000,
+                INITIAL_ACD_TO_CONVERT: 2000,
                 CHANCE_TO_LOCK: 1, // always relock all ACD balance (initial liquidity provider)
                 INTEREST_SENSITIVITY: 0.5 /* how sensitive is the locker for marketLockInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
                                             TODO: make this a curve and to a param which makes more sense
                                                     + do we need CHANCE_TO_LOCK since we have this?   */,
-                INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: 0.05 /* locks with a small chance even when interestadvantage is 0 or less.
+                INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: -0.1 /* locks with a small chance even when interestadvantage is 0 or less.
                                                                 e.g. 0.01 then it calculates with 1% adv. when 0% advantage
                                                                  TODO: make it better */
             }
         },
         randomLocker: {
             type: 'LockerBasic',
-            count: 10,
+            count: 50,
             balances: {
-                eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_LOCK & INITIAL_ACD_TO_CONVERT */
+                eth: 5000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_LOCK & INITIAL_ACD_TO_CONVERT */
             },
             params: {
-                INITIAL_ACD_TO_CONVERT: 1000,
-                CHANCE_TO_LOCK: 0.05, // relock by chance % of days when no lock
+                INITIAL_ACD_TO_CONVERT: 2000,
+                CHANCE_TO_LOCK: 0.5, // relock by chance % of days when no lock
                 INTEREST_SENSITIVITY: 0.5 /* how sensitive is the locker for marketLockInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
                                             TODO: make this a curve and to a param which makes more sense
                                                     + do we need CHANCE_TO_LOCK since we have this?   */,
-                INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: 0.05 /* locks with a small chance even when interestadvantage is 0 or less.
+                INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: -0.1 /* locks with a small chance even when interestadvantage is 0 or less.
                                                                 e.g. 0.01 then it calculates with 1% adv. when 0% advantage
                                                                  TODO: make it better */
             }
         },
         randomAllSellBorrower: {
             type: 'BorrowerBasic',
-            count: 5,
+            count: 40,
             balances: {
                 eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_TAKE_LOAN & CHANCE_TO_TAKE_LOAN  */
             },
             params: {
-                MAX_LOAN_AMOUNT_ACD: 1000,
+                MAX_LOAN_AMOUNT_ACD: 2000,
                 CHANCE_TO_TAKE_LOAN: 1, // % chance to take a loan (on top of chances based on marketrates
                 CHANCE_TO_SELL_ALL_ACD: 1, // immediately sells full ACD balance
                 INTEREST_SENSITIVITY: 0.5 /* how sensitive is the borrower for marketLoanInterestRate ?
@@ -218,12 +241,12 @@ function init() {
         },
         randomKeeperBorrower: {
             type: 'BorrowerBasic',
-            count: 5,
+            count: 50,
             balances: {
                 eth: 50000000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_TAKE_LOAN & CHANCE_TO_TAKE_LOAN  */
             },
             params: {
-                MAX_LOAN_AMOUNT_ACD: 1000,
+                MAX_LOAN_AMOUNT_ACD: 2000,
                 CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan
                 CHANCE_TO_SELL_ALL_ACD: 0.05, // % chance to sell all ACD balance (unless repayment is due soon)
                 INTEREST_SENSITIVITY: 0.5 /* how sensitive is the borrower for marketLoanInterestRate ?
