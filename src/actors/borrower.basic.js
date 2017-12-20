@@ -43,25 +43,47 @@ class BorrowerBasic extends Actor {
 
         /* Get new loan if there is no loan */
         if (this.loans.length === 0) {
-            const augmintInterest = state.augmint.loanProducts[0].interestPt;
+            const loanProduct = state.augmint.loanProducts[0];
+            const augmintInterest = loanProduct.interestPt;
             const marketInterest = state.augmint.params.marketLoanInterestRate;
 
             const interestAdvantagePt =
                 (marketInterest - augmintInterest) / marketInterest +
                 this.params.INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT;
             const marketChance = Math.min(1, interestAdvantagePt * this.params.INTEREST_SENSITIVITY);
+            const wantToTake = state.utils.byChanceInADay(this.params.CHANCE_TO_TAKE_LOAN * marketChance);
+            const ethBalanceInAcd = this.convertEthToAcd(this.ethBalance);
+            const wantToTakeAmount = wantToTake
+                ? Math.min(
+                      Math.floor(
+                          this.convertEthToAcd(this.ethBalance) * marketChance * loanProduct.loanCollateralRatio
+                      ),
+                      ethBalanceInAcd,
+                      this.params.MAX_LOAN_AMOUNT_ACD
+                  )
+                : 0;
 
-            //console.log(marketInterest, augmintInterest, interestAdvantagePt, marketChance * state.meta.stepsPerDay);
-
-            if (state.utils.byChanceInADay(this.params.CHANCE_TO_TAKE_LOAN * marketChance)) {
-                let loanAmount = Math.min(this.convertEthToAcd(this.ethBalance), this.params.MAX_LOAN_AMOUNT_ACD);
-                this.takeLoan(0, loanAmount);
+            // console.debug(
+            //     this.id,
+            //     marketInterest,
+            //     augmintInterest,
+            //     'ethBalanceInAcd: ' + ethBalanceInAcd,
+            //     'int adv: ' + interestAdvantagePt,
+            //     'marketChance: ' + marketChance * 100 + '%',
+            //     'chance perday: ' +
+            //         this.params.CHANCE_TO_TAKE_LOAN * marketChance * state.meta.stepsPerDay * 100 +
+            //         '% ' +
+            //         wantToTake,
+            //     'wantToTakeAmount: ' + wantToTakeAmount
+            // );
+            if (wantToTake && wantToTakeAmount > state.augmint.loanProducts[0].minimumLoanInAcd) {
+                this.takeLoan(0, wantToTakeAmount);
             }
         }
 
         /* Sell all ACD (CHANCE_TO_SELL_ALL_ACD) unless repayment is due soon */
         if (this.acdBalance && !willRepaySoon && state.utils.byChanceInADay(this.params.CHANCE_TO_SELL_ALL_ACD)) {
-            this.sellACD(this.acdBalance); // TODO: how to simulate keeping some ACD and selling at random moment?
+            this.sellACD(this.acdBalance);
         }
 
         if (this.loans.length > 0) {

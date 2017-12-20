@@ -37,16 +37,18 @@ class LockerBasic extends Actor {
             const marketChance = Math.min(1, interestAdvantagePt * this.params.INTEREST_SENSITIVITY);
 
             this.wantToLock = state.utils.byChanceInADay(this.params.CHANCE_TO_LOCK * marketChance);
+            const ethBalanceInAcd = this.convertEthToAcd(this.ethBalance);
             this.wantToLockAmount = this.wantToLock
-                ? Math.min(this.convertEthToAcd(this.ethBalance) * marketChance, this.getMaxLockableAcd())
+                ? Math.min(ethBalanceInAcd * marketChance, this.getMaxLockableAcd(), ethBalanceInAcd)
                 : 0;
 
-            // console.log(
+            // console.debug(
             //     marketInterest,
             //     augmintInterest,
+            //     'ethBalanceInAcd: ' + ethBalanceInAcd,
             //     'int adv: ' + interestAdvantagePt,
             //     'marketChance: ' + marketChance * 100 + '%',
-            //     'chance perday: ' + marketChance * state.meta.stepsPerDay * 100 + '% ' + this.wantToLock,
+            //     'chance perday: ' this.params.CHANCE_TO_LOCK * marketChance * state.meta.stepsPerDay * 100 + '% ' + this.wantToLock,
             //     'wanToLockAmount: ' + this.wantToLockAmount
             // );
         }
