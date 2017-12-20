@@ -184,14 +184,13 @@ function init() {
             It's is special actor, don't change the name of it ('reserve').
         */
         reserve: { type: 'ReserveBasic', balances: { acd: 50000 /* genesis acd */, eth: 0 } },
-        monetaryBoard: { type: 'MonetaryBoardBasic', balances: {} },
+        //monetaryBoard: { type: 'MonetaryBoardBasic', balances: {} },
         alwaysLocker: {
             type: 'LockerBasic',
             balances: {
-                eth: 5000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_LOCK & INITIAL_ACD_TO_CONVERT */
+                eth: 5000
             },
             params: {
-                INITIAL_ACD_TO_CONVERT: 2000,
                 CHANCE_TO_LOCK: 1, // always relock all ACD balance (initial liquidity provider)
                 INTEREST_SENSITIVITY: 0.5 /* how sensitive is the locker for marketLockInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
@@ -206,17 +205,16 @@ function init() {
             type: 'LockerBasic',
             count: 50,
             balances: {
-                eth: 5000 /* "unlimited" ETH, demand adjusted with CHANCE_TO_LOCK & INITIAL_ACD_TO_CONVERT */
+                eth: 5000
             },
             params: {
-                INITIAL_ACD_TO_CONVERT: 2000,
-                CHANCE_TO_LOCK: 0.5, // relock by chance % of days when no lock
+                CHANCE_TO_LOCK: 0.5, // relock by chance % of days when no lock and  lock interest rates compelling
                 INTEREST_SENSITIVITY: 0.5 /* how sensitive is the locker for marketLockInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
                                             TODO: make this a curve and to a param which makes more sense
                                                     + do we need CHANCE_TO_LOCK since we have this?   */,
                 INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: -0.1 /* locks with a small chance even when interestadvantage is 0 or less.
-                                                                e.g. 0.01 then it calculates with 1% adv. when 0% advantage
+                                                                e.g. 0.1 then it calculates with 10% adv. when 0% advantage
                                                                  TODO: make it better */
             }
         },
