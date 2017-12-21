@@ -7,6 +7,14 @@ const augmint = require('./augmint.js');
 const logger = require('../lib/logger.js');
 const orderBook = augmint.orderBook;
 
+function convertEthToUsd(ethAmount) {
+    return ethAmount * augmint.rates.ethToUsd;
+}
+
+function convertUsdToEth(usdAmount) {
+    return usdAmount / augmint.rates.ethToUsd;
+}
+
 function buyACD(actorId, acdAmount) {
     if (acdAmount <= 0) {
         return false;
@@ -146,12 +154,48 @@ function sellACD(actorId, acdAmount) {
     return true;
 }
 
+function sellEthForUsd(actorId, usdAmount) {
+    const ethAmount = convertUsdToEth(usdAmount);
+    if (ethAmount > augmint.actors[actorId].balances.eth) {
+        console.error(
+            'insufficient ETH balance to sell ETH ' + actorId,
+            ' usdAmount:' + usdAmount,
+            'eth balance: ',
+            augmint.actors[actorId].balances.eth
+        );
+        return false;
+    }
+    augmint.actors[actorId].balances.eth -= ethAmount;
+    augmint.actors[actorId].balances.usd += usdAmount;
+    return true;
+}
+
+function buyEthWithUsd(actorId, usdAmount) {
+    const ethAmount = convertUsdToEth(usdAmount);
+    if (usdAmount > augmint.actors[actorId].balances.usd) {
+        console.error(
+            'insufficient USD balance to buy ETH ' + actorId,
+            ' usdAmount:' + usdAmount,
+            'eth balance: ',
+            augmint.actors[actorId].balances.eth
+        );
+        return false;
+    }
+    augmint.actors[actorId].balances.eth += ethAmount;
+    augmint.actors[actorId].balances.usd -= usdAmount;
+    return true;
+}
+
 function convertAcdToEth(acdAmount) {
     return acdAmount / augmint.rates.ethToAcd;
 }
 
 function convertEthToAcd(ethAmount) {
     return ethAmount * augmint.rates.ethToAcd;
+}
+
+function convertUsdToAcd(usdAmount) {
+    return usdAmount; /* TODO: make this a conversion? via ethToAcd and ethToUsd or new usdToAcd */
 }
 
 function getActorSellAcdOrdersSum(actorId) {
@@ -166,5 +210,10 @@ module.exports = {
     sellACD,
     convertAcdToEth,
     convertEthToAcd,
+    sellEthForUsd,
+    buyEthWithUsd,
+    convertEthToUsd,
+    convertUsdToEth,
+    convertUsdToAcd,
     getActorSellAcdOrdersSum
 };

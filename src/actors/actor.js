@@ -15,7 +15,8 @@ class Actor {
         augmint.actors[this.id] = {
             balances: {
                 eth: balances.eth || 0,
-                acd: balances.acd || 0
+                acd: balances.acd || 0,
+                usd: balances.usd || 0
             },
             state: state || {},
             type: this.constructor.name,
@@ -36,6 +37,10 @@ class Actor {
 
     get ethBalance() {
         return augmint.actors[this.id].balances.eth || 0;
+    }
+
+    get usdBalance() {
+        return augmint.actors[this.id].balances.usd || 0;
     }
 
     get loans() {
@@ -101,6 +106,18 @@ class Actor {
         return exchange.convertEthToAcd(ethAmount);
     }
 
+    convertEthToUsd(ethAmount) {
+        return exchange.convertEthToUsd(ethAmount);
+    }
+
+    convertUsdToEth(usdAmount) {
+        return exchange.convertUsdToEth(usdAmount);
+    }
+
+    convertUsdToAcd(usdAmount) {
+        return exchange.convertUsdToAcd(usdAmount);
+    }
+
     // MOVE SET:
     buyACD(acdAmount) {
         let ret = exchange.buyACD(this.id, acdAmount);
@@ -111,6 +128,18 @@ class Actor {
     sellACD(acdAmount) {
         let ret = exchange.sellACD(this.id, acdAmount);
         logger.logMove(augmint, this.id, 'sellAcd order', { acdAmount: acdAmount });
+        return ret;
+    }
+
+    buyEthWithUsd(usdAmount) {
+        let ret = exchange.buyEthWithUsd(this.id, usdAmount);
+        logger.logMove(augmint, this.id, 'buyEth order', { usdAmount: usdAmount });
+        return ret;
+    }
+
+    sellEthForUsd(usdAmount) {
+        let ret = exchange.sellEth(this.id, usdAmount);
+        logger.logMove(augmint, this.id, 'sellEth order', { usdAmount: usdAmount });
         return ret;
     }
 

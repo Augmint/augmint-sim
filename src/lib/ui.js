@@ -188,8 +188,7 @@ function init() {
         alwaysLocker: {
             type: 'LockerBasic',
             balances: {
-                eth: 5000 /* TODO: set this in ACD so we have a realistic value with any ETH/USD
-                                price we start the simulation with */
+                usd: 10000
             },
             params: {
                 CHANCE_TO_LOCK: 1, // always relock all ACD balance (initial liquidity provider)
@@ -206,7 +205,7 @@ function init() {
             type: 'LockerBasic',
             count: 10,
             balances: {
-                eth: 5000
+                usd: 10000
             },
             params: {
                 CHANCE_TO_LOCK: 0.5, // relock by chance % of days when no lock and  lock interest rates compelling
