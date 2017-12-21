@@ -15,6 +15,18 @@ function convertUsdToEth(usdAmount) {
     return usdAmount / augmint.rates.ethToUsd;
 }
 
+function convertAcdToEth(acdAmount) {
+    return acdAmount / augmint.rates.ethToAcd;
+}
+
+function convertEthToAcd(ethAmount) {
+    return ethAmount * augmint.rates.ethToAcd;
+}
+
+function convertUsdToAcd(usdAmount) {
+    return usdAmount; /* TODO: make this a conversion? via ethToAcd and ethToUsd or new usdToAcd */
+}
+
 function buyACD(actorId, acdAmount) {
     if (acdAmount <= 0) {
         return false;
@@ -36,7 +48,7 @@ function buyACD(actorId, acdAmount) {
         // get fulfilled, we're always looking at the first element
         const sellOrder = sellOrders[0];
         const sellAmount = sellOrder.amount > acdAmount ? acdAmount : sellOrder.amount;
-        const ethAmount = sellAmount / augmint.rates.ethToAcd;
+        const ethAmount = convertAcdToEth(sellAmount);
         const feesInAcd = sellAmount * augmint.params.exchangeFeePercentage;
 
         // reduce remaining buy order:
@@ -103,7 +115,7 @@ function sellACD(actorId, acdAmount) {
         // get fulfilled, we're always looking at the first element
         const buyOrder = buyOrders[0];
         const buyAmount = buyOrder.amount > acdAmount ? acdAmount : buyOrder.amount;
-        const ethAmount = buyAmount / augmint.rates.ethToAcd;
+        const ethAmount = convertAcdToEth(buyAmount);
         const feesInEth = ethAmount * augmint.params.exchangeFeePercentage;
 
         // reduce remaining sell order:
@@ -184,18 +196,6 @@ function buyEthWithUsd(actorId, usdAmount) {
     augmint.actors[actorId].balances.eth += ethAmount;
     augmint.actors[actorId].balances.usd -= usdAmount;
     return true;
-}
-
-function convertAcdToEth(acdAmount) {
-    return acdAmount / augmint.rates.ethToAcd;
-}
-
-function convertEthToAcd(ethAmount) {
-    return ethAmount * augmint.rates.ethToAcd;
-}
-
-function convertUsdToAcd(usdAmount) {
-    return usdAmount; /* TODO: make this a conversion? via ethToAcd and ethToUsd or new usdToAcd */
 }
 
 function getActorSellAcdOrdersSum(actorId) {

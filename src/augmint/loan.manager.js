@@ -155,7 +155,8 @@ function collectDefaultedLoan(actorId, loanId) {
         return false;
     }
 
-    const targetDefaultFeeInEth = loan.loanAmountInAcd * augmint.rates.ethToAcd * (1 + loan.defaultFeePercentage);
+    const targetDefaultFeeInEth =
+        augmint.exchange.convertAcdToEth(loan.loanAmountInAcd) * (1 + loan.defaultFeePercentage);
     const actualDefaultFeeInEth = Math.min(loan.collateralInEth, targetDefaultFeeInEth);
 
     // move collateral -> augmint reserves/user
