@@ -138,7 +138,7 @@ class Actor {
     }
 
     sellEthForUsd(usdAmount) {
-        let ret = exchange.sellEth(this.id, usdAmount);
+        let ret = exchange.sellEthForUsd(this.id, usdAmount);
         logger.logMove(augmint, this.id, 'sellEth order', { usdAmount: usdAmount });
         return ret;
     }
