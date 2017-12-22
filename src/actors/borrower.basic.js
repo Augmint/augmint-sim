@@ -91,7 +91,8 @@ class BorrowerBasic extends Actor {
 
             if (willRepaySoon && this.acdBalance < repaymentDue) {
                 // buys ACD for repayment
-                const buyAmount = Math.max(0, repaymentDue - this.acdBalance);
+                let buyAmount = Math.max(0, repaymentDue - this.acdBalance);
+                buyAmount /= 1 - state.augmint.params.exchangeFeePercentage;
                 this.buyACD(buyAmount);
             }
 
