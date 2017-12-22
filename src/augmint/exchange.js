@@ -167,11 +167,16 @@ function sellACD(actorId, acdAmount) {
 }
 
 function sellEthForUsd(actorId, usdAmount) {
-    const ethAmount = convertUsdToEth(usdAmount);
+    let ethAmount = convertUsdToEth(usdAmount);
+    if (ethAmount - augmint.actors[actorId].balances.eth < ethAmount * 0.00001) {
+        // FIXME: we won't need this dirty hack when swiching to BigNumber
+        ethAmount = augmint.actors[actorId].balances.eth;
+    }
     if (ethAmount > augmint.actors[actorId].balances.eth) {
         console.error(
             'insufficient ETH balance to sell ETH ' + actorId,
             ' usdAmount:' + usdAmount,
+            ' ethAmount: ' + ethAmount,
             'eth balance: ',
             augmint.actors[actorId].balances.eth
         );
@@ -188,6 +193,7 @@ function buyEthWithUsd(actorId, usdAmount) {
         console.error(
             'insufficient USD balance to buy ETH ' + actorId,
             ' usdAmount:' + usdAmount,
+            ' ethAmount: ' + ethAmount,
             'eth balance: ',
             augmint.actors[actorId].balances.eth
         );
