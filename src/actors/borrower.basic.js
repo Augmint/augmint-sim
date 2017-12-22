@@ -24,13 +24,14 @@ const defaultParams = {
 class BorrowerBasic extends Actor {
     constructor(id, balances, state, _params = {}) {
         super(id, balances, state, Object.assign({}, defaultParams, _params));
-        this.doesLikeLoanInterestRate;
+        this.triedToBuyForRepayment = false;
     }
 
     executeMoves(state) {
         const { currentTime } = state.meta;
         const repaymentDue = this.loans[0] ? this.loans[0].repaymentDue + this.params.REPAYMENT_COST_ACD : 0;
         // TODO: move this to loanManager? Unlikely that anyone would repay a loan if value below repayment
+        const timeUntilRepayment = this.loans[0] ? this.loans[0].repayBy - currentTime : 0;
         const collateralValueAcd = this.loans[0]
             ? this.loans[0] && this.convertEthToAcd(this.loans[0].collateralInEth)
             : 0;
@@ -43,6 +44,7 @@ class BorrowerBasic extends Actor {
 
         /* Get new loan if there is no loan */
         if (this.loans.length === 0) {
+            this.triedToBuyForRepayment = false;
             const loanProduct = state.augmint.loanProducts[0];
             const augmintInterest = loanProduct.interestPt;
             const marketInterest = state.augmint.params.marketLoanInterestRate;
@@ -63,19 +65,6 @@ class BorrowerBasic extends Actor {
                   )
                 : 0;
 
-            // console.debug(
-            //     this.id,
-            //     marketInterest,
-            //     augmintInterest,
-            //     'ethBalanceInAcd: ' + ethBalanceInAcd,
-            //     'int adv: ' + interestAdvantagePt,
-            //     'marketChance: ' + marketChance * 100 + '%',
-            //     'chance perday: ' +
-            //         this.params.CHANCE_TO_TAKE_LOAN * marketChance * state.meta.stepsPerDay * 100 +
-            //         '% ' +
-            //         wantToTake,
-            //     'wantToTakeAmount: ' + wantToTakeAmount
-            // );
             if (wantToTake && wantToTakeAmount > state.augmint.loanProducts[0].minimumLoanInAcd) {
                 this.takeLoan(0, wantToTakeAmount);
             }
@@ -86,25 +75,34 @@ class BorrowerBasic extends Actor {
             this.sellACD(this.acdBalance);
         }
 
-        if (this.loans.length > 0) {
+        if (this.loans.length > 0 && willRepaySoon) {
             /* BUY ACD in advance for repayment */
-
-            if (willRepaySoon && this.acdBalance < repaymentDue) {
+            if (
+                this.acdBalance < repaymentDue &&
+                /* rare edge case when ethValue recovered since last tick but
+                    there would not be enough time to buy acd. We let it default, not even trying to buy ACD : */
+                !this.triedToBuyForRepayment &&
+                timeUntilRepayment <= state.meta.timeStep
+            ) {
                 // buys ACD for repayment
                 let buyAmount = Math.max(0, repaymentDue - this.acdBalance);
                 buyAmount /= 1 - state.augmint.params.exchangeFeePercentage;
                 this.buyACD(buyAmount);
+                this.triedToBuyForRepayment = true;
             }
 
             /* Repay REPAY_X_DAYS_BEFORE maturity  */
             if (
-                currentTime >= this.loans[0].repayBy - this.params.REPAY_X_DAYS_BEFORE * ONE_DAY_IN_SECS &&
-                repaymentDue < collateralValueAcd
+                repaymentDue < collateralValueAcd &&
+                timeUntilRepayment <= this.params.REPAY_X_DAYS_BEFORE * ONE_DAY_IN_SECS &&
+                (this.acdBalance >= repaymentDue ||
+                    (timeUntilRepayment < state.meta.timeStep && this.triedToBuyForRepayment))
             ) {
                 // repays ACD:
                 if (!this.repayLoan(this.loans[0].id)) {
                     throw new AugmintError(
-                        'Always borrower couldn\'t repay.\n' +
+                        this.id +
+                            ' couldn\'t repay.\n' +
                             'repaymentDue: ' +
                             repaymentDue +
                             '\nACD borrower balance: ' +
