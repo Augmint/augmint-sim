@@ -64,7 +64,7 @@ function buyACD(actorId, acdAmount) {
         augmint.balances.exchangeAcd -= sellAmount;
         augmint.actors[actorId].balances.acd += sellAmount - feesInAcd;
         augmint.balances.acdFeesEarned += feesInAcd;
-        logger.logMove(augmint, actorId, 'Order match', {
+        logger.logMove(actorId, 'Order match', {
             buyer: actorId,
             seller: sellOrder.actorId,
             ethAmount: ethAmount,
@@ -131,7 +131,7 @@ function sellACD(actorId, acdAmount) {
         // acd: exchange -> buyer
         augmint.balances.exchangeAcd -= buyAmount;
         augmint.actors[buyOrder.actorId].balances.acd += buyAmount;
-        logger.logMove(augmint, actorId, 'Order match', {
+        logger.logMove(actorId, 'Order match', {
             buyer: buyOrder.actorId,
             seller: actorId,
             ethAmount: ethAmount,

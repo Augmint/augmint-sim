@@ -123,7 +123,7 @@ function populateRatesDropDown() {
 
 function init() {
     graphs.init(graphsWrapper);
-    logger.init(logTextArea);
+    logger.init(simulation.getState, logTextArea);
 
     populateRatesDropDown();
 

@@ -10,7 +10,7 @@ const ActorDirectory = require('../actors/actor.directory.js');
 const RandomSeed = require('random-seed');
 
 let params = {};
-
+let iteration = 0;
 let random = new RandomSeed(params.randomSeed);
 
 const actors = new Set();
@@ -54,7 +54,8 @@ function getState() {
             currentTime: clock.getTime(),
             currentDay: clock.getDay(),
             timeStep: params.timeStep,
-            stepsPerDay: params.stepsPerDay
+            stepsPerDay: params.stepsPerDay,
+            iteration: iteration
         },
         augmint: augmint,
         exchange: exchange,
@@ -64,7 +65,7 @@ function getState() {
 }
 
 function incrementBy(_timeStep = params.timeStep) {
-    logger.logIteration(augmint);
+    logger.logIteration();
     rates.updateRates();
     // actors make their moves:
     actors.forEach(actor => {
@@ -74,6 +75,7 @@ function incrementBy(_timeStep = params.timeStep) {
     // system updates:
     loanManager.collectAllDefaultedLoans();
     clock.incrementBy(_timeStep);
+    iteration++;
 }
 
 function addActors(newActors) {

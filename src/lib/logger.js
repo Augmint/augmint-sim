@@ -3,7 +3,7 @@ const clock = require('./clock.js');
 let printEachIteration = false;
 let printEachMove = true;
 
-let iteration = 0;
+let simulationState;
 let logTextArea;
 
 const augmintStatusHeader = [
@@ -27,7 +27,8 @@ const movesConsoleLogHeader = [' day', ' iteration', ' actor', ' move', ' params
 const movesLogHeader = movesConsoleLogHeader.concat(augmintStatusHeader);
 let movesLog = new Array(movesLogHeader);
 
-function init(_logTextArea) {
+function init(_simulationState, _logTextArea) {
+    simulationState = _simulationState;
     logTextArea = _logTextArea;
 }
 
@@ -63,7 +64,8 @@ function toCsv(_array) {
     return ret;
 }
 
-function getAugmintStatusLog(augmint) {
+function getAugmintStatusLog() {
+    const augmint = simulationState().augmint;
     return [
         augmint.rates.ethToUsd,
         augmint.netAcdDemand,
@@ -80,30 +82,29 @@ function getAugmintStatusLog(augmint) {
     ];
 }
 
-function logMove(augmint, actor, move, params) {
+function logMove(actor, move, params) {
     const daysPassed = clock.getDay();
-    const logItem = [daysPassed, iteration, actor, move, params];
+    const logItem = [daysPassed, simulationState().meta.iteration, actor, move, params];
     if (printEachMove) {
         if (movesLog.length === 1) {
             addToLogTextArea('MOVE, ' + movesConsoleLogHeader + '\n');
         }
         addToLogTextArea('MOVE, ' + toCsv(new Array(logItem)) + '\n');
     }
-    movesLog.push(logItem.concat(getAugmintStatusLog(augmint)));
+    movesLog.push(logItem.concat(getAugmintStatusLog()));
 }
 
-function logIteration(augmint) {
+function logIteration() {
     const daysPassed = clock.getDay();
-    const logItem = [daysPassed, iteration].concat(getAugmintStatusLog(augmint));
+    const logItem = [daysPassed, simulationState().meta.iteration].concat(getAugmintStatusLog());
     if (printEachIteration) {
         if (iterationLog.length === 1) {
             addToLogTextArea('ITERATION, ' + iterationLogHeader + '\n');
         }
         addToLogTextArea('ITERATION ' + toCsv(new Array(logItem)) + '\n');
     }
-    logMove(augmint, 'simulation', 'New iteration', '');
+    logMove('simulation', 'New iteration', '');
     iterationLog.push(logItem);
-    iteration++;
 }
 
 function printIterationLog() {
