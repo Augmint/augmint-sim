@@ -82,7 +82,7 @@ class BorrowerBasic extends Actor {
                 /* rare edge case when ethValue recovered since last tick but
                     there would not be enough time to buy acd. We let it default, not even trying to buy ACD : */
                 !this.triedToBuyForRepayment &&
-                timeUntilRepayment <= state.meta.timeStep
+                timeUntilRepayment >= state.meta.timeStep
             ) {
                 // buys ACD for repayment
                 let buyAmount = Math.max(0, repaymentDue - this.acdBalance);
