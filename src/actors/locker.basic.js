@@ -79,7 +79,14 @@ class LockerBasic extends Actor {
         }
 
         /* sell ACD left on balance */
-        // TODO:
+        if (this.acdBalance > 0) {
+            this.sellACD(this.acdBalance);
+        }
+
+        /* sell ETH balance to USD */
+        if (this.ethBalance > 0) {
+            this.sellEthForUsd(this.convertEthToUsd(this.ethBalance));
+        }
     }
 }
 
