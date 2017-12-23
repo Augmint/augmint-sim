@@ -159,6 +159,7 @@ function init() {
         augmintOptions: {
             balances: { interestEarnedPool: 1000 /* genesis */ },
             params: {
+                maxLoanToDepositRatio: 1, // don't allow new loan if it's more
                 exchangeFeePercentage: 0.003,
                 marketLoanInterestRate: 0.14, // what do we compete with?  actor's demand for loans depends on it
                 marketLockInterestRate: 0.06, // what do we compete with? actor's demand for locks depends on it

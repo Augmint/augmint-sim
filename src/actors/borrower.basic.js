@@ -43,7 +43,7 @@ class BorrowerBasic extends Actor {
             repaymentDue < collateralValueAcd;
 
         /* Get new loan if there is no loan */
-        if (this.loans.length === 0) {
+        if (this.loans.length === 0 && state.augmint.borrowingAllowed) {
             this.triedToBuyForRepayment = false;
             const loanProduct = state.augmint.loanProducts[0];
             const augmintInterest = loanProduct.interestPt;

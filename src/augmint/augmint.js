@@ -28,7 +28,8 @@ module.exports = {
         marketLockInterestRate: 0.04, // what do we compete with? actor's demand for locks depends on it
         exchangeFeePercentage: 0.1,
         lockedAcdInterestPercentage: 0.5,
-        lockTimeInDays: 365
+        lockTimeInDays: 365,
+        maxLoanToDepositRatio: 1 // don't allow new loans if it's more
     },
 
     rates: {
@@ -108,5 +109,15 @@ module.exports = {
             this.reserveAcd +
             this.reserveAcdOnExchange
         );
+    },
+
+    get loanToDepositRatio() {
+        return this.balances.lockedAcdPool === 0
+            ? this.params.maxLoanToDepositRatio
+            : this.balances.openLoansAcd / this.balances.lockedAcdPool;
+    },
+
+    get borrowingAllowed() {
+        return this.loanToDepositRatio < this.params.maxLoanToDepositRatio;
     }
 };

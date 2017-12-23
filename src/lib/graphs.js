@@ -199,6 +199,28 @@ const graphs = [
         }]
     },
     {
+        title: 'Loan to Deposit Ratio',
+        options: { scales: { yAxes: [ {ticks: { suggestedMax: 2 } } ] } },
+        datasets: [
+            {
+            func: augmint => { return augmint.params.maxLoanToDepositRatio; },
+                options: {
+                        label: 'max',
+                        borderDash: DASHED_LINE,
+                        borderColor: DARKRED,
+                        backgroundColor: TRANSPARENT
+                    }
+            },
+            {
+            func: augmint => { return augmint.loanToDepositRatio; },
+                options: {
+                    label: 'current',
+                    borderColor: OPEN_LOANS_COLOR,
+                    backgroundColor: TRANSPARENT
+                }
+        }]
+    },
+    {
         title: 'ACD Locked',
         datasets: [{
             func: augmint => { return augmint.balances.lockedAcdPool; },
