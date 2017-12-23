@@ -25,8 +25,8 @@ const ACD_SUPPLY_COLOR = BLUE;
 const ACD_SUPPLY_COLOR_OPA = BLUE_OPA;
 const LOCKED_ACD_COLOR = YELLOW;
 const LOCKED_ACD_COLOR_OPA = YELLOW_OPA;
-const USER_ACD_COLOR = ORANGE;
-const USER_ACD_COLOR_OPA = ORANGE_OPA;
+const FLOATING_ACD_COLOR = ORANGE;
+const FLOATING_ACD_COLOR_OPA = ORANGE_OPA;
 const SYSTEM_ACC_COLOR = GREEN;
 const SYSTEM_ACC_COLOR_OPA = GREEN_OPA;
 const DEFAULTED_COLOR = DARKRED;
@@ -102,12 +102,12 @@ const graphs = [
             },
             {
                 func: augmint => {
-                    return augmint.usersAcd;
+                    return augmint.floatingAcd;
                 },
                 options: {
-                    label: 'user',
-                    borderColor: USER_ACD_COLOR,
-                    backgroundColor: USER_ACD_COLOR
+                    label: 'floating',
+                    borderColor: FLOATING_ACD_COLOR,
+                    backgroundColor: FLOATING_ACD_COLOR
                 }
             }
         ]
@@ -118,8 +118,8 @@ const graphs = [
             func: augmint => { return augmint.floatingAcd; },
             options: {
                 label: 'user',
-                borderColor: USER_ACD_COLOR,
-                backgroundColor: USER_ACD_COLOR_OPA
+                borderColor: FLOATING_ACD_COLOR,
+                backgroundColor: FLOATING_ACD_COLOR_OPA
             }
         }]
     },
