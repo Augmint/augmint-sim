@@ -199,7 +199,8 @@ function init() {
                                                     + do we need CHANCE_TO_LOCK since we have this?   */,
                 INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: -0.1 /* locks with a small chance even when interestadvantage is 0 or less.
                                                                 e.g. 0.01 then it calculates with 1% adv. when 0% advantage
-                                                                 TODO: make it better */
+                                                                 TODO: make it better */,
+                CHANCE_TO_SELL_ALL_ACD: 0.1 /* if  doesn't want lock then what chance in a day that they sell their ACD */
             }
         },
         randomLocker: {
@@ -216,7 +217,8 @@ function init() {
                                                     + do we need CHANCE_TO_LOCK since we have this?   */,
                 INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: -0.1 /* locks with a small chance even when interestadvantage is 0 or less.
                                                                 e.g. 0.1 then it calculates with 10% adv. when 0% advantage
-                                                                 TODO: make it better */
+                                                                 TODO: make it better */,
+                CHANCE_TO_SELL_ALL_ACD: 0.05 /* if  doesn't want lock then what chance in a day that they sell their ACD */
             }
         },
         randomAllSellBorrower: {
@@ -227,7 +229,7 @@ function init() {
             },
             params: {
                 MAX_LOAN_AMOUNT_ACD: 10000, // TODO: remove this param from actor and create a system limit
-                CHANCE_TO_TAKE_LOAN: 1, // % chance to take a loan (on top of chances based on marketrates
+                CHANCE_TO_TAKE_LOAN: 1, // % chance to take a loan on a day (on top of chances based on marketrates
                 CHANCE_TO_SELL_ALL_ACD: 1, // immediately sells full ACD balance
                 INTEREST_SENSITIVITY: 3 /* how sensitive is the borrower for marketLoanInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
@@ -246,7 +248,7 @@ function init() {
             },
             params: {
                 MAX_LOAN_AMOUNT_ACD: 10000,
-                CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan
+                CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan on a day (on top of chances based on marketrates
                 CHANCE_TO_SELL_ALL_ACD: 0.05, // % chance to sell all ACD balance (unless repayment is due soon)
                 INTEREST_SENSITIVITY: 0.5 /* how sensitive is the borrower for marketLoanInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt

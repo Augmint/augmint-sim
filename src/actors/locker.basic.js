@@ -11,7 +11,8 @@ const defaultParams = {
                                         + do we need CHANCE_TO_LOCK since we have this?    */,
     INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: 0.05 /* locks with a small chance even when interestadvantage is 0 or less.
                                                     e.g. 0.01 then it calculates with 1% adv. when 0% advantage
-                                                     TODO: make it better */
+                                                     TODO: make it better */,
+    CHANCE_TO_SELL_ALL_ACD: 1 /* if  doesn't want lock then what chance in a day that they sell their ACD */
 };
 
 class LockerBasic extends Actor {
@@ -79,7 +80,7 @@ class LockerBasic extends Actor {
         }
 
         /* sell ACD left on balance */
-        if (this.acdBalance > 0) {
+        if (this.acdBalance > 0 && state.utils.byChanceInADay(this.params.CHANCE_TO_SELL_ALL_ACD)) {
             this.sellACD(this.acdBalance);
         }
 
