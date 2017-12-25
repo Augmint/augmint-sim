@@ -29,12 +29,14 @@ module.exports = {
         exchangeFeePercentage: 0.1,
         lockedAcdInterestPercentage: 0.5,
         lockTimeInDays: 365,
-        maxLoanToDepositRatio: 1 // don't allow new loans if it's more
+        maxLoanToDepositRatio: 1, // don't allow new loans if it's more
+        ethUsdTrendSampleDays: 3 // how many days to inspect for rates.ethToUsdTrend calculation)
     },
 
     rates: {
         ethToAcd: 1, // i.e. price per acd in eth
-        ethToUsd: 1
+        ethToUsd: 1,
+        ethToUsdTrend: 0
     },
 
     orderBook: {

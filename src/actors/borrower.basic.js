@@ -12,6 +12,7 @@ const defaultParams = {
     CHANCE_TO_TAKE_LOAN: 1, // % chance to take loan on a day (when there is no open loan)
     CHANCE_TO_SELL_ALL_ACD: 1, // % chance to sell all acd on a day (unless repayment is due soon)
 
+    COLLATERAL_RATIO_SENSITIVITY: 1 /* chance = COLLATERAL_RATIO_SENSITIVITY * collateralRatio */,
     INTEREST_SENSITIVITY: 0.5 /* how sensitive is the borrower for marketLoanInterestRate ?
                                 linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
                                 TODO: make this a curve and to a param which makes more sense
@@ -53,7 +54,13 @@ class BorrowerBasic extends Actor {
             const interestAdvantagePt =
                 (marketInterest - augmintInterest) / marketInterest +
                 this.params.INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT;
-            const marketChance = Math.min(1, interestAdvantagePt * this.params.INTEREST_SENSITIVITY);
+            const marketChance = Math.min(
+                1,
+                interestAdvantagePt *
+                    this.params.INTEREST_SENSITIVITY *
+                    this.params.COLLATERAL_RATIO_SENSITIVITY *
+                    loanProduct.loanCollateralRatio
+            );
             const wantToTake = state.utils.byChanceInADay(this.params.CHANCE_TO_TAKE_LOAN * marketChance);
             const wantToTakeAmount = wantToTake
                 ? Math.min(

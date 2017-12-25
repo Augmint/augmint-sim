@@ -10,12 +10,12 @@ const BLUE = 'rgba(41, 51, 155, 1)';
 
 const DARKRED = 'rgba(141, 8, 1, 1)';
 
-const PURPLE_OPA = 'rgba(139, 95, 191, 0.2)';
+//const PURPLE_OPA = 'rgba(139, 95, 191, 0.2)';
 const GREY_OPA = 'rgb(230, 88, 88)';
 const TRANSPARENT = 'rgba(0, 0, 0, 0)';
 //const DARKGREEN_OPA = 'rgba(3, 71, 50, 0.2)';
 const GREEN_OPA = 'rgba(0, 129, 72,  0.2)';
-const YELLOW_OPA = 'rgba(198, 192, 19,  0.2)';
+//const YELLOW_OPA = 'rgba(198, 192, 19,  0.2)';
 const ORANGE_OPA = 'rgba(239, 138, 23,  0.2)';
 //const RED_OPA = 'rgba(239, 41, 23,  0.2)';
 const DARKRED_OPA = 'rgba(141, 8, 1,  0.2)';
@@ -24,7 +24,7 @@ const BLUE_OPA = 'rgba(41, 51, 155, 0.2)';
 const ACD_SUPPLY_COLOR = BLUE;
 const ACD_SUPPLY_COLOR_OPA = BLUE_OPA;
 const LOCKED_ACD_COLOR = YELLOW;
-const LOCKED_ACD_COLOR_OPA = YELLOW_OPA;
+//const LOCKED_ACD_COLOR_OPA = YELLOW_OPA;
 const FLOATING_ACD_COLOR = ORANGE;
 const FLOATING_ACD_COLOR_OPA = ORANGE_OPA;
 const SYSTEM_ACC_COLOR = GREEN;
@@ -32,7 +32,7 @@ const SYSTEM_ACC_COLOR_OPA = GREEN_OPA;
 const DEFAULTED_COLOR = DARKRED;
 const DEFAULTED_COLOR_OPA = DARKRED_OPA;
 const OPEN_LOANS_COLOR = PURPLE;
-const OPEN_LOANS_COLOR_OPA = PURPLE_OPA;
+//const OPEN_LOANS_COLOR_OPA = PURPLE_OPA;
 
 const DASHED_LINE = [5, 5];
 
@@ -48,6 +48,14 @@ const graphs = [
             options: { backgroundColor: TRANSPARENT}
         }]
     },
+    // {
+    //     title: 'ETH/USD trend ',
+    //     options: { scales: { yAxes: [ {ticks: { suggestedMax: 0.02, min: undefined } } ] } },
+    //     datasets: [{
+    //         func: augmint => { return Math.round(augmint.rates.ethToUsdTrend*1000); },
+    //         options: { backgroundColor: TRANSPARENT}
+    //     }]
+    // },
     {
         title: 'Net ACD Demand',
         options: { scales: { yAxes: [ {ticks: { min: undefined } } ] } },
@@ -187,6 +195,17 @@ const graphs = [
                     }
             }
         ]
+    },
+    {
+        title: 'Loan Collateral Ratio %',
+        options: { scales: { yAxes: [ {ticks: { suggestedMax: 80, suggestedMin: 20 } } ] } },
+        datasets: [{
+            func: augmint => { return augmint.loanProducts[0].loanCollateralRatio * 100; },
+            options: {
+                borderColor: OPEN_LOANS_COLOR,
+                backgroundColor: TRANSPARENT
+            }
+        }]
     },
     {
         title: 'Interest Earned (ACD)',

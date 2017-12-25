@@ -165,6 +165,7 @@ function init() {
                 marketLockInterestRate: 0.06, // what do we compete with? actor's demand for locks depends on it
                 lockedAcdInterestPercentage: 0.08,
                 lockTimeInDays: 30,
+                ethUsdTrendSampleDays: 5, // how many days to inspect for rates.ethToUsdTrend calculation)
                 loanProduct: {
                     minimumLoanInAcd: 100,
                     loanCollateralRatio: 0.6,
@@ -185,7 +186,18 @@ function init() {
             It's is special actor, don't change the name of it ('reserve').
         */
         reserve: { type: 'ReserveBasic', balances: { acd: 50000 /* genesis acd */, eth: 0 } },
-        //monetaryBoard: { type: 'MonetaryBoardBasic', balances: {} },
+        boardLoanCollateralRatio: {
+            type: 'BoardLoanCollateralRatio',
+            balances: {},
+            params: {
+                HIGH_COLLATERAL_RATIO: 0.3, // collateral ratio when ETH/USD trend above high trigger
+                MID_COLLATERAL_RATIO: 0.6, // collateral ratio when ETH/USD trend b/w low & high triggers
+                LOW_COLLATERAL_RATIO: 0.6, // collateral ratio when ETH/USD trend < low trigger
+                TREND_TRIGGER_LOW: 0.003, // ETH/USD trend: least squares abs(m) value (price normalised to 0-1)
+                TREND_TRIGGER_HIGH: 0.01, // ETH/USD trend: least squares abs(m) value (price normalised to 0-1)
+                MIN_DAYS_BEFORE_RAISE: 14 // how many days to wait from last change before raising COLLATERAL ratio
+            }
+        },
         alwaysLocker: {
             type: 'LockerBasic',
             balances: {
@@ -238,6 +250,7 @@ function init() {
                 WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 0.5, // increase in demand % pa.
                 CHANCE_TO_TAKE_LOAN: 1, // % chance to take a loan on a day (on top of chances based on marketrates
                 CHANCE_TO_SELL_ALL_ACD: 1, // immediately sells full ACD balance
+                COLLATERAL_RATIO_SENSITIVITY: 2, // chance = COLLATERAL_RATIO_SENSITIVITY * collateralRatio
                 INTEREST_SENSITIVITY: 2 /* how sensitive is the borrower for marketLoanInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
                                             TODO: make this a curve and to a param which makes more sense
@@ -260,7 +273,8 @@ function init() {
                 WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 0.5, // increase in demand % pa.
                 CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan on a day (on top of chances based on marketrates
                 CHANCE_TO_SELL_ALL_ACD: 0.05, // % chance to sell all ACD balance (unless repayment is due soon)
-                INTEREST_SENSITIVITY: 1 /* how sensitive is the borrower for marketLoanInterestRate ?
+                COLLATERAL_RATIO_SENSITIVITY: 2, // chance = COLLATERAL_RATIO_SENSITIVITY * collateralRatio
+                INTEREST_SENSITIVITY: 2 /* how sensitive is the borrower for marketLoanInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
                                             TODO: make this a curve and to a param which makes more sense
                                                     + do we need CHANCE_TO_TAKE_LOAN since we have this?  */,

@@ -2,13 +2,15 @@
 
 const rates = require('./rates.json');
 const clock = require('../lib/clock');
-const augmint = require('./augmint.js');
+const statistical = require('../lib/statistical.js');
 const AugmintError = require('../augmint/augmint.error.js');
+
 let dayAdjust = 0;
+let ethUsdHist = [];
 
-function updateRates() {
+function updateRates(state) {
     const day = clock.getDay() + dayAdjust;
-
+    const augmint = state.augmint;
     if (!rates[day]) {
         throw new AugmintError(
             'No ETH/USD historic price available for day ' +
@@ -21,6 +23,23 @@ function updateRates() {
     }
     augmint.rates.ethToAcd = rates[day].open;
     augmint.rates.ethToUsd = rates[day].open;
+    ethUsdHist.push(augmint.rates.ethToUsd);
+    if (ethUsdHist.length > augmint.params.ethUsdTrendSampleDays * state.meta.stepsPerDay) {
+        ethUsdHist.shift();
+    }
+
+    // scale down prices & populate x
+    let scaledHist = [];
+    let x = [];
+    const maxVal = Math.max(...ethUsdHist);
+    for (let i = 0; i < ethUsdHist.length; i++) {
+        scaledHist.push(ethUsdHist[i] / maxVal);
+        x.push(i);
+    }
+
+    const ret = {};
+    const fx = statistical.leastSquares(x, scaledHist, ret);
+    augmint.rates.ethToUsdTrend = ret.m;
 }
 
 function setDay(day) {

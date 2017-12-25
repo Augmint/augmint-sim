@@ -66,7 +66,7 @@ function getState() {
 
 function incrementBy(_timeStep = params.timeStep) {
     logger.logIteration();
-    rates.updateRates();
+    rates.updateRates(getState());
     // actors make their moves:
     actors.forEach(actor => {
         actor.executeMoves(getState());

@@ -4,7 +4,7 @@
 
 module.exports = {
     ReserveBasic: require('./reserve.basic.js'),
-    MonetaryBoardBasic: require('./monetaryBoard.basic.js'),
+    BoardLoanCollateralRatio: require('./board.loanCollateralRatio.js'),
     ExchangeTester: require('./exchange.tester.js'),
     LockerBasic: require('./locker.basic.js'),
     BorrowerBasic: require('./borrower.basic.js')
