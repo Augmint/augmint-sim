@@ -159,7 +159,7 @@ function init() {
         augmintOptions: {
             balances: { interestEarnedPool: 1000 /* genesis */ },
             params: {
-                maxLoanToDepositRatio: 1, // don't allow new loan if it's more
+                maxLoanToDepositRatio: 1.5, // don't allow new loan if it's more
                 exchangeFeePercentage: 0.003,
                 marketLoanInterestRate: 0.14, // what do we compete with?  actor's demand for loans depends on it
                 marketLockInterestRate: 0.06, // what do we compete with? actor's demand for locks depends on it
@@ -195,7 +195,7 @@ function init() {
                 ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
                 USD_BALANCE_GROWTH_PA: 0.3 /* USD balance grows daily by pa. % to simulate growth */,
                 CHANCE_TO_LOCK: 1, // always relock all ACD balance (initial liquidity provider)
-                INTEREST_SENSITIVITY: 0.5 /* how sensitive is the locker for marketLockInterestRate ?
+                INTEREST_SENSITIVITY: 2 /* how sensitive is the locker for marketLockInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
                                             TODO: make this a curve and to a param which makes more sense
                                                     + do we need CHANCE_TO_LOCK since we have this?   */,
@@ -215,7 +215,7 @@ function init() {
                 ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
                 USD_BALANCE_GROWTH_PA: 0.3 /* USD balance grows daily by pa. % to simulate growth */,
                 CHANCE_TO_LOCK: 0.5, // relock by chance % of days when no lock and  lock interest rates compelling
-                INTEREST_SENSITIVITY: 0.5 /* how sensitive is the locker for marketLockInterestRate ?
+                INTEREST_SENSITIVITY: 1 /* how sensitive is the locker for marketLockInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
                                             TODO: make this a curve and to a param which makes more sense
                                                     + do we need CHANCE_TO_LOCK since we have this?   */,
@@ -229,7 +229,7 @@ function init() {
             type: 'BorrowerBasic',
             count: 5,
             balances: {
-                eth: 5000
+                eth: 500000 // unlimited ETH - demand adjusted with params
             },
             params: {
                 ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
@@ -238,7 +238,7 @@ function init() {
                 WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 0.5, // increase in demand % pa.
                 CHANCE_TO_TAKE_LOAN: 1, // % chance to take a loan on a day (on top of chances based on marketrates
                 CHANCE_TO_SELL_ALL_ACD: 1, // immediately sells full ACD balance
-                INTEREST_SENSITIVITY: 3 /* how sensitive is the borrower for marketLoanInterestRate ?
+                INTEREST_SENSITIVITY: 2 /* how sensitive is the borrower for marketLoanInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
                                             TODO: make this a curve and to a param which makes more sense
                                                     + do we need CHANCE_TO_TAKE_LOAN since we have this? */,
@@ -251,7 +251,7 @@ function init() {
             type: 'BorrowerBasic',
             count: 50,
             balances: {
-                eth: 5000
+                eth: 500000 // unlimited ETH - demand adjusted with params
             },
             params: {
                 ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
@@ -260,7 +260,7 @@ function init() {
                 WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 0.5, // increase in demand % pa.
                 CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan on a day (on top of chances based on marketrates
                 CHANCE_TO_SELL_ALL_ACD: 0.05, // % chance to sell all ACD balance (unless repayment is due soon)
-                INTEREST_SENSITIVITY: 0.5 /* how sensitive is the borrower for marketLoanInterestRate ?
+                INTEREST_SENSITIVITY: 1 /* how sensitive is the borrower for marketLoanInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
                                             TODO: make this a curve and to a param which makes more sense
                                                     + do we need CHANCE_TO_TAKE_LOAN since we have this?  */,

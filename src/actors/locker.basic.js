@@ -3,7 +3,7 @@
 const Actor = require('./actor.js');
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const defaultParams = {
-    RELEASE_DELAY_DAYS: 10,
+    RELEASE_DELAY_DAYS: 1,
     CHANCE_TO_LOCK: 1,
     INTEREST_SENSITIVITY: 0.5 /* how sensitive is the locker for marketLockInterestRate ?
                                 linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
