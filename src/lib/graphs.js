@@ -222,22 +222,26 @@ const graphs = [
     },
     {
         title: 'ACD Locked',
+        options: {
+            title: { display: false },
+            legend: { display: true },
+            tooltips: { enabled: true , mode: 'index', intersect: false}
+        },
         datasets: [{
             func: augmint => { return augmint.balances.lockedAcdPool; },
             options: {
+                    label: 'locked',
                     borderColor: LOCKED_ACD_COLOR,
-                    backgroundColor: LOCKED_ACD_COLOR_OPA
+                    backgroundColor: TRANSPARENT
                 }
-        }]
-    },
-    {
-        title: 'ACD in open Loans',
-        datasets: [{
+        },
+        {
             func: augmint => { return augmint.balances.openLoansAcd; },
             options: {
-                    borderColor: OPEN_LOANS_COLOR,
-                    backgroundColor: OPEN_LOANS_COLOR_OPA
-                }
+                label: 'loans',
+                borderColor: OPEN_LOANS_COLOR,
+                backgroundColor: TRANSPARENT
+            }
         }]
     },
     {
