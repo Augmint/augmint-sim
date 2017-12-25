@@ -7,7 +7,10 @@ const loanManager = require('../augmint/loan.manager.js');
 const logger = require('../lib/logger.js');
 const freezer = require('../augmint/freezer.js');
 const exchange = require('../augmint/exchange.js');
-const defaultParams = {};
+const defaultParams = {
+    ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
+    USD_BALANCE_GROWTH_PA: 0 /* USD balance grows daily by pa. % to simulate growth */
+};
 
 class Actor {
     constructor(id, balances = {}, state = null, _params) {
@@ -27,6 +30,13 @@ class Actor {
     // BEHAVIOUR
     executeMoves(state) {
         // to be implemented by child classes
+
+        /* Call super.executeMoves(state) in child for these: */
+        /* Add balance growth */
+        if (state.meta.iteration % state.params.stepsPerDay === 0) {
+            this.ethBalance *= (1 + this.params.ETH_BALANCE_GROWTH_PA) ** (1 / 365);
+            this.usdBalance *= (1 + this.params.USD_BALANCE_GROWTH_PA) ** (1 / 365);
+        }
     }
 
     // STATE:
@@ -39,8 +49,16 @@ class Actor {
         return augmint.actors[this.id].balances.eth || 0;
     }
 
+    set ethBalance(newBal) {
+        augmint.actors[this.id].balances.eth = newBal;
+    }
+
     get usdBalance() {
         return augmint.actors[this.id].balances.usd || 0;
+    }
+
+    set usdBalance(newBal) {
+        augmint.actors[this.id].balances.usd = newBal;
     }
 
     get loans() {

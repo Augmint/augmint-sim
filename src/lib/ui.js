@@ -192,6 +192,8 @@ function init() {
                 usd: 10000
             },
             params: {
+                ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
+                USD_BALANCE_GROWTH_PA: 0.3 /* USD balance grows daily by pa. % to simulate growth */,
                 CHANCE_TO_LOCK: 1, // always relock all ACD balance (initial liquidity provider)
                 INTEREST_SENSITIVITY: 0.5 /* how sensitive is the locker for marketLockInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
@@ -210,6 +212,8 @@ function init() {
                 usd: 10000
             },
             params: {
+                ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
+                USD_BALANCE_GROWTH_PA: 0.3 /* USD balance grows daily by pa. % to simulate growth */,
                 CHANCE_TO_LOCK: 0.5, // relock by chance % of days when no lock and  lock interest rates compelling
                 INTEREST_SENSITIVITY: 0.5 /* how sensitive is the locker for marketLockInterestRate ?
                                             linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
@@ -229,6 +233,8 @@ function init() {
             },
             params: {
                 MAX_LOAN_AMOUNT_ACD: 10000, // TODO: remove this param from actor and create a system limit
+                ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
+                USD_BALANCE_GROWTH_PA: 0 /* USD balance grows daily by pa. % to simulate growth */,
                 CHANCE_TO_TAKE_LOAN: 1, // % chance to take a loan on a day (on top of chances based on marketrates
                 CHANCE_TO_SELL_ALL_ACD: 1, // immediately sells full ACD balance
                 INTEREST_SENSITIVITY: 3 /* how sensitive is the borrower for marketLoanInterestRate ?
@@ -248,6 +254,8 @@ function init() {
             },
             params: {
                 MAX_LOAN_AMOUNT_ACD: 10000,
+                ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
+                USD_BALANCE_GROWTH_PA: 0 /* USD balance grows daily by pa. % to simulate growth */,
                 CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan on a day (on top of chances based on marketrates
                 CHANCE_TO_SELL_ALL_ACD: 0.05, // % chance to sell all ACD balance (unless repayment is due soon)
                 INTEREST_SENSITIVITY: 0.5 /* how sensitive is the borrower for marketLoanInterestRate ?

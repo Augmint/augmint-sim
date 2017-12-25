@@ -111,6 +111,7 @@ class BorrowerBasic extends Actor {
                 }
             }
         }
+        super.executeMoves(state);
     }
 }
 

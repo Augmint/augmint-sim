@@ -42,16 +42,6 @@ class LockerBasic extends Actor {
             this.wantToLockAmount = this.wantToLock
                 ? Math.min(acdAvailable * marketChance, this.getMaxLockableAcd(), acdAvailable)
                 : 0;
-
-            // console.debug(
-            //     marketInterest,
-            //     augmintInterest,
-            //     'ethBalanceInAcd: ' + ethBalanceInAcd,
-            //     'int adv: ' + interestAdvantagePt,
-            //     'marketChance: ' + marketChance * 100 + '%',
-            //     'chance perday: ' this.params.CHANCE_TO_LOCK * marketChance * state.meta.stepsPerDay * 100 + '% ' + this.wantToLock,
-            //     'wantToLockAmount: ' + this.wantToLockAmount
-            // );
         }
 
         /* release lock RELEASE_DELAY_DAYS later than could unlock */
@@ -88,6 +78,8 @@ class LockerBasic extends Actor {
         if (this.ethBalance > 0) {
             this.sellEthForUsd(this.convertEthToUsd(this.ethBalance));
         }
+
+        super.executeMoves(state);
     }
 }
 
