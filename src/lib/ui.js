@@ -232,9 +232,10 @@ function init() {
                 eth: 5000
             },
             params: {
-                MAX_LOAN_AMOUNT_ACD: 10000, // TODO: remove this param from actor and create a system limit
                 ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
                 USD_BALANCE_GROWTH_PA: 0 /* USD balance grows daily by pa. % to simulate growth */,
+                WANTS_TO_BORROW_AMOUNT: 10000, // how much they want to borrow
+                WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 0.5, // increase in demand % pa.
                 CHANCE_TO_TAKE_LOAN: 1, // % chance to take a loan on a day (on top of chances based on marketrates
                 CHANCE_TO_SELL_ALL_ACD: 1, // immediately sells full ACD balance
                 INTEREST_SENSITIVITY: 3 /* how sensitive is the borrower for marketLoanInterestRate ?
@@ -253,9 +254,10 @@ function init() {
                 eth: 5000
             },
             params: {
-                MAX_LOAN_AMOUNT_ACD: 10000,
                 ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
                 USD_BALANCE_GROWTH_PA: 0 /* USD balance grows daily by pa. % to simulate growth */,
+                WANTS_TO_BORROW_AMOUNT: 10000, // how much they want to borrow
+                WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 0.5, // increase in demand % pa.
                 CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan on a day (on top of chances based on marketrates
                 CHANCE_TO_SELL_ALL_ACD: 0.05, // % chance to sell all ACD balance (unless repayment is due soon)
                 INTEREST_SENSITIVITY: 0.5 /* how sensitive is the borrower for marketLoanInterestRate ?

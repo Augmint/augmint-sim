@@ -7,7 +7,8 @@ const defaultParams = {
     REPAY_X_DAYS_BEFORE: 1,
     BUY_ACD_X_DAYS_BEFORE_REPAY: 1,
     REPAYMENT_COST_ACD: 5, // TODO: this should be global
-    MAX_LOAN_AMOUNT_ACD: 1000,
+    WANTS_TO_BORROW_AMOUNT: 10000, // how much they want to borrow
+    WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 0.1, // increase in demand % pa.
     CHANCE_TO_TAKE_LOAN: 1, // % chance to take loan on a day (when there is no open loan)
     CHANCE_TO_SELL_ALL_ACD: 1, // % chance to sell all acd on a day (unless repayment is due soon)
 
@@ -54,14 +55,10 @@ class BorrowerBasic extends Actor {
                 this.params.INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT;
             const marketChance = Math.min(1, interestAdvantagePt * this.params.INTEREST_SENSITIVITY);
             const wantToTake = state.utils.byChanceInADay(this.params.CHANCE_TO_TAKE_LOAN * marketChance);
-            const ethBalanceInAcd = this.convertEthToAcd(this.ethBalance);
             const wantToTakeAmount = wantToTake
                 ? Math.min(
-                      Math.floor(
-                          this.convertEthToAcd(this.ethBalance) * marketChance * loanProduct.loanCollateralRatio
-                      ),
-                      ethBalanceInAcd,
-                      this.params.MAX_LOAN_AMOUNT_ACD
+                      Math.floor(this.params.WANTS_TO_BORROW_AMOUNT * marketChance * loanProduct.loanCollateralRatio),
+                      Math.floor(this.convertEthToAcd(this.ethBalance) * loanProduct.loanCollateralRatio)
                   )
                 : 0;
 
@@ -110,6 +107,11 @@ class BorrowerBasic extends Actor {
                     );
                 }
             }
+        }
+
+        /* Increase demand */
+        if (state.meta.iteration % state.params.stepsPerDay === 0) {
+            this.params.WANTS_TO_BORROW_AMOUNT *= (1 + this.params.WANTS_TO_BORROW_AMOUNT_GROWTH_PA) ** (1 / 365);
         }
         super.executeMoves(state);
     }
