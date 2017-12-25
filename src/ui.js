@@ -1,11 +1,11 @@
 'use strict';
 
-const simulation = require('./simulation.js');
-const logger = require('./logger.js');
-const rates = require('../augmint/rates.js');
-const graphs = require('./graphs.js');
-const scenario = require('../scenarios/base.js');
-const AugmintError = require('../augmint/augmint.error.js');
+const simulation = require('./lib/simulation.js');
+const logger = require('./lib/logger.js');
+const rates = require('./augmint/rates.js');
+const graphs = require('./lib/graphs.js');
+const scenario = require('./scenarios/base.js');
+const AugmintError = require('./augmint/augmint.error.js');
 
 // DOM elements
 const clockElem = document.querySelector('.clock');
