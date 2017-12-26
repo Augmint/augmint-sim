@@ -2,7 +2,7 @@
 
 'use strict';
 
-//const AugmintError = require('../augmint/augmint.error.js');
+const AugmintError = require('../augmint/augmint.error.js');
 const augmint = require('./augmint.js');
 const logger = require('../lib/logger.js');
 const orderBook = augmint.orderBook;
@@ -166,6 +166,21 @@ function sellACD(actorId, acdAmount) {
     return true;
 }
 
+function convertReserveEthToAcd(acdAmount) {
+    // SELL ETH from reserve and issue ACD  TODO: reconsider the accounting of this
+    if (augmint.actors['reserve'].balances.eth < this.convertAcdToEth(acdAmount)) {
+        throw new AugmintError(
+            ' convertReserveEthToAcd:  reserve ETH balance of ' +
+                augmint.actors['reserve'].balances.eth +
+                ' ETH is not enough to buy ' +
+                acdAmount +
+                ' ACD'
+        );
+    }
+    augmint.actors['reserve'].balances.eth -= this.convertAcdToEth(acdAmount);
+    augmint.actors['reserve'].balances.acd += acdAmount;
+}
+
 function sellEthForUsd(actorId, usdAmount) {
     let ethAmount = convertUsdToEth(usdAmount);
     if (ethAmount - augmint.actors[actorId].balances.eth < ethAmount * 0.00001) {
@@ -214,6 +229,7 @@ function getActorSellAcdOrdersSum(actorId) {
 module.exports = {
     buyACD,
     sellACD,
+    convertReserveEthToAcd,
     convertAcdToEth,
     convertEthToAcd,
     sellEthForUsd,

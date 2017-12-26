@@ -187,6 +187,11 @@ class Actor {
         logger.logMove(this.id, 'repayLoan', { loanId: loanId });
         return ret;
     }
+
+    convertReserveEthToAcd(acdAmount) {
+        logger.logMove(this.id, 'convertReserveEthToAcd', { acdAmount: acdAmount, acdBalance: this.acdBalance });
+        return exchange.convertReserveEthToAcd(acdAmount);
+    }
 }
 
 module.exports = Actor;
