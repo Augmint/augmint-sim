@@ -4,11 +4,11 @@ const Actor = require('./actor.js');
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const defaultParams = {
     RELEASE_DELAY_DAYS: 1,
+    WANTS_TO_LOCK_AMOUNT: 10000, // how much they want to lock
+    WANTS_TO_LOCK_AMOUNT_GROWTH_PA: 0.5, // increase in demand % pa.
     CHANCE_TO_LOCK: 1,
-    INTEREST_SENSITIVITY: 0.5 /* how sensitive is the locker for marketLockInterestRate ?
-                                linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
-                                TODO: make this a curve and to a param which makes more sense
-                                        + do we need CHANCE_TO_LOCK since we have this?    */,
+    INTEREST_SENSITIVITY: 2 /* how sensitive is the locker for marketLockInterestRate ?
+                            linear, marketChance = augmintInterest / (marketInterest * INTEREST_SENSITIVITY)  */,
     CHANCE_TO_SELL_ALL_ACD: 1 /* if  doesn't want lock then what chance in a day that they sell their ACD */
 };
 
@@ -29,13 +29,12 @@ class LockerBasic extends Actor {
             this.lastAugmintInterest != augmintInterest ||
             this.lastMarketInterest != marketInterest
         ) {
-            const interestAdvantagePt = (augmintInterest - marketInterest) / marketInterest;
-            const marketChance = Math.min(1, interestAdvantagePt * this.params.INTEREST_SENSITIVITY);
+            const marketChance = Math.min(1, augmintInterest / (marketInterest * this.params.INTEREST_SENSITIVITY));
 
             this.wantToLock = state.utils.byChanceInADay(this.params.CHANCE_TO_LOCK * marketChance);
             const acdAvailable = this.convertUsdToAcd(this.usdBalance) + this.acdBalance;
             this.wantToLockAmount = this.wantToLock
-                ? Math.min(acdAvailable * marketChance, this.getMaxLockableAcd(), acdAvailable)
+                ? Math.min(acdAvailable, this.getMaxLockableAcd(), this.params.WANTS_TO_LOCK_AMOUNT)
                 : 0;
         }
 
@@ -51,7 +50,7 @@ class LockerBasic extends Actor {
         }
 
         /* Buy ACD for next lock */
-        if (this.acdBalance < this.wantToLockAmount) {
+        if (this.acdBalance < this.wantToLockAmount && state.augmint.lockingAllowed) {
             this.buyEthWithUsd(this.wantToLockAmount - this.acdBalance);
             this.buyACD(this.wantToLockAmount - this.acdBalance);
         }
@@ -60,7 +59,7 @@ class LockerBasic extends Actor {
         let lockAmountNow = Math.min(this.wantToLockAmount, this.acdBalance);
         if (lockAmountNow > 0) {
             if (this.lockACD(lockAmountNow)) {
-                this.lockAmount -= lockAmountNow;
+                this.wantToLockAmount -= lockAmountNow;
             }
         }
 
@@ -74,6 +73,10 @@ class LockerBasic extends Actor {
             this.sellEthForUsd(this.convertEthToUsd(this.ethBalance));
         }
 
+        /* Increase demand */
+        if (state.meta.iteration % state.params.stepsPerDay === 0) {
+            this.params.WANTS_TO_LOCK_AMOUNT *= (1 + this.params.WANTS_TO_LOCK_AMOUNT_GROWTH_PA) ** (1 / 365);
+        }
         super.executeMoves(state);
     }
 }

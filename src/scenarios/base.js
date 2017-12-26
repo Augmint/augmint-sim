@@ -1,9 +1,10 @@
 'use strict';
 
 const augmintOptions = {
-    balances: { interestEarnedPool: 1000 /* genesis */ },
+    balances: { interestEarnedPool: 5000 /* genesis */ },
     params: {
-        maxLoanToDepositRatio: 1.5, // don't allow new loan if it's more
+        loanToLockRatioLoanLimit: 2, // don't allow new loans if it's more
+        loanToLockRatioLockLimit: 1.5, // don't allow new locks if it's less
         exchangeFeePercentage: 0.003,
         marketLoanInterestRate: 0.14, // what do we compete with?  actor's demand for loans depends on it
         marketLockInterestRate: 0.06, // what do we compete with? actor's demand for locks depends on it
@@ -27,7 +28,7 @@ const actors = {
         or changing the actor type.
         It's is special actor, don't change the name of it ('reserve').
     */
-    reserve: { type: 'ReserveBasic', balances: { acd: 50000 /* genesis acd */, eth: 0 } },
+    reserve: { type: 'ReserveBasic', balances: { acd: 100000 /* genesis acd */, eth: 0 } },
     // boardLoanCollateralRatio: {
     //     type: 'BoardLoanCollateralRatio',
     //     balances: {},
@@ -43,33 +44,29 @@ const actors = {
     alwaysLocker: {
         type: 'LockerBasic',
         balances: {
-            usd: 10000
+            usd: 100000000 // 'unlimited' USD, lock demand adjusted with WANTS_TO_LOCK_AMOUNT
         },
         params: {
-            ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
-            USD_BALANCE_GROWTH_PA: 5 /* USD balance grows daily by pa. % to simulate growth */,
+            WANTS_TO_LOCK_AMOUNT: 10000, // how much they want to lock
+            WANTS_TO_LOCK_AMOUNT_GROWTH_PA: 1, // increase in demand % pa.
             CHANCE_TO_LOCK: 1, // always relock all ACD balance (initial liquidity provider)
             INTEREST_SENSITIVITY: 2 /* how sensitive is the locker for marketLockInterestRate ?
-                                        linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
-                                        TODO: make this a curve and to a param which makes more sense
-                                                + do we need CHANCE_TO_LOCK since we have this?   */,
-            CHANCE_TO_SELL_ALL_ACD: 0.1 /* if  doesn't want lock then what chance in a day that they sell their ACD */
+                                    linear, marketChance = augmintInterest / (marketInterest * INTEREST_SENSITIVITY)  */,
+            CHANCE_TO_SELL_ALL_ACD: 1 /* if  doesn't want lock then what chance in a day that they sell their ACD */
         }
     },
     randomLocker: {
         type: 'LockerBasic',
         count: 10,
         balances: {
-            usd: 10000
+            usd: 100000000 // 'unlimited' USD, lock demand adjusted with WANTS_TO_LOCK_AMOUNT
         },
         params: {
-            ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
-            USD_BALANCE_GROWTH_PA: 5 /* USD balance grows daily by pa. % to simulate growth */,
+            WANTS_TO_LOCK_AMOUNT: 10000, // how much they want to lock
+            WANTS_TO_LOCK_AMOUNT_GROWTH_PA: 1, // increase in demand % pa.
             CHANCE_TO_LOCK: 0.5, // relock by chance % of days when no lock and  lock interest rates compelling
-            INTEREST_SENSITIVITY: 1 /* how sensitive is the locker for marketLockInterestRate ?
-                                        linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
-                                        TODO: make this a curve and to a param which makes more sense
-                                                + do we need CHANCE_TO_LOCK since we have this?   */,
+            INTEREST_SENSITIVITY: 2 /* how sensitive is the locker for marketLockInterestRate ?
+                                    linear, marketChance = augmintInterest / (marketInterest * INTEREST_SENSITIVITY)  */,
             CHANCE_TO_SELL_ALL_ACD: 0.05 /* if  doesn't want lock then what chance in a day that they sell their ACD */
         }
     },
@@ -82,15 +79,12 @@ const actors = {
         params: {
             ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
             USD_BALANCE_GROWTH_PA: 0 /* USD balance grows daily by pa. % to simulate growth */,
-            WANTS_TO_BORROW_AMOUNT: 10000, // how much they want to borrow
-            WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 0.5, // increase in demand % pa.
+            WANTS_TO_BORROW_AMOUNT: 1000, // how much they want to borrow
+            WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 1, // increase in demand % pa.
             CHANCE_TO_TAKE_LOAN: 1, // % chance to take a loan on a day (on top of chances based on marketrates
             CHANCE_TO_SELL_ALL_ACD: 1, // immediately sells full ACD balance
-            COLLATERAL_RATIO_SENSITIVITY: 2, // chance = COLLATERAL_RATIO_SENSITIVITY * collateralRatio
             INTEREST_SENSITIVITY: 2 /* how sensitive is the borrower for marketLoanInterestRate ?
-                                        linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
-                                        TODO: make this a curve and to a param which makes more sense
-                                                + do we need CHANCE_TO_TAKE_LOAN since we have this? */
+                                    linear, marketChance = augmintInterest / (marketInterest * INTEREST_SENSITIVITY)  */
         }
     },
     randomKeeperBorrower: {
@@ -103,14 +97,11 @@ const actors = {
             ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
             USD_BALANCE_GROWTH_PA: 0 /* USD balance grows daily by pa. % to simulate growth */,
             WANTS_TO_BORROW_AMOUNT: 10000, // how much they want to borrow
-            WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 0.5, // increase in demand % pa.
+            WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 1, // increase in demand % pa.
             CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan on a day (on top of chances based on marketrates
             CHANCE_TO_SELL_ALL_ACD: 0.05, // % chance to sell all ACD balance (unless repayment is due soon)
-            COLLATERAL_RATIO_SENSITIVITY: 2, // chance = COLLATERAL_RATIO_SENSITIVITY * collateralRatio
             INTEREST_SENSITIVITY: 2 /* how sensitive is the borrower for marketLoanInterestRate ?
-                                        linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
-                                        TODO: make this a curve and to a param which makes more sense
-                                                + do we need CHANCE_TO_TAKE_LOAN since we have this?  */
+                                    linear, marketChance = augmintInterest / (marketInterest * INTEREST_SENSITIVITY)  */
         }
     }
     // actor: { type: 'ExchangeTester', balances: { eth: 10000, acd: 10000 } }

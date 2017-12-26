@@ -29,7 +29,8 @@ module.exports = {
         exchangeFeePercentage: 0.1,
         lockedAcdInterestPercentage: 0.5,
         lockTimeInDays: 365,
-        maxLoanToDepositRatio: 1, // don't allow new loans if it's more
+        loanToLockRatioLoanLimit: 1.5, // don't allow new loans if it's more
+        loanToLockRatioLockLimit: 1, // don't allow new locks if it's less
         ethUsdTrendSampleDays: 3 // how many days to inspect for rates.ethToUsdTrend calculation)
     },
 
@@ -115,11 +116,15 @@ module.exports = {
 
     get loanToDepositRatio() {
         return this.balances.lockedAcdPool === 0
-            ? this.params.maxLoanToDepositRatio
+            ? this.params.loanToLockRatioLoanLimit
             : this.balances.openLoansAcd / this.balances.lockedAcdPool;
     },
 
     get borrowingAllowed() {
-        return this.loanToDepositRatio < this.params.maxLoanToDepositRatio;
+        return this.loanToDepositRatio < this.params.loanToLockRatioLoanLimit;
+    },
+
+    get lockingAllowed() {
+        return this.loanToDepositRatio > this.params.loanToLockRatioLockLimit;
     }
 };

@@ -12,11 +12,9 @@ const defaultParams = {
     CHANCE_TO_TAKE_LOAN: 1, // % chance to take loan on a day (when there is no open loan)
     CHANCE_TO_SELL_ALL_ACD: 1, // % chance to sell all acd on a day (unless repayment is due soon)
 
-    COLLATERAL_RATIO_SENSITIVITY: 1 /* chance = COLLATERAL_RATIO_SENSITIVITY * collateralRatio */,
-    INTEREST_SENSITIVITY: 0.5 /* how sensitive is the borrower for marketLoanInterestRate ?
-                                linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
-                                TODO: make this a curve and to a param which makes more sense
-                                        + do we need CHANCE_TO_TAKE_LOAN since we have this?   */
+    COLLATERAL_RATIO_SENSITIVITY: 1 /* not implemented! */,
+    INTEREST_SENSITIVITY: 2 /* how sensitive is the borrower for marketLoanInterestRate ?
+                            linear, marketChance = augmintInterest / (marketInterest * INTEREST_SENSITIVITY)  */
     // TODO: add loan forgotten chance param ( 0.1%?)
 };
 
@@ -48,18 +46,12 @@ class BorrowerBasic extends Actor {
             const augmintInterest = loanProduct.interestPt;
             const marketInterest = state.augmint.params.marketLoanInterestRate;
 
-            const interestAdvantagePt = (marketInterest - augmintInterest) / marketInterest;
-            const marketChance = Math.min(
-                1,
-                interestAdvantagePt *
-                    this.params.INTEREST_SENSITIVITY *
-                    this.params.COLLATERAL_RATIO_SENSITIVITY *
-                    loanProduct.loanCollateralRatio
-            );
+            const marketChance = Math.min(1, augmintInterest / (marketInterest * this.params.INTEREST_SENSITIVITY));
+
             const wantToTake = state.utils.byChanceInADay(this.params.CHANCE_TO_TAKE_LOAN * marketChance);
             const wantToTakeAmount = wantToTake
                 ? Math.min(
-                      Math.floor(this.params.WANTS_TO_BORROW_AMOUNT * marketChance * loanProduct.loanCollateralRatio),
+                      Math.floor(this.params.WANTS_TO_BORROW_AMOUNT * loanProduct.loanCollateralRatio),
                       Math.floor(this.convertEthToAcd(this.ethBalance) * loanProduct.loanCollateralRatio)
                   )
                 : 0;

@@ -222,11 +222,20 @@ const graphs = [
         options: { scales: { yAxes: [ {ticks: { suggestedMax: 2 } } ] } },
         datasets: [
             {
-            func: augmint => { return augmint.params.maxLoanToDepositRatio; },
+            func: augmint => { return augmint.params.loanToLockRatioLoanLimit; },
                 options: {
-                        label: 'max',
+                        label: 'loan limit',
                         borderDash: DASHED_LINE,
-                        borderColor: DARKRED,
+                        borderColor: OPEN_LOANS_COLOR,
+                        backgroundColor: TRANSPARENT
+                    }
+            },
+            {
+            func: augmint => { return augmint.params.loanToLockRatioLockLimit; },
+                options: {
+                        label: 'lock limit',
+                        borderDash: DASHED_LINE,
+                        borderColor: LOCKED_ACD_COLOR,
                         backgroundColor: TRANSPARENT
                     }
             },
@@ -234,7 +243,7 @@ const graphs = [
             func: augmint => { return augmint.loanToDepositRatio; },
                 options: {
                     label: 'current',
-                    borderColor: OPEN_LOANS_COLOR,
+                    borderColor: DARKRED,
                     backgroundColor: TRANSPARENT
                 }
         }]
