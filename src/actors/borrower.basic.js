@@ -46,7 +46,7 @@ class BorrowerBasic extends Actor {
             const augmintInterest = loanProduct.interestPt;
             const marketInterest = state.augmint.params.marketLoanInterestRate;
 
-            const marketChance = Math.min(1, augmintInterest / (marketInterest * this.params.INTEREST_SENSITIVITY));
+            const marketChance = Math.min(1, marketInterest / (augmintInterest * this.params.INTEREST_SENSITIVITY));
 
             const wantToTake = state.utils.byChanceInADay(this.params.CHANCE_TO_TAKE_LOAN * marketChance);
             const wantToTakeAmount = wantToTake
