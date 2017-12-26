@@ -59,10 +59,10 @@ const graphs = [
     //     }]
     // },
     {
-        title: 'Net ACD Demand',
+        title: 'Net ACD Demand \'000s',
         options: { scales: { yAxes: [ {ticks: { min: undefined } } ] } },
         datasets: [{
-            func: augmint => { return Math.round(augmint.netAcdDemand);}
+            func: augmint => { return Math.round(augmint.netAcdDemand / 1000);}
         }]
     },
     {
@@ -76,9 +76,9 @@ const graphs = [
         }]
     },
     {
-        title: 'Total ACD',
+        title: 'Total ACD \'000s',
         datasets: [{
-            func: augmint => { return Math.round(augmint.totalAcd); },
+            func: augmint => { return Math.round(augmint.totalAcd / 1000); },
             options: {
                 borderColor: ACD_SUPPLY_COLOR,
                 backgroundColor: ACD_SUPPLY_COLOR_OPA
@@ -86,7 +86,7 @@ const graphs = [
         }]
     },
     {
-        title: 'ACD Supply Distribution',
+        title: 'ACD Supply Distribution \'000s',
         options: {
             title: { display: false },
             legend: { display: true },
@@ -95,7 +95,7 @@ const graphs = [
         },
         datasets: [
             {
-                func: augmint => { return (augmint.systemAcd); },
+                func: augmint => { return (augmint.systemAcd / 1000); },
                 options: {
                     label: 'system',
                     borderColor: SYSTEM_ACC_COLOR,
@@ -103,7 +103,7 @@ const graphs = [
                 }
             },
             {
-                func: augmint => { return augmint.balances.lockedAcdPool; },
+                func: augmint => { return augmint.balances.lockedAcdPool / 1000; },
                 options: {
                     label: 'locked',
                     borderColor: LOCKED_ACD_COLOR,
@@ -112,7 +112,7 @@ const graphs = [
             },
             {
                 func: augmint => {
-                    return augmint.floatingAcd;
+                    return augmint.floatingAcd / 1000;
                 },
                 options: {
                     label: 'floating',
@@ -123,9 +123,9 @@ const graphs = [
         ]
     },
     {
-        title: 'floating ACD (accs + orders)',
+        title: 'floating ACD (accs + orders) \'000s',
         datasets: [{
-            func: augmint => { return augmint.floatingAcd; },
+            func: augmint => { return Math.round(augmint.floatingAcd / 1000); },
             options: {
                 label: 'user',
                 borderColor: FLOATING_ACD_COLOR,
@@ -134,9 +134,9 @@ const graphs = [
         }]
     },
     {
-        title: 'ACD Reserves',
+        title: 'ACD Reserves \'000s',
         datasets: [{
-            func: augmint => { return augmint.reserveAcd; },
+            func: augmint => { return augmint.reserveAcd / 1000; },
             options: {
                 borderColor: SYSTEM_ACC_COLOR,
                 backgroundColor: SYSTEM_ACC_COLOR_OPA
@@ -144,7 +144,7 @@ const graphs = [
         }]
     },
     {
-        title: 'ETH Reserves',
+        title: 'ETH Reserves (ETH)',
         datasets: [{
             func: augmint => { return augmint.reserveEth; },
             options: {
