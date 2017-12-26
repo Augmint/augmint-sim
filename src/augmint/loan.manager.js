@@ -36,7 +36,7 @@ function getLoanProducts() {
 }
 
 function takeLoan(actorId, loanProductId, loanAmountInAcd) {
-    if (augmint.loanToDepositRatio > augmint.params.loanToLockRatioLoanLimit) {
+    if (!augmint.borrowingAllowed) {
         return false;
     }
     const loanProduct = loanProducts[loanProductId];

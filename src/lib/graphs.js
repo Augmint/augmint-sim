@@ -5,7 +5,7 @@ const PURPLE = 'rgba(139, 95, 191, 1)';
 const GREEN = 'rgba(0, 129, 72, 1)';
 const YELLOW = 'rgba(198, 192, 19, 1)';
 const ORANGE = 'rgba(239, 138, 23, 1)';
-//const RED = 'rgba(239, 41, 23, 1)';
+const RED = 'rgba(239, 41, 23, 1)';
 const BLUE = 'rgba(41, 51, 155, 1)';
 
 const DARKRED = 'rgba(141, 8, 1, 1)';
@@ -21,6 +21,8 @@ const ORANGE_OPA = 'rgba(239, 138, 23,  0.2)';
 const DARKRED_OPA = 'rgba(141, 8, 1,  0.2)';
 const BLUE_OPA = 'rgba(41, 51, 155, 0.2)';
 
+const DEFAULT_COLOR = RED;
+const DEFAULT_COLOR_BG = GREY_OPA;
 const ACD_SUPPLY_COLOR = BLUE;
 const ACD_SUPPLY_COLOR_OPA = BLUE_OPA;
 const LOCKED_ACD_COLOR = YELLOW;
@@ -218,8 +220,13 @@ const graphs = [
         }]
     },
     {
-        title: 'Loan to Deposit Ratio',
-        options: { scales: { yAxes: [ {ticks: { suggestedMax: 2 } } ] } },
+        title: 'Loan to Lock Ratio',
+        options: {
+            title: { display: false },
+            scales: { yAxes: [ {ticks: { suggestedMax: 3 } } ] },
+            legend: { display: true },
+            tooltips: { enabled: true , mode: 'index', intersect: false}
+        },
         datasets: [
             {
             func: augmint => { return augmint.params.loanToLockRatioLoanLimit; },
@@ -242,8 +249,8 @@ const graphs = [
             {
             func: augmint => { return augmint.loanToDepositRatio; },
                 options: {
-                    label: 'current',
-                    borderColor: DARKRED,
+                    label: 'current loan to lock ratio',
+                    borderColor: DEFAULT_COLOR,
                     backgroundColor: TRANSPARENT
                 }
         }]
@@ -315,7 +322,8 @@ function init(wrapper) {
     Chart.defaults.global.legend.display = false;
     Chart.defaults.global.elements.line.tension = 0;
     Chart.defaults.global.elements.line.borderWidth = 2;
-    Chart.defaults.global.elements.line.borderColor = GREY_OPA;
+    Chart.defaults.global.elements.line.borderColor = DEFAULT_COLOR;
+    Chart.defaults.global.elements.line.backgroundColor = DEFAULT_COLOR_BG;
     Chart.defaults.global.elements.point.radius = 0;
     Chart.scaleService.updateScaleDefaults('linear', {
         ticks: {

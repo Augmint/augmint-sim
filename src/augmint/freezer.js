@@ -12,7 +12,7 @@ const locks = augmint.locks;
 let counter = 0;
 
 function lockACD(actorId, acdAmount) {
-    if (augmint.loanToDepositRatio < augmint.params.loanToLockRatioLockLimit) {
+    if (!augmint.lockingAllowed) {
         return false;
     }
     const interestPt = (1 + augmint.params.lockedAcdInterestPercentage) ** (augmint.params.lockTimeInDays / 365) - 1;
