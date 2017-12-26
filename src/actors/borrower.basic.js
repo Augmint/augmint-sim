@@ -16,10 +16,7 @@ const defaultParams = {
     INTEREST_SENSITIVITY: 0.5 /* how sensitive is the borrower for marketLoanInterestRate ?
                                 linear, chance = INTEREST_SENSITIVITY * marketRateAdventagePt
                                 TODO: make this a curve and to a param which makes more sense
-                                        + do we need CHANCE_TO_TAKE_LOAN since we have this?   */,
-    INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT: 0.05 /* takes loan with a small chance even when interestadvantage is 0 or less.
-                                                    e.g. 0.01 then it calculates with 1% adv. when 0% advantage
-                                                     TODO: make it better :/*/
+                                        + do we need CHANCE_TO_TAKE_LOAN since we have this?   */
     // TODO: add loan forgotten chance param ( 0.1%?)
 };
 
@@ -51,9 +48,7 @@ class BorrowerBasic extends Actor {
             const augmintInterest = loanProduct.interestPt;
             const marketInterest = state.augmint.params.marketLoanInterestRate;
 
-            const interestAdvantagePt =
-                (marketInterest - augmintInterest) / marketInterest +
-                this.params.INTEREST_ADVANTAGE_PT_POINT_ADJUSTMENT;
+            const interestAdvantagePt = (marketInterest - augmintInterest) / marketInterest;
             const marketChance = Math.min(
                 1,
                 interestAdvantagePt *
