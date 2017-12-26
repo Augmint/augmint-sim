@@ -57,17 +57,17 @@ const actors = {
     },
     randomLocker: {
         type: 'LockerBasic',
-        count: 10,
+        count: 50,
         balances: {
             usd: 100000000 // 'unlimited' USD, lock demand adjusted with WANTS_TO_LOCK_AMOUNT
         },
         params: {
-            WANTS_TO_LOCK_AMOUNT: 10000, // how much they want to lock
-            WANTS_TO_LOCK_AMOUNT_GROWTH_PA: 1, // increase in demand % pa.
-            CHANCE_TO_LOCK: 0.5, // relock by chance % of days when no lock and  lock interest rates compelling
+            WANTS_TO_LOCK_AMOUNT: 5000, // how much they want to lock
+            WANTS_TO_LOCK_AMOUNT_GROWTH_PA: 2, // increase in demand % pa.
+            CHANCE_TO_LOCK: 0.05, // relock by chance % of days when no lock and  lock interest rates compelling
             INTEREST_SENSITIVITY: 2 /* how sensitive is the locker for marketLockInterestRate ?
                                     linear, marketChance = augmintInterest / (marketInterest * INTEREST_SENSITIVITY)  */,
-            CHANCE_TO_SELL_ALL_ACD: 0.05 /* if  doesn't want lock then what chance in a day that they sell their ACD */
+            CHANCE_TO_SELL_ALL_ACD: 0.1 /* if  doesn't want lock then what chance in a day that they sell their ACD */
         }
     },
     randomAllSellBorrower: {
@@ -79,8 +79,8 @@ const actors = {
         params: {
             ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
             USD_BALANCE_GROWTH_PA: 0 /* USD balance grows daily by pa. % to simulate growth */,
-            WANTS_TO_BORROW_AMOUNT: 1000, // how much they want to borrow
-            WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 1, // increase in demand % pa.
+            WANTS_TO_BORROW_AMOUNT: 5000, // how much they want to borrow
+            WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 2, // increase in demand % pa.
             CHANCE_TO_TAKE_LOAN: 1, // % chance to take a loan on a day (on top of chances based on marketrates
             CHANCE_TO_SELL_ALL_ACD: 1, // immediately sells full ACD balance
             INTEREST_SENSITIVITY: 2 /* how sensitive is the borrower for marketLoanInterestRate ?
@@ -96,10 +96,10 @@ const actors = {
         params: {
             ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
             USD_BALANCE_GROWTH_PA: 0 /* USD balance grows daily by pa. % to simulate growth */,
-            WANTS_TO_BORROW_AMOUNT: 10000, // how much they want to borrow
-            WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 1, // increase in demand % pa.
+            WANTS_TO_BORROW_AMOUNT: 5000, // how much they want to borrow
+            WANTS_TO_BORROW_AMOUNT_GROWTH_PA: 2, // increase in demand % pa.
             CHANCE_TO_TAKE_LOAN: 0.05, // % chance to take a loan on a day (on top of chances based on marketrates
-            CHANCE_TO_SELL_ALL_ACD: 0.05, // % chance to sell all ACD balance (unless repayment is due soon)
+            CHANCE_TO_SELL_ALL_ACD: 0.1, // % chance to sell all ACD balance (unless repayment is due soon)
             INTEREST_SENSITIVITY: 2 /* how sensitive is the borrower for marketLoanInterestRate ?
                                     linear, marketChance = augmintInterest / (marketInterest * INTEREST_SENSITIVITY)  */
         }
