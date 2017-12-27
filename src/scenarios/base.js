@@ -3,8 +3,8 @@
 const augmintOptions = {
     balances: { interestEarnedPool: 5000 /* genesis */ },
     params: {
-        loanToLockRatioLoanLimit: 2, // don't allow new loans if it's more
-        loanToLockRatioLockLimit: 1.5, // don't allow new locks if it's less
+        loanToLockRatioLoanLimit: 1.0, // don't allow new loans if it's more
+        loanToLockRatioLockLimit: 1.0, // don't allow new locks if it's less
         exchangeFeePercentage: 0.003,
         marketLoanInterestRate: 0.14, // what do we compete with?  actor's demand for loans depends on it
         marketLockInterestRate: 0.06, // what do we compete with? actor's demand for locks depends on it

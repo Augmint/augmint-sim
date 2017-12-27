@@ -125,6 +125,6 @@ module.exports = {
     },
 
     get lockingAllowed() {
-        return this.loanToDepositRatio > this.params.loanToLockRatioLockLimit;
+        return this.loanToDepositRatio >= this.params.loanToLockRatioLockLimit;
     }
 };
