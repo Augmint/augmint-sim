@@ -59,14 +59,14 @@ const graphs = [
     //     }]
     // },
     {
-        title: 'Net ACD Demand \'000s',
+        title: 'Open ACD Demand \'000s',
         options: { scales: { yAxes: [ {ticks: { min: undefined } } ] } },
         datasets: [{
             func: augmint => { return Math.round(augmint.netAcdDemand / 1000);}
         }]
     },
     {
-        title: 'ACD user demand (% of total ACD)',
+        title: 'Open ACD user demand (% of total ACD)',
         options: { scales: { yAxes: [ {ticks: {min: undefined} }]}},
         datasets: [{
             func: augmint => {

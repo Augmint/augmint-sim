@@ -22,13 +22,6 @@ const augmintOptions = {
 };
 
 const actors = {
-    /* ReserveBasic is continuosly intervening by buying/selling ACD from/to reserve accounts
-        as long there is any ETH/ACD in the reserves
-        The behaviour of reserve can be changed by params and initial balances
-        or changing the actor type.
-        It's is special actor, don't change the name of it ('reserve').
-    */
-    reserve: { type: 'ReserveBasic', balances: { acd: 100000 /* genesis acd */, eth: 0 } },
     // boardLoanCollateralRatio: {
     //     type: 'BoardLoanCollateralRatio',
     //     balances: {},
@@ -103,8 +96,16 @@ const actors = {
             INTEREST_SENSITIVITY: 2 /* how sensitive is the borrower for marketLoanInterestRate ?
                                     linear, marketChance = augmintInterest / (marketInterest * INTEREST_SENSITIVITY)  */
         }
-    }
+    },
     // actor: { type: 'ExchangeTester', balances: { eth: 10000, acd: 10000 } }
+    /* ReserveBasic is continuosly intervening by buying/selling ACD from/to reserve accounts
+        as long there is any ETH/ACD in the reserves
+        The behaviour of reserve can be changed by params and initial balances
+        or changing the actor type.
+        It's is special actor, don't change the name of it ('reserve').
+        Leave this actor as last so that end of day snapshots are reflecting after intervention state on graphs.
+    */
+    reserve: { type: 'ReserveBasic', balances: { acd: 100000 /* genesis acd */, eth: 0 } }
 };
 
 module.exports = {
