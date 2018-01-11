@@ -172,9 +172,8 @@ function collectDefaultedLoan(actorId, loanId) {
     //     throw new AugmintError('collateralHeld has gone negative: ', augmint.balances.collateralHeld);
     // }
 
-    // move interest holding pool -> reserve
+    // burn interest from holding pool
     augmint.balances.interestHoldingPool -= loan.premiumInAcd;
-    augmint.actors.reserve.balances.acd += loan.premiumInAcd;
 
     augmint.balances.openLoansAcd -= loan.repaymentDue;
     augmint.balances.defaultedLoansAcd += loan.repaymentDue;
