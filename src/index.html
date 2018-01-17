@@ -17,6 +17,10 @@
     .sim-inputs label {
         margin-right: 10px;
     }
+    
+    input[type=number]{
+        width: 75px;
+    }
 
     .graphs-wrapper {
         display: flex;
@@ -60,9 +64,9 @@
         <!-- <label>Exchange Fees (%): <input type="number" value="0" data-key="exchangeFeePercentage"/></label> -->
         <label>Loan to deposit ratio LOAN limit: <input type="number" data-key="loanToLockRatioLoanLimit"/></label><br/>
         <label>Loan to deposit ratio LOCK limit: <input type="number" data-key="loanToLockRatioLockLimit"/></label><br/>
-        <label>Market lock interest pa. (%): <input type="number" data-key="marketLockInterestRate" /></label><br/>
+        <label>Market deposit interest pa. (%): <input type="number" data-key="marketLockInterestRate" /></label><br/>
 
-        <label>Locked ACD Interest pa. (%): <input type="number" data-key="lockedAcdInterestPercentage"/></label>
+        <label>Locked ACD premium pa. (%): <input type="number" data-key="lockedAcdInterestPercentage"/></label>
         <label>Lock Time (days): <input type="number" value="30" data-key="lockTimeInDays"/></label><br/>
         <label>Market loan interest pa. (%): <input type="number" data-key="marketLoanInterestRate"/></label><br/>
     </div>
