@@ -154,6 +154,16 @@ const graphs = [
         }]
     },
     {
+        title: 'ETH Reserves (USD)',
+        datasets: [{
+            func: augmint => { return augmint.reserveEth * augmint.rates.ethToUsd; },
+            options: {
+                borderColor: SYSTEM_ACC_COLOR,
+                backgroundColor: SYSTEM_ACC_COLOR_OPA
+            }
+        }]
+    },
+    {
         title: 'Interest rates',
         options: {
             title: { display: false },
