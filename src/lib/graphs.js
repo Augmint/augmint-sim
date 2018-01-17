@@ -154,9 +154,9 @@ const graphs = [
         }]
     },
     {
-        title: 'ETH Reserves (USD)',
+        title: 'ETH Reserves (USD) \'000s',
         datasets: [{
-            func: augmint => { return augmint.reserveEth * augmint.rates.ethToUsd; },
+            func: augmint => { return augmint.reserveEth * augmint.rates.ethToUsd / 1000; },
             options: {
                 borderColor: SYSTEM_ACC_COLOR,
                 backgroundColor: SYSTEM_ACC_COLOR_OPA
