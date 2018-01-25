@@ -73,7 +73,6 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
 
     // MINT acd -> user/interest pool
     augmint.actors[actorId].balances.acd += loanAmountInAcd;
-    augmint.balances.interestHoldingPool += premiumInAcd;
 
     augmint.balances.openLoansAcd += loanAmountInAcd + premiumInAcd;
     const loanId = counter;
@@ -113,8 +112,11 @@ function repayLoan(actorId, loanId) {
         return false;
     }
 
-    // repayment acd -> BURN acd
+    // burn loan amount (disbursed) acd and move interest to interestEarned
     augmint.actors[actorId].balances.acd -= loan.repaymentDue;
+    augmint.balances.interestEarnedPool += loan.premiumInAcd;
+
+    augmint.balances.openLoansAcd -= loan.repaymentDue;
     // FIXME: uncomment these once changed to BigNumber
     // // sanity check (NB: totalAcd is calculated on the fly by a getter)
     // if (augmint.totalAcd < 0) {
@@ -128,18 +130,6 @@ function repayLoan(actorId, loanId) {
     // // sanity check
     // if (augmint.balances.collateralHeld < 0) {
     //     throw new AugmintError('collateralHeld has gone negative: ', augmint.balances.collateralHeld);
-    // }
-
-    // move interest from holding pool -> earned
-    augmint.balances.interestHoldingPool -= loan.premiumInAcd;
-    augmint.balances.interestEarnedPool += loan.premiumInAcd;
-
-    augmint.balances.openLoansAcd -= loan.repaymentDue;
-
-    // FIXME: uncomment these once changed to BigNumber
-    // // sanity check
-    // if (augmint.balances.interestHoldingPool < 0) {
-    //     throw new AugmintError('interestHoldingPool has gone negative: ', augmint.balances.interestHoldingPool);
     // }
 
     // remove loan
@@ -172,16 +162,8 @@ function collectDefaultedLoan(actorId, loanId) {
     //     throw new AugmintError('collateralHeld has gone negative: ', augmint.balances.collateralHeld);
     // }
 
-    // burn interest from holding pool
-    augmint.balances.interestHoldingPool -= loan.premiumInAcd;
-
     augmint.balances.openLoansAcd -= loan.repaymentDue;
     augmint.balances.defaultedLoansAcd += loan.repaymentDue;
-    // FIXME: uncomment these once changed to BigNumber
-    // // sanity check (NB: interestHoldingPool < 0 can only come about through an error in logic, not market forces)
-    // if (augmint.balances.interestHoldingPool < 0) {
-    //     throw new AugmintError('interestHoldingPool has gone negative: ', augmint.balances.interestHoldingPool);
-    // }
 
     // remove loan
     delete loans[actorId][loanId];

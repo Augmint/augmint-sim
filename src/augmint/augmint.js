@@ -14,7 +14,6 @@ module.exports = {
         lockedAcdPool: 0,
         openLoansAcd: 0,
         defaultedLoansAcd: 0,
-        interestHoldingPool: 0,
         interestEarnedPool: 0,
         exchangeAcd: 0,
         // eth:
@@ -80,7 +79,6 @@ module.exports = {
             this.actorsAcd +
             systemBalances.acdFeesEarned +
             systemBalances.lockedAcdPool +
-            systemBalances.interestHoldingPool +
             systemBalances.interestEarnedPool +
             systemBalances.exchangeAcd
         );
@@ -106,11 +104,7 @@ module.exports = {
     get systemAcd() {
         // all ACD in control of Augmint system
         return (
-            this.balances.acdFeesEarned +
-            this.balances.interestHoldingPool +
-            this.balances.interestEarnedPool +
-            this.reserveAcd +
-            this.reserveAcdOnExchange
+            this.balances.acdFeesEarned + this.balances.interestEarnedPool + this.reserveAcd + this.reserveAcdOnExchange
         );
     },
 

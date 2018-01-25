@@ -15,7 +15,6 @@ const augmintStatusHeader = [
     ' lockedAcdPool',
     ' openLoansAcd',
     ' defaultedLoansAcd',
-    ' interestHoldingPool',
     ' interestEarnedPool',
     ' ethFeesEarned',
     ' collateralHeld'
@@ -75,7 +74,6 @@ function getAugmintStatusLog() {
         augmint.balances.lockedAcdPool,
         augmint.balances.openLoansAcd,
         augmint.balances.defaultedLoansAcd,
-        augmint.balances.interestHoldingPool,
         augmint.balances.interestEarnedPool,
         augmint.balances.ethFeesEarned,
         augmint.balances.collateralHeld
