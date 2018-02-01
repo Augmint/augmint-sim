@@ -37,16 +37,18 @@ function getParamsFromUI() {
         if (!key) {
             return;
         }
-
+        //percentages
+        if(key==="marketLockInterestRate"||key==="lockedAcdInterestPercentage"||key==="marketLoanInterestRate"){params[key]/=100;}
+        
         params[key] = value;
     });
 
     params.loanProduct = {
         minimumLoanInAcd: Number.parseFloat(document.getElementById('minimumLoanInAcd').value),
-        loanCollateralRatio: Number.parseFloat(document.getElementById('loanCollateralRatio').value),
-        interestPt: Number.parseFloat(document.getElementById('loanInterestPt').value), // p.a.
+        loanCollateralRatio: Number.parseFloat(document.getElementById('loanCollateralRatio').value/100),
+        interestPt: Number.parseFloat(document.getElementById('loanInterestPt').value/100), // p.a.
         repaymentPeriodInDays: Number.parseFloat(document.getElementById('repaymentPeriodInDays').value),
-        defaultFeePercentage: Number.parseFloat(document.getElementById('defaultFeePercentage').value)
+        defaultFeePercentage: Number.parseFloat(document.getElementById('defaultFeePercentage').value/100)
     };
     return params;
 }
@@ -55,14 +57,18 @@ function updateUIFromParams() {
     const augmint = simulation.getState().augmint;
     inputs.forEach(input => {
         const key = input.dataset.key;
+        //percentages
+        if(key==="marketLockInterestRate"||key==="lockedAcdInterestPercentage"||key==="marketLoanInterestRate"){
+            augmint.params[key]=(augmint.params[key]*100).toFixed(0);
+        }
         input.value = augmint.params[key];
     });
     // we assume there is only 1 loanProduct but it's fine for now
     document.getElementById('minimumLoanInAcd').value = augmint.loanProducts[0].minimumLoanInAcd;
-    document.getElementById('loanCollateralRatio').value = augmint.loanProducts[0].loanCollateralRatio;
-    document.getElementById('loanInterestPt').value = augmint.loanProducts[0].interestPt;
+    document.getElementById('loanCollateralRatio').value = augmint.loanProducts[0].loanCollateralRatio*100;
+    document.getElementById('loanInterestPt').value = augmint.loanProducts[0].interestPt*100;
     document.getElementById('repaymentPeriodInDays').value = augmint.loanProducts[0].repaymentPeriodInDays;
-    document.getElementById('defaultFeePercentage').value = augmint.loanProducts[0].defaultFeePercentage;
+    document.getElementById('defaultFeePercentage').value = augmint.loanProducts[0].defaultFeePercentage*100;
 }
 
 function togglePause() {
