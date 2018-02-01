@@ -37,10 +37,10 @@ function getParamsFromUI() {
         if (!key) {
             return;
         }
+       
+        params[key] = value;
         //percentages
         if(key==="marketLockInterestRate"||key==="lockedAcdInterestPercentage"||key==="marketLoanInterestRate"){params[key]/=100;}
-        
-        params[key] = value;
     });
 
     params.loanProduct = {
