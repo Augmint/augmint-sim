@@ -65,10 +65,10 @@ function updateUIFromParams() {
     });
     // we assume there is only 1 loanProduct but it's fine for now
     document.getElementById('minimumLoanInAcd').value = augmint.loanProducts[0].minimumLoanInAcd;
-    document.getElementById('loanCollateralRatio').value = augmint.loanProducts[0].loanCollateralRatio*100;
-    document.getElementById('loanInterestPt').value = augmint.loanProducts[0].interestPt*100;
+    document.getElementById('loanCollateralRatio').value = (augmint.loanProducts[0].loanCollateralRatio*100).toFixed(2);
+    document.getElementById('loanInterestPt').value = (augmint.loanProducts[0].interestPt*100).toFixed(2);
     document.getElementById('repaymentPeriodInDays').value = augmint.loanProducts[0].repaymentPeriodInDays;
-    document.getElementById('defaultFeePercentage').value = augmint.loanProducts[0].defaultFeePercentage*100;
+    document.getElementById('defaultFeePercentage').value = (augmint.loanProducts[0].defaultFeePercentage*100).toFixed(2);
 }
 
 function togglePause() {
