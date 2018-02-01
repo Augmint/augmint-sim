@@ -59,7 +59,7 @@ function updateUIFromParams() {
         const key = input.dataset.key;
         //percentages
         if(key==="marketLockInterestRate"||key==="lockedAcdInterestPercentage"||key==="marketLoanInterestRate"){
-            augmint.params[key]=(augmint.params[key]*100);
+            augmint.params[key]=(augmint.params[key]*100).toFixed(2);
         }
         input.value = augmint.params[key];
     });
