@@ -6,6 +6,7 @@ const rates = require('./augmint/rates.js');
 const graphs = require('./lib/graphs.js');
 const scenario = require('./scenarios/base.js');
 const AugmintError = require('./augmint/augmint.error.js');
+const augmintjs = require('./augmint/augmint.js');
 
 // DOM elements
 const clockElem = document.querySelector('.clock');
@@ -37,7 +38,7 @@ function getParamsFromUI() {
         if (!key) {
             return;
         }
-       
+
         params[key] = value;
         //percentages
         if(key==="marketLockInterestRate"||key==="lockedAcdInterestPercentage"||key==="marketLoanInterestRate"){params[key]/=100;}
@@ -50,6 +51,9 @@ function getParamsFromUI() {
         repaymentPeriodInDays: Number.parseFloat(document.getElementById('repaymentPeriodInDays').value),
         defaultFeePercentage: Number.parseFloat(document.getElementById('defaultFeePercentage').value/100)
     };
+    //technical params
+    params["ethUsdTrendSampleDays"] = Number.parseFloat(document.getElementById('ethUsdTrendSampleDays').value)
+    
     return params;
 }
 
@@ -69,6 +73,8 @@ function updateUIFromParams() {
     document.getElementById('loanInterestPt').value = (augmint.loanProducts[0].interestPt*100).toFixed(2);
     document.getElementById('repaymentPeriodInDays').value = augmint.loanProducts[0].repaymentPeriodInDays;
     document.getElementById('defaultFeePercentage').value = (augmint.loanProducts[0].defaultFeePercentage*100).toFixed(2);
+    // technical params
+    document.getElementById('ethUsdTrendSampleDays').value = (augmint.params.ethUsdTrendSampleDays);
 }
 
 function togglePause() {
