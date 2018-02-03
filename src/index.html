@@ -7,26 +7,45 @@
         font-family: sans-serif;
         padding: 10px;
     }
+    
+    h4{
+        margin-left: 10px;
+    }
 
     .btn {
         margin-bottom: 10px;
         padding: 6px 10px;
         font-size: 1em;
     }
-
-    .sim-inputs label {
-        margin-right: 10px;
-    }
     
-    input[type=number]{
-        width: 75px;
-    }
-
-    .graphs-wrapper {
+    .flex-container {
         display: flex;
         flex-wrap: wrap;
     }
 
+    .flex-item {
+        width: 350px;
+        background-color: #f2f2f2;
+        margin-right: 2px;
+        margin-bottom: 2px;
+        border-radius: 10px;
+    }
+    
+    label {
+        float: left;
+        width: 250px;
+        margin-left: 10px;
+    }
+    
+    input[type=number]{
+        width: 75px;
+        text-align: right;
+    }
+    .graphs-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
     .graphs-wrapper canvas {
         margin-right: 10px;
     }
@@ -42,7 +61,7 @@
     <div class="error-msg"></div>
     <div class="buttons">
         <button class="btn pause-btn">Start</button>
-        <label for="rates-dropdown">Set ETH/USD:</label>
+        <label2 for="rates-dropdown">Set ETH/USD:</label2>
         <select id="rates-dropdown" class="dropdown rates-dropdown">
         </select>
         <button class="btn toggleLog-btn">Show log</button>
@@ -60,22 +79,34 @@
             <textarea id="log-textarea" class="textarea log-textarea" readonly cols="165" wrap="off" placeholder="nothing in the log yet. Click start." rows="20"></textarea>
         </div>
     </div>
-    <div class="sim-inputs">
+    <div class="flex-container">
+    <div class="flex-item">
+        <h4>Monetary params:</h4>
         <!-- <label>Exchange Fees (%): <input type="number" value="0" data-key="exchangeFeePercentage"/></label> -->
-        <label>Loan to deposit ratio LOAN limit: <input type="number" data-key="loanToLockRatioLoanLimit"/></label><br/>
-        <label>Loan to deposit ratio LOCK limit: <input type="number" data-key="loanToLockRatioLockLimit"/></label><br/>
-        <label>Market deposit interest pa. (%): <input type="number" data-key="marketLockInterestRate" /></label><br/>
-
-        <label>Locked ACD premium pa. (%): <input type="number" data-key="lockedAcdInterestPercentage"/></label>
-        <label>Lock Time (days): <input type="number" value="30" data-key="lockTimeInDays"/></label><br/>
-        <label>Market loan interest pa. (%): <input type="number" data-key="marketLoanInterestRate"/></label><br/>
+        <div class="sim-inputs">
+        <label>Market deposit interest pa. (%): </label><input type="number" data-key="marketLockInterestRate" /><br/>
+        <label>Locked ACD premium pa. (%): </label><input type="number" data-key="lockedAcdInterestPercentage"/><br/><br/>
+        <label>Market loan interest pa. (%): </label><input type="number" data-key="marketLoanInterestRate"/><br/><br/>
+        <label>Loan to deposit ratio LOAN limit: </label><input type="number" step="0.1" data-key="loanToLockRatioLoanLimit"/><br/>
+        <label>Loan to deposit ratio LOCK limit: </label><input type="number" step="0.1" data-key="loanToLockRatioLockLimit"/><br/><br/>
+        <label>Lock Time (days): </label><input type="number" value="30" data-key="lockTimeInDays"/><br/>
+        </div>
+        <label class="loanproduct-inputs">Loan term (days): </label><input type="number" id="repaymentPeriodInDays"/><br/><br/>
+        <label class="loanproduct-inputs">Loan ACD Interest pa. (%): </label><input type="number" id="loanInterestPt"/><br/><br/>
+        <label class="loanproduct-inputs">Loan collateral ratio (%): </label><input type="number" id="loanCollateralRatio"/><br/>
+        <br/>
     </div>
-    <div class="loanproduct-inputs">
-        <label>Loan ACD Interest pa. (%): <input type="number" id="loanInterestPt"/></label>
-        <label>Loan term (days): <input type="number" id="repaymentPeriodInDays"/></label><br/>
-        <label>Loan collateral ratio (%): <input type="number" id="loanCollateralRatio"/></label>
-        <label>Defaulting fee (%): <input type="number" id="defaultFeePercentage"/></label>
-        <label>Min. loan ACD amount: <input type="number" id="minimumLoanInAcd"/></label>
+    <div class="flex-item">
+        <h4>Actor params:</h4>
+        <label class="loanproduct-inputs">Defaulting fee (%): </label><input type="number" id="defaultFeePercentage"/><br/>
+        <label class="loanproduct-inputs">Min. loan ACD amount: </label><input type="number" id="minimumLoanInAcd"/><br/>
+        <br/>
+    </div>
+    <div class="flex-item">
+        <h4>Technical params:</h4>
+        <label class="technical-inputs">ethUsdTrendSampleDays: </label><input type="number" id="ethUsdTrendSampleDays"/><br/>
+        <br/>
+    </div>
     </div>
     <p>Days Passed: <span class="clock">0</span> </p>
 
