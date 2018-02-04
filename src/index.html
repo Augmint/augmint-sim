@@ -7,6 +7,10 @@
         font-family: sans-serif;
         padding: 10px;
     }
+
+    .buttons {
+        margin-top: 10px;
+    }
     
     h4{
         margin-left: 10px;
@@ -17,6 +21,10 @@
         padding: 6px 10px;
         font-size: 1em;
     }
+
+    .logo {
+        margin-right: 15px;
+    }
     
     .flex-container {
         display: flex;
@@ -24,21 +32,16 @@
     }
 
     .flex-item {
-        width: 360px;
+        width: 370px;
         background-color: #f2f2f2;
         margin-right: 2px;
         margin-bottom: 2px;
         border-radius: 10px;
     }
-
-    .logo {
-        background-image: url("http://barjak.net/foto/2_augmint_alternate-logo_reversed-360.jpg");
-        height: 360px;
-    }
     
     label {
         float: left;
-        width: 250px;
+        width: 260px;
         margin-left: 10px;
     }
     
@@ -64,6 +67,7 @@
 </head>
 <body>
     <div class="error-msg"></div>
+    <img src="http://barjak.net/foto/2_augmint_alternate-logo_reversed-360.jpg" align="left" class="logo" alt="Augmint logo" width="140">
     <div class="buttons">
         <button class="btn pause-btn">Start</button>
         <label2 for="rates-dropdown">Set ETH/USD:</label2>
@@ -84,9 +88,8 @@
             <textarea id="log-textarea" class="textarea log-textarea" readonly cols="165" wrap="off" placeholder="nothing in the log yet. Click start." rows="20"></textarea>
         </div>
     </div>
+    <br/>
     <div class="flex-container">
-        <div class="flex-item logo">
-        </div>
         <div class="flex-item">
             <h4>Monetary params:</h4>
             <!-- <label>Exchange Fees (%): <input type="number" value="0" data-key="exchangeFeePercentage"/></label> -->
