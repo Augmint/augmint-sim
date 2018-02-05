@@ -28,9 +28,17 @@ module.exports = {
         exchangeFeePercentage: 0.1,
         lockedAcdInterestPercentage: 0.5,
         lockTimeInDays: 365,
-        loanToLockRatioLoanLimit: 1.5, // don't allow new loans if it's more
-        loanToLockRatioLockLimit: 1, // don't allow new locks if it's less
-        ethUsdTrendSampleDays: 3 // how many days to inspect for rates.ethToUsdTrend calculation)
+        loanToLockRatioLoanLimit: 1.2, // don't allow new loans if it's more
+        loanToLockRatioLockLimit: 0.8, // don't allow new locks if it's less
+        ethUsdTrendSampleDays: 3, // how many days to inspect for rates.ethToUsdTrend calculation)
+
+        lockNoLimitAllowance: 500 /* in token - if totalLockAmount is below this then a new lock is allowed
+                                     up to this amount even if it will bring the loanToDepositRatio BELOW
+                                     loanToDepositLoanLimit
+                                     (interest earned account balance still applies a limit on top of it) */,
+        loanNoLimitAllowance: 500 /* in token - if totalLoanAmount is below this then a new loan is allowed
+                                     up this amount even if it will bring the loanToDepositRatio
+                                     ABOVE loanToDepositLoanLimit */
     },
 
     rates: {
@@ -109,16 +117,53 @@ module.exports = {
     },
 
     get loanToDepositRatio() {
-        return this.balances.lockedAcdPool === 0
-            ? this.params.loanToLockRatioLoanLimit
-            : this.balances.openLoansAcd / this.balances.lockedAcdPool;
+        return this.balances.lockedAcdPool === 0 ? 'N/A' : this.balances.openLoansAcd / this.balances.lockedAcdPool;
     },
 
-    get borrowingAllowed() {
-        return this.loanToDepositRatio < this.params.loanToLockRatioLoanLimit;
+    /* for maxBorrowableAmount &  maxLockableAmount calculation logic see:
+        https://docs.google.com/spreadsheets/d/1MeWYPYZRIm1n9lzpvbq8kLfQg1hhvk5oJY6NrR401S0/edit#gid=1427271130 */
+    get maxBorrowableAmount() {
+        let maxLoan;
+        if (this.balances.openLoansAcd < this.params.loanNoLimitAllowance) {
+            maxLoan = this.params.loanNoLimitAllowance - this.balances.openLoansAcd;
+        } else {
+            maxLoan = this.balances.lockedAcdPool * this.params.loanToLockRatioLoanLimit - this.balances.openLoansAcd;
+        }
+        maxLoan = maxLoan < 0 ? 0 : maxLoan.toFixed(4);
+        return maxLoan;
     },
 
-    get lockingAllowed() {
-        return this.loanToDepositRatio >= this.params.loanToLockRatioLockLimit;
+    get maxLockableAmount() {
+        let maxLock;
+        const allowedByLockLimit =
+            this.balances.openLoansAcd / this.params.loanToLockRatioLockLimit - this.balances.lockedAcdPool;
+
+        const interestPt = (1 + this.params.lockedAcdInterestPercentage) ** (this.params.lockTimeInDays / 365) - 1;
+        const allowedByEarning = this.balances.interestEarnedPool / interestPt;
+        // console.debug(
+        //     'Lock Params:',
+        //     'totalLock: ',
+        //     this.balances.lockedAcdPool,
+        //     'totalLoan: ',
+        //     this.balances.openLoansAcd,
+        //     'loanToLockRatioLockLimit: ',
+        //     this.params.loanToLockRatioLockLimit,
+        //     'earned interestPool: ',
+        //     this.balances.interestEarnedPool,
+        //     'lock interest: ',
+        //     this.params.lockedAcdInterestPercentage
+        // );
+        if (this.balances.lockedAcdPool < this.params.lockNoLimitAllowance) {
+            maxLock = Math.min(
+                Math.max(allowedByLockLimit, this.params.lockNoLimitAllowance - this.balances.lockedAcdPool),
+                allowedByEarning
+            );
+        } else {
+            maxLock = Math.min(allowedByLockLimit, allowedByEarning);
+        }
+
+        maxLock = maxLock < 0 ? 0 : maxLock.toFixed(4);
+
+        return maxLock;
     }
 };

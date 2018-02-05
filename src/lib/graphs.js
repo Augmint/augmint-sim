@@ -233,7 +233,7 @@ const graphs = [
         title: 'Loan to Lock Ratio',
         options: {
             title: { display: false },
-            scales: { yAxes: [ {ticks: { suggestedMax: 3 } } ] },
+            scales: { yAxes: [ {ticks: { suggestedMin: 0.5, suggestedMax: 1.5 } } ] },
             legend: { display: true },
             tooltips: { enabled: true , mode: 'index', intersect: false}
         },
@@ -348,7 +348,7 @@ function init(wrapper) {
 
         canvas.height = 250;
         //canvas.width = 300;
-        canvas.width = (graph.title === "ETH/USD"||graph.title === "Open ACD Demand '000s") ? 920 : 300;
+        canvas.width = graph.title === "ETH/USD"||graph.title === "Open ACD Demand '000s" ? 920 : 300;
         
         graph.canvas = canvas;
         graph.ctx = canvas.getContext('2d');

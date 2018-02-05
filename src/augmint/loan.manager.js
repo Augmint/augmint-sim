@@ -36,7 +36,12 @@ function getLoanProducts() {
 }
 
 function takeLoan(actorId, loanProductId, loanAmountInAcd) {
-    if (!augmint.borrowingAllowed) {
+    if (loanAmountInAcd > augmint.maxBorrowableAmount) {
+        console.warn(
+            `actor (id: ${actorId} tried to get a ${loanAmountInAcd} but the max borrowable amount is ${
+                augmint.maxBorrowableAmount
+            }. Augmint didn't give any loan.`
+        );
         return false;
     }
     const loanProduct = loanProducts[loanProductId];

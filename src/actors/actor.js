@@ -112,10 +112,6 @@ class Actor {
         return loanManager.getLoanProducts();
     }
 
-    getMaxLockableAcd() {
-        return freezer.getMaxLockableAcd();
-    }
-
     convertAcdToEth(acdAmount) {
         return exchange.convertAcdToEth(acdAmount);
     }

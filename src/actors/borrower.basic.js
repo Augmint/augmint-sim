@@ -40,7 +40,7 @@ class BorrowerBasic extends Actor {
             repaymentDue < collateralValueAcd;
 
         /* Get new loan if there is no loan */
-        if (this.loans.length === 0 && state.augmint.borrowingAllowed) {
+        if (this.loans.length === 0 && state.augmint.maxBorrowableAmount > 0) {
             this.triedToBuyForRepayment = false;
             const loanProduct = state.augmint.loanProducts[0];
             const augmintInterest = loanProduct.interestPt;
@@ -52,7 +52,8 @@ class BorrowerBasic extends Actor {
             const wantToTakeAmount = wantToTake
                 ? Math.min(
                       Math.floor(this.params.WANTS_TO_BORROW_AMOUNT * loanProduct.loanCollateralRatio),
-                      Math.floor(this.convertEthToAcd(this.ethBalance) * loanProduct.loanCollateralRatio)
+                      Math.floor(this.convertEthToAcd(this.ethBalance) * loanProduct.loanCollateralRatio),
+                      state.augmint.maxBorrowableAmount
                   )
                 : 0;
 
