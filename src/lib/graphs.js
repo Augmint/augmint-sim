@@ -347,8 +347,9 @@ function init(wrapper) {
         wrapper.appendChild(canvas);
 
         canvas.height = 250;
-        canvas.width = 300;
-
+        //canvas.width = 300;
+        canvas.width = (graph.title === "ETH/USD"||graph.title === "Open ACD Demand '000s") ? 920 : 300;
+        
         graph.canvas = canvas;
         graph.ctx = canvas.getContext('2d');
         graph.xData = [];
@@ -387,12 +388,12 @@ function update(timeInSecs, augmint) {
         graph.xData.push(Math.floor(timeInSecs / ONE_DAY_IN_SECS));
         graph.datasets.forEach(dataset => {
             dataset.yData.push(dataset.func(augmint));
-            if (dataset.yData.length > 365) {
+            if (dataset.yData.length > 365 && (graph.title !== "ETH/USD"||graph.title !== "Open ACD Demand '000s")) {
                 dataset.yData.shift();
             }
         });
 
-        if (graph.xData.length > 365) {
+        if (graph.xData.length > 365 && (graph.title !== "ETH/USD"||graph.title !== "Open ACD Demand '000s")) {
             graph.xData.shift();
         }
 
