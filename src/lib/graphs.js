@@ -348,7 +348,7 @@ function init(wrapper) {
 
         canvas.height = 250;
         //canvas.width = 300;
-        canvas.width = graph.title === "ETH/USD"||graph.title === "Open ACD Demand '000s" ? 920 : 300;
+        canvas.width = graph.title === 'ETH/USD' || graph.title === 'Open ACD Demand \'000s' ? 920 : 300;
 
         graph.canvas = canvas;
         graph.ctx = canvas.getContext('2d');
