@@ -33,8 +33,9 @@ class LockerBasic extends Actor {
 
             this.wantToLock = state.utils.byChanceInADay(this.params.CHANCE_TO_LOCK * marketChance);
             const acdAvailable = this.convertUsdToAcd(this.usdBalance) + this.acdBalance;
+
             this.wantToLockAmount = this.wantToLock
-                ? Math.min(acdAvailable, this.getMaxLockableAcd(), this.params.WANTS_TO_LOCK_AMOUNT)
+                ? Math.min(acdAvailable, state.augmint.maxLockableAmount, this.params.WANTS_TO_LOCK_AMOUNT)
                 : 0;
         }
 
@@ -50,7 +51,7 @@ class LockerBasic extends Actor {
         }
 
         /* Buy ACD for next lock */
-        if (this.acdBalance < this.wantToLockAmount && state.augmint.lockingAllowed) {
+        if (this.acdBalance < this.wantToLockAmount) {
             this.buyEthWithUsd(this.wantToLockAmount - this.acdBalance);
             this.buyACD(this.wantToLockAmount - this.acdBalance);
         }

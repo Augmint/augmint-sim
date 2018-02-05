@@ -12,7 +12,12 @@ const locks = augmint.locks;
 let counter = 0;
 
 function lockACD(actorId, acdAmount) {
-    if (!augmint.lockingAllowed) {
+    if (acdAmount > augmint.maxLockableAmount) {
+        console.warn(
+            `actor (id: ${actorId} tried to lock ${acdAmount} but the max lockable amount is ${
+                augmint.maxLockableAmount
+            }. Augmint didn't give allow to lock.`
+        );
         return false;
     }
     const interestPt = (1 + augmint.params.lockedAcdInterestPercentage) ** (augmint.params.lockTimeInDays / 365) - 1;
@@ -75,15 +80,8 @@ function getLocksForActor(actorId) {
     return locks[actorId];
 }
 
-function getMaxLockableAcd() {
-    const interestPt = (1 + augmint.params.lockedAcdInterestPercentage) ** (augmint.params.lockTimeInDays / 365) - 1;
-    const maxAmount = Math.floor(augmint.balances.interestEarnedPool / interestPt);
-    return maxAmount;
-}
-
 module.exports = {
     lockACD,
     releaseACD,
-    getLocksForActor,
-    getMaxLockableAcd
+    getLocksForActor
 };

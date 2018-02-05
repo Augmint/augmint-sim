@@ -233,7 +233,7 @@ const graphs = [
         title: 'Loan to Lock Ratio',
         options: {
             title: { display: false },
-            scales: { yAxes: [ {ticks: { suggestedMax: 3 } } ] },
+            scales: { yAxes: [ {ticks: { suggestedMin: 0.5, suggestedMax: 1.5 } } ] },
             legend: { display: true },
             tooltips: { enabled: true , mode: 'index', intersect: false}
         },

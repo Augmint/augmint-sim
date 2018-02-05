@@ -41,19 +41,25 @@ function getParamsFromUI() {
 
         params[key] = value;
         //percentages
-        if(key==="marketLockInterestRate"||key==="lockedAcdInterestPercentage"||key==="marketLoanInterestRate"){params[key]/=100;}
+        if (
+            key === 'marketLockInterestRate' ||
+            key === 'lockedAcdInterestPercentage' ||
+            key === 'marketLoanInterestRate'
+        ) {
+            params[key] /= 100;
+        }
     });
 
     params.loanProduct = {
         minimumLoanInAcd: Number.parseFloat(document.getElementById('minimumLoanInAcd').value),
-        loanCollateralRatio: Number.parseFloat(document.getElementById('loanCollateralRatio').value/100),
-        interestPt: Number.parseFloat(document.getElementById('loanInterestPt').value/100), // p.a.
+        loanCollateralRatio: Number.parseFloat(document.getElementById('loanCollateralRatio').value / 100),
+        interestPt: Number.parseFloat(document.getElementById('loanInterestPt').value / 100), // p.a.
         repaymentPeriodInDays: Number.parseFloat(document.getElementById('repaymentPeriodInDays').value),
-        defaultFeePercentage: Number.parseFloat(document.getElementById('defaultFeePercentage').value/100)
+        defaultFeePercentage: Number.parseFloat(document.getElementById('defaultFeePercentage').value / 100)
     };
     //technical params
-    params["ethUsdTrendSampleDays"] = Number.parseFloat(document.getElementById('ethUsdTrendSampleDays').value)
-    
+    params['ethUsdTrendSampleDays'] = Number.parseFloat(document.getElementById('ethUsdTrendSampleDays').value);
+
     return params;
 }
 
@@ -62,19 +68,27 @@ function updateUIFromParams() {
     inputs.forEach(input => {
         const key = input.dataset.key;
         //percentages
-        if(key==="marketLockInterestRate"||key==="lockedAcdInterestPercentage"||key==="marketLoanInterestRate"){
-            augmint.params[key]=(augmint.params[key]*100).toFixed(2);
+        if (
+            key === 'marketLockInterestRate' ||
+            key === 'lockedAcdInterestPercentage' ||
+            key === 'marketLoanInterestRate'
+        ) {
+            augmint.params[key] = (augmint.params[key] * 100).toFixed(2);
         }
         input.value = augmint.params[key];
     });
     // we assume there is only 1 loanProduct but it's fine for now
     document.getElementById('minimumLoanInAcd').value = augmint.loanProducts[0].minimumLoanInAcd;
-    document.getElementById('loanCollateralRatio').value = (augmint.loanProducts[0].loanCollateralRatio*100).toFixed(2);
-    document.getElementById('loanInterestPt').value = (augmint.loanProducts[0].interestPt*100).toFixed(2);
+    document.getElementById('loanCollateralRatio').value = (augmint.loanProducts[0].loanCollateralRatio * 100).toFixed(
+        2
+    );
+    document.getElementById('loanInterestPt').value = (augmint.loanProducts[0].interestPt * 100).toFixed(2);
     document.getElementById('repaymentPeriodInDays').value = augmint.loanProducts[0].repaymentPeriodInDays;
-    document.getElementById('defaultFeePercentage').value = (augmint.loanProducts[0].defaultFeePercentage*100).toFixed(2);
+    document.getElementById('defaultFeePercentage').value = (
+        augmint.loanProducts[0].defaultFeePercentage * 100
+    ).toFixed(2);
     // technical params
-    document.getElementById('ethUsdTrendSampleDays').value = (augmint.params.ethUsdTrendSampleDays);
+    document.getElementById('ethUsdTrendSampleDays').value = augmint.params.ethUsdTrendSampleDays;
 }
 
 function togglePause() {
@@ -182,6 +196,14 @@ function render() {
 
     // only re-render once per day:
     if (daysPassed > lastRender) {
+        // console.debug(
+        //     'daysPassed: ',
+        //     daysPassed,
+        //     'maxLockable: ',
+        //     state.augmint.maxLockableAmount,
+        //     'maxBorrowable: ',
+        //     state.augmint.maxBorrowableAmount
+        // );
         lastRender = daysPassed;
         clockElem.innerHTML = daysPassed;
         graphs.update(state.meta.currentTime, state.augmint);
