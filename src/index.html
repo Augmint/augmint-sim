@@ -11,7 +11,7 @@
     .buttons {
         margin-top: 10px;
     }
-    
+
     h4{
         margin-left: 10px;
     }
@@ -27,26 +27,26 @@
         float: left;
         width: 140px;
     }
-    
+
     .flex-container {
         display: flex;
         flex-wrap: wrap;
     }
 
     .flex-item {
-        width: 370px;
+        width: 400px;
         background-color: #f2f2f2;
         margin-right: 2px;
         margin-bottom: 2px;
         border-radius: 10px;
     }
-    
+
     label {
         float: left;
-        width: 260px;
+        width: 290px;
         margin-left: 10px;
     }
-    
+
     input[type=number]{
         width: 75px;
         text-align: right;
@@ -55,7 +55,7 @@
         display: flex;
         flex-wrap: wrap;
     }
-    
+
     .graphs-wrapper canvas {
         margin-right: 10px;
     }
@@ -99,8 +99,8 @@
             <label>Market deposit interest pa. (%): </label><input type="number" data-key="marketLockInterestRate" /><br/>
             <label>Locked ACD premium pa. (%): </label><input type="number" data-key="lockedAcdInterestPercentage"/><br/>
             <label>Market loan interest pa. (%): </label><input type="number" data-key="marketLoanInterestRate"/><br/>
-            <label>Loan to deposit ratio LOAN limit: </label><input type="number" step="0.1" data-key="loanToLockRatioLoanLimit"/><br/>
-            <label>Loan to deposit ratio LOCK limit: </label><input type="number" step="0.1" data-key="loanToLockRatioLockLimit"/><br/>
+            <label>Loan to deposit ratio LOAN limit (%): </label><input type="number" step="1" data-key="loanToLockRatioLoanLimit"/><br/>
+            <label>Loan to deposit ratio LOCK limit (%): </label><input type="number" step="1" data-key="loanToLockRatioLockLimit"/><br/>
             <label>Lock Time (days): </label><input type="number" value="30" data-key="lockTimeInDays"/><br/>
             </div>
             <label class="loanproduct-inputs">Loan term (days): </label><input type="number" id="repaymentPeriodInDays"/><br/>

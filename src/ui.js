@@ -6,7 +6,6 @@ const rates = require('./augmint/rates.js');
 const graphs = require('./lib/graphs.js');
 const scenario = require('./scenarios/base.js');
 const AugmintError = require('./augmint/augmint.error.js');
-const augmintjs = require('./augmint/augmint.js');
 
 // DOM elements
 const clockElem = document.querySelector('.clock');
@@ -44,7 +43,9 @@ function getParamsFromUI() {
         if (
             key === 'marketLockInterestRate' ||
             key === 'lockedAcdInterestPercentage' ||
-            key === 'marketLoanInterestRate'
+            key === 'marketLoanInterestRate' ||
+            key === 'loanToLockRatioLoanLimit' ||
+            key === 'loanToLockRatioLockLimit'
         ) {
             params[key] /= 100;
         }
@@ -71,7 +72,9 @@ function updateUIFromParams() {
         if (
             key === 'marketLockInterestRate' ||
             key === 'lockedAcdInterestPercentage' ||
-            key === 'marketLoanInterestRate'
+            key === 'marketLoanInterestRate' ||
+            key === 'loanToLockRatioLoanLimit' ||
+            key === 'loanToLockRatioLockLimit'
         ) {
             augmint.params[key] = (augmint.params[key] * 100).toFixed(2);
         }
