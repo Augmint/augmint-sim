@@ -230,6 +230,30 @@ const graphs = [
         }]
     },
     {
+        title: 'Max allowed lock/loan',
+        options: {
+            title: { display: false },
+            legend: { display: true },
+            tooltips: { enabled: true , mode: 'index', intersect: false}
+        },
+        datasets: [{
+            func: augmint => { return augmint.maxLockableAmount; },
+            options: {
+                    label: 'maxLockable',
+                    borderColor: LOCKED_ACD_COLOR,
+                    backgroundColor: TRANSPARENT
+                }
+        },
+        {
+            func: augmint => { return augmint.maxBorrowableAmount(0); },
+            options: {
+                label: 'maxBorrowable',
+                borderColor: OPEN_LOANS_COLOR,
+                backgroundColor: TRANSPARENT
+            }
+        }]
+    },
+    {
         title: 'Loan to Lock Ratio',
         options: {
             title: { display: false },

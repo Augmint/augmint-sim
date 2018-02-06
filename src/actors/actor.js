@@ -85,6 +85,10 @@ class Actor {
         return augmint.actors[this.id].params;
     }
 
+    get ownAcdOrdersSum() {
+        return augmint.exchange.getActorBuyAcdOrdersSum(this.id);
+    }
+
     // GENERAL STATE:
     getKey(key) {
         return augmint.actors[this.id].state[key];

@@ -57,7 +57,7 @@ function lockACD(actorId, acdAmount) {
         lockedUntil: clock.getTime() + augmint.params.lockTimeInDays * ONE_DAY_IN_SECS
     };
 
-    return lockId;
+    return true;
 }
 
 function releaseACD(actorId, lockId) {
@@ -90,6 +90,7 @@ function releaseACD(actorId, lockId) {
 
     // remove lock:
     delete locks[actorId][lockId];
+    return true;
 }
 
 // allows actors to query their locks:
