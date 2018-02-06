@@ -45,13 +45,13 @@ class LockerBasic extends Actor {
                 this.wantToLockAmount =
                     this.wantToLockAmount < state.augmint.params.minimumLockAmount ? 0 : this.wantToLockAmount;
 
-                console.debug(
-                    `**** Willing to LOCK. this.wantToLockAmount: ${
-                        this.wantToLockAmount
-                    }  maxLockableAmount: ${maxLockableAmount} acdAvailable: ${acdAvailable} minimumLockAmount: ${
-                        state.augmint.params.minimumLockAmount
-                    }`
-                );
+                // console.debug(
+                //     `**** Willing to LOCK. this.wantToLockAmount: ${
+                //         this.wantToLockAmount
+                //     }  maxLockableAmount: ${maxLockableAmount} acdAvailable: ${acdAvailable} minimumLockAmount: ${
+                //         state.augmint.params.minimumLockAmount
+                //     }`
+                // );
             } else {
                 this.wantToLockAmount = 0;
             }
@@ -87,11 +87,11 @@ class LockerBasic extends Actor {
 
         /* Lock if we want and can */
         if (this.wantToLockAmount > 0 && this.acdBalance >= this.wantToLockAmount) {
-            console.debug(
-                `**** GOING to LOCK. lockAmountNow: ${
-                    this.wantToLockAmount
-                } maxLockableAmount: ${maxLockableAmount} acdBalance: ${this.acdBalance}`
-            );
+            // console.debug(
+            //     `**** GOING to LOCK. lockAmountNow: ${
+            //         this.wantToLockAmount
+            //     } maxLockableAmount: ${maxLockableAmount} acdBalance: ${this.acdBalance}`
+            // );
 
             if (this.lockACD(this.wantToLockAmount)) {
                 this.waitingForBuyOrder = false;
