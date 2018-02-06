@@ -36,14 +36,16 @@ function getLoanProducts() {
 }
 
 function takeLoan(actorId, loanProductId, loanAmountInAcd) {
-    if (loanAmountInAcd > augmint.maxBorrowableAmount) {
+    if (loanAmountInAcd > augmint.maxBorrowableAmount(loanProductId)) {
         console.warn(
-            `actor (id: ${actorId} tried to get a ${loanAmountInAcd} but the max borrowable amount is ${
-                augmint.maxBorrowableAmount
-            }. Augmint didn't give any loan.`
+            `actor (id: ${actorId} tried to get a ${loanAmountInAcd} for product id ${loanProductId}
+                but the max borrowable amount is ${augmint.maxBorrowableAmount(
+                    loanProductId
+                )}. Augmint didn't give any loan.`
         );
         return false;
     }
+
     const loanProduct = loanProducts[loanProductId];
 
     if (!loanProduct) {
@@ -106,13 +108,10 @@ function repayLoan(actorId, loanId) {
     const loan = loans[actorId][loanId];
 
     if (augmint.actors[actorId].balances.acd < loan.repaymentDue) {
-        console.error(
-            'repayLoan() ACD balance of ',
-            actorId,
-            ' balance: ',
-            augmint.actors[actorId].balances.acd,
-            'is not enough to repay ',
-            loan.repaymentDue
+        console.warn(
+            `actor (id: ${actorId} tried to repay ${loan.repaymentDue} but actor's balance is ${
+                augmint.actors[actorId].balances.acd
+            } loanId: ${loanId}. Augmint rejected lock.`
         );
         return false;
     }
@@ -144,12 +143,18 @@ function repayLoan(actorId, loanId) {
 
 function collectDefaultedLoan(actorId, loanId) {
     if (!loans[actorId] || !loans[actorId][loanId]) {
+        console.warn(`Collection failed, tried to collect a non existent loan. actorId: ${actorId} loanId: ${loanId}`);
         return false;
     }
 
     const loan = loans[actorId][loanId];
+    const currentTime = clock.getTime();
 
-    if (loan.repayBy >= clock.getTime()) {
+    if (loan.repayBy >= currentTime) {
+        console.warn(
+            `Collection failed, tried to collect a loan which is not defaulted yet.
+             loan.repayBy: ${loan.repayBy} currentTime: ${currentTime} ${actorId} loanId: ${loanId}`
+        );
         return false;
     }
 

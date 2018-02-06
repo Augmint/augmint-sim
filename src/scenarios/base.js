@@ -11,6 +11,7 @@ const augmintOptions = {
         lockedAcdInterestPercentage: 0.08,
         lockTimeInDays: 30,
         ethUsdTrendSampleDays: 5, // how many days to inspect for rates.ethToUsdTrend calculation)
+        minimumLockAmount: 100, // without interest
         lockNoLimitAllowance: 500 /* in token - if totalLockAmount is below this then a new lock is allowed
                                      up to this amount even if it will bring the loanToDepositRatio BELOW
                                      loanToDepositLoanLimit
