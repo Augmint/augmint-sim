@@ -31,7 +31,7 @@ module.exports = {
         loanToLockRatioLoanLimit: 1.2, // don't allow new loans if it's more
         loanToLockRatioLockLimit: 0.8, // don't allow new locks if it's less
         ethUsdTrendSampleDays: 3, // how many days to inspect for rates.ethToUsdTrend calculation)
-
+        minimumLockAmount: 100, // without interest
         lockNoLimitAllowance: 500 /* in token - if totalLockAmount is below this then a new lock is allowed
                                      up to this amount even if it will bring the loanToDepositRatio BELOW
                                      loanToDepositLoanLimit
