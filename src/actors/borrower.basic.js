@@ -26,49 +26,68 @@ class BorrowerBasic extends Actor {
 
     executeMoves(state) {
         const { currentTime } = state.meta;
-        const repaymentDue = this.loans[0] ? this.loans[0].repaymentDue + this.params.REPAYMENT_COST_ACD : 0;
-        // TODO: move this to loanManager? Unlikely that anyone would repay a loan if value below repayment
-        const timeUntilRepayment = this.loans[0] ? this.loans[0].repayBy - currentTime : 0;
-        const collateralValueAcd = this.loans[0]
-            ? this.loans[0] && this.convertEthToAcd(this.loans[0].collateralInEth)
-            : 0;
-        const willRepaySoon =
-            this.loans[0] &&
-            currentTime >=
-                this.loans[0].repayBy -
-                    (this.params.BUY_ACD_X_DAYS_BEFORE_REPAY + this.params.REPAY_X_DAYS_BEFORE) * ONE_DAY_IN_SECS &&
-            repaymentDue < collateralValueAcd;
+        const loanProduct = state.augmint.loanProducts[0];
+        let willRepaySoon = false;
+        let timeUntilRepayment = 0;
+        let repaymentDue = 0;
+        let collateralValueAcd = 0;
+        let wantToTake = false;
+        let wantToTakeAmount = 0;
+        let loanAmountNow = 0;
 
-        /* Get new loan if there is no loan */
-        if (this.loans.length === 0 && state.augmint.maxBorrowableAmount > 0) {
-            this.triedToBuyForRepayment = false;
-            const loanProduct = state.augmint.loanProducts[0];
+        if (this.loans.length !== 0) {
+            /* we have a loan, is repayment due? */
+            repaymentDue = this.loans[0].repaymentDue + this.params.REPAYMENT_COST_ACD;
+            timeUntilRepayment = this.loans[0].repayBy - currentTime;
+            collateralValueAcd = this.loans[0] && this.convertEthToAcd(this.loans[0].collateralInEth);
+            willRepaySoon =
+                currentTime >=
+                    this.loans[0].repayBy -
+                        (this.params.BUY_ACD_X_DAYS_BEFORE_REPAY + this.params.REPAY_X_DAYS_BEFORE) * ONE_DAY_IN_SECS &&
+                repaymentDue < collateralValueAcd; // TODO: move this last bit to loanManager? Unlikely that anyone would repay a loan if collateral value below repayment amount
+        } else {
+            /* no open loans , can we and do we want we take a new loan? */
             const augmintInterest = loanProduct.interestPt;
             const marketInterest = state.augmint.params.marketLoanInterestRate;
-
             const marketChance = Math.min(1, marketInterest / (augmintInterest * this.params.INTEREST_SENSITIVITY));
+            wantToTake = state.utils.byChanceInADay(this.params.CHANCE_TO_TAKE_LOAN * marketChance);
+            if (wantToTake) {
+                wantToTakeAmount = Math.min(
+                    Math.floor(this.params.WANTS_TO_BORROW_AMOUNT * loanProduct.loanCollateralRatio),
+                    Math.floor(this.convertEthToAcd(this.ethBalance) * loanProduct.loanCollateralRatio),
+                    state.augmint.maxBorrowableAmount(0)
+                );
+                loanAmountNow = wantToTakeAmount < loanProduct.minimumLoanInAcd ? 0 : wantToTakeAmount;
+            }
 
-            const wantToTake = state.utils.byChanceInADay(this.params.CHANCE_TO_TAKE_LOAN * marketChance);
-            const wantToTakeAmount = wantToTake
-                ? Math.min(
-                      Math.floor(this.params.WANTS_TO_BORROW_AMOUNT * loanProduct.loanCollateralRatio),
-                      Math.floor(this.convertEthToAcd(this.ethBalance) * loanProduct.loanCollateralRatio),
-                      state.augmint.maxBorrowableAmount
-                  )
-                : 0;
+            // console.debug(
+            //     `**** Willing TO TAKE LOAN. amount: ${loanAmountNow} wantToTakeAmount: ${wantToTakeAmount} maxBorrowableAmount: ${state.augmint.maxBorrowableAmount(
+            //         0
+            //     )}`
+            // );
+        }
 
-            if (wantToTake && wantToTakeAmount > state.augmint.loanProducts[0].minimumLoanInAcd) {
-                this.takeLoan(0, wantToTakeAmount);
+        /* Get new loan  */
+        if (loanAmountNow > 0) {
+            // console.debug(
+            //     `**** GOING TO TAKE LOAN. amount: ${loanAmountNow} maxBorrowableAmount: ${state.augmint.maxBorrowableAmount(
+            //         0
+            //     )}`
+            // );
+            this.triedToBuyForRepayment = false;
+
+            if (wantToTake) {
+                this.takeLoan(0, loanAmountNow);
             }
         }
 
         /* Sell all ACD (CHANCE_TO_SELL_ALL_ACD) unless repayment is due soon */
-        if (this.acdBalance && !willRepaySoon && state.utils.byChanceInADay(this.params.CHANCE_TO_SELL_ALL_ACD)) {
+        if (this.acdBalance > 0 && !willRepaySoon && state.utils.byChanceInADay(this.params.CHANCE_TO_SELL_ALL_ACD)) {
             this.sellACD(this.acdBalance);
         }
 
-        if (this.loans.length > 0 && willRepaySoon) {
-            /* BUY ACD in advance for repayment */
+        /* BUY ACD in advance for repayment */
+        if (willRepaySoon) {
             if (
                 this.acdBalance < repaymentDue &&
                 /* rare edge case when ethValue recovered since last tick but
@@ -104,7 +123,7 @@ class BorrowerBasic extends Actor {
             }
         }
 
-        /* Increase demand */
+        /* Increase loan  demand */
         if (state.meta.iteration % state.params.stepsPerDay === 0) {
             this.params.WANTS_TO_BORROW_AMOUNT *= (1 + this.params.WANTS_TO_BORROW_AMOUNT_GROWTH_PA) ** (1 / 365);
         }

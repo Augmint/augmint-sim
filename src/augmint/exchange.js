@@ -34,6 +34,11 @@ function buyACD(actorId, acdAmount) {
     const totalEthAmount = acdAmount / augmint.rates.ethToAcd;
 
     if (augmint.actors[actorId].balances.eth < totalEthAmount) {
+        console.warn(
+            `buyAcd order failed. Tried to buy ${acdAmount} (=${totalEthAmount} ETH) but only has ${
+                augmint.actors[actorId].balances.eth
+            } ETH. actorId: ${actorId}`
+        );
         return false;
     }
 
@@ -221,8 +226,15 @@ function buyEthWithUsd(actorId, usdAmount) {
 
 function getActorSellAcdOrdersSum(actorId) {
     return orderBook.sell.reduce((sum, sellOrder) => {
-        let reserveAmount = sellOrder.actorId == actorId ? sellOrder.amount : 0;
-        return sum + reserveAmount;
+        const amount = sellOrder.actorId == actorId ? sellOrder.amount : 0;
+        return sum + amount;
+    }, 0);
+}
+
+function getActorBuyAcdOrdersSum(actorId) {
+    return orderBook.buy.reduce((sum, buyOrder) => {
+        const amount = buyOrder.actorId == actorId ? buyOrder.amount : 0;
+        return sum + amount;
     }, 0);
 }
 
@@ -237,5 +249,6 @@ module.exports = {
     convertEthToUsd,
     convertUsdToEth,
     convertUsdToAcd,
-    getActorSellAcdOrdersSum
+    getActorSellAcdOrdersSum,
+    getActorBuyAcdOrdersSum
 };

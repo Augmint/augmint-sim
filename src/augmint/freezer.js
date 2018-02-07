@@ -12,11 +12,11 @@ const locks = augmint.locks;
 let counter = 0;
 
 function lockACD(actorId, acdAmount) {
-    if (acdAmount > augmint.maxLockableAmount) {
+    if (acdAmount > augmint.maxLockableAmount || acdAmount < augmint.params.minimumLockAmount) {
         console.warn(
-            `actor (id: ${actorId} tried to lock ${acdAmount} but the max lockable amount is ${
-                augmint.maxLockableAmount
-            }. Augmint didn't give allow to lock.`
+            `actor (id: ${actorId} tried to lock ${acdAmount} but the max: ${augmint.maxLockableAmount}. and min: ${
+                augmint.params.minimumLockAmount
+            }. Augmint rejected lock.`
         );
         return false;
     }
@@ -24,10 +24,20 @@ function lockACD(actorId, acdAmount) {
     const interestInAcd = acdAmount * interestPt;
 
     if (augmint.actors[actorId].balances.acd < acdAmount) {
+        console.warn(
+            `actor (id: ${actorId} tried to lock ${acdAmount} but actor's balance is ${
+                augmint.actors[actorId].balances.acd
+            }. Augmint rejected lock.`
+        );
         return false;
     }
 
     if (augmint.balances.interestEarnedPool < interestInAcd) {
+        console.warn(
+            `actor (id: ${actorId} tried to lock ${acdAmount} but interestEarnedPool balance is ${
+                augmint.balances.interestEarnedPool
+            } and lock's interest would be ${interestInAcd}. Augmint rejected lock.`
+        );
         return false;
     }
 
@@ -47,17 +57,24 @@ function lockACD(actorId, acdAmount) {
         lockedUntil: clock.getTime() + augmint.params.lockTimeInDays * ONE_DAY_IN_SECS
     };
 
-    return lockId;
+    return true;
 }
 
 function releaseACD(actorId, lockId) {
     if (!locks[actorId] || !locks[actorId][lockId]) {
+        console.warn(
+            `Release lock failed, tried to release a non existent lock. actorId: ${actorId} lockId: ${lockId}`
+        );
         return false;
     }
 
     const lock = locks[actorId][lockId];
-
-    if (lock.lockedUntil > clock.getTime()) {
+    const currentTime = clock.getTime();
+    if (lock.lockedUntil > currentTime) {
+        console.warn(
+            `Release lock failed, tried to release a lock which is not available yet.
+             loan.repayBy: ${lock.lockedUntil} currentTime: ${currentTime} ${actorId} lockId: ${lockId}`
+        );
         return false;
     }
 
@@ -73,6 +90,7 @@ function releaseACD(actorId, lockId) {
 
     // remove lock:
     delete locks[actorId][lockId];
+    return true;
 }
 
 // allows actors to query their locks:
