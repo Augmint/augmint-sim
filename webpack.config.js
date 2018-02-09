@@ -1,7 +1,7 @@
 'use strict';
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-let FaviconsWebpackPlugin = require('favicons-webpack-plugin');
+const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 
 module.exports = {
     entry: './src/ui.js',
