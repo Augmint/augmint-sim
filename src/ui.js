@@ -62,7 +62,7 @@ function getParamsFromUI() {
     //actor params
     scenario.actors.reserve.balances.acd = Number.parseFloat(document.getElementById('reserveBalancesAcd').value);
     scenario.actors.reserve.balances.eth = Number.parseFloat(document.getElementById('reserveBalancesEth').value);
-    
+
     return params;
 }
 
