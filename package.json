@@ -15,6 +15,7 @@
     "devDependencies": {
         "browserify": "14.5.0",
         "copy-webpack-plugin": "4.3.0",
+        "favicons-webpack-plugin": "0.0.7",
         "watchify": "3.9.0",
         "webpack": "3.10.0",
         "webpack-dev-server": "2.9.7"
