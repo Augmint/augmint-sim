@@ -107,7 +107,7 @@ const actors = {
         It's is special actor, don't change the name of it ('reserve').
         Leave this actor as last so that end of day snapshots are reflecting after intervention state on graphs.
     */
-    reserve: { type: 'ReserveBasic', balances: { acd: 100000 /* genesis acd */, eth: 0 } }
+    reserve: { type: 'ReserveBasic', balances: { acd: 100000 /* genesis acd */, eth: 0 } } //reserve acd //reserve eth
 };
 
 module.exports = {
