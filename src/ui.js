@@ -59,7 +59,10 @@ function getParamsFromUI() {
     };
     //technical params
     params['ethUsdTrendSampleDays'] = Number.parseFloat(document.getElementById('ethUsdTrendSampleDays').value);
-
+    //actor params
+    scenario.actors.reserve.balances.acd = Number.parseFloat(document.getElementById('reserveBalancesAcd').value);
+    scenario.actors.reserve.balances.eth = Number.parseFloat(document.getElementById('reserveBalancesEth').value);
+    
     return params;
 }
 
@@ -88,8 +91,12 @@ function updateUIFromParams() {
     document.getElementById('defaultFeePercentage').value = (
         augmint.loanProducts[0].defaultFeePercentage * 100
     ).toFixed(2);
-    // technical params
+    //technical params
     document.getElementById('ethUsdTrendSampleDays').value = augmint.params.ethUsdTrendSampleDays;
+    //actor params
+    document.getElementById('reserveBalancesAcd').value = scenario.actors.reserve.balances.acd;
+    document.getElementById('reserveBalancesEth').value = scenario.actors.reserve.balances.eth;
+
 }
 
 function togglePause() {
