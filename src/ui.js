@@ -44,8 +44,7 @@ function getParamsFromUI() {
             key === 'marketLockInterestRate' ||
             key === 'lockedAcdInterestPercentage' ||
             key === 'marketLoanInterestRate' ||
-            key === 'loanToLockRatioLoanLimit' ||
-            key === 'loanToLockRatioLockLimit'
+            key === 'ltdDifferenceLimit'
         ) {
             params[key] /= 100;
         }
@@ -73,8 +72,7 @@ function updateUIFromParams() {
             key === 'marketLockInterestRate' ||
             key === 'lockedAcdInterestPercentage' ||
             key === 'marketLoanInterestRate' ||
-            key === 'loanToLockRatioLoanLimit' ||
-            key === 'loanToLockRatioLockLimit'
+            key === 'ltdDifferenceLimit'
         ) {
             augmint.params[key] = (augmint.params[key] * 100).toFixed(2);
         }

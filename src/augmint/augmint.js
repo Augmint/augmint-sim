@@ -28,17 +28,11 @@ module.exports = {
         exchangeFeePercentage: 0.1,
         lockedAcdInterestPercentage: 0.5,
         lockTimeInDays: 365,
-        loanToLockRatioLoanLimit: 1.2, // don't allow new loans if it's more
-        loanToLockRatioLockLimit: 0.8, // don't allow new locks if it's less
         ethUsdTrendSampleDays: 3, // how many days to inspect for rates.ethToUsdTrend calculation)
         minimumLockAmount: 100, // without interest
-        lockNoLimitAllowance: 500 /* in token - if totalLockAmount is below this then a new lock is allowed
-                                     up to this amount even if it will bring the loanToDepositRatio BELOW
-                                     loanToDepositLoanLimit
-                                     (interest earned account balance still applies a limit on top of it) */,
-        loanNoLimitAllowance: 500 /* in token - if totalLoanAmount is below this then a new loan is allowed
-                                     up this amount even if it will bring the loanToDepositRatio
-                                     ABOVE loanToDepositLoanLimit */
+        ltdDifferenceLimit: 0.2 /* allow lock or loan if Loan To Deposut ratio stay within 1 +/- this param  */,
+        allowedLtdDifferenceAmount: 5000 /* in token - if totalLoan and totalLock difference is less than this
+                                            then allow loan or lock even if ltdDifference limit would go off with it */
     },
 
     rates: {
@@ -117,72 +111,65 @@ module.exports = {
     },
 
     get loanToDepositRatio() {
-        // checking against 1 b/c of rounding issues (need to move BugNumber)
+        // checking against 1 b/c of rounding issues (need to move to BigNumber)
         return this.balances.lockedAcdPool < 1 ? 'N/A' : this.balances.openLoansAcd / this.balances.lockedAcdPool;
     },
 
     /* for maxBorrowableAmount &  maxLockableAmount calculation logic see:
-        https://docs.google.com/spreadsheets/d/1MeWYPYZRIm1n9lzpvbq8kLfQg1hhvk5oJY6NrR401S0/edit#gid=1427271130 */
+        https://docs.google.com/spreadsheets/d/1MeWYPYZRIm1n9lzpvbq8kLfQg1hhvk5oJY6NrR401S0/edit#gid=270865454 */
     maxBorrowableAmount(productId) {
-        let maxLoanWithInterest;
-        if (Math.round(this.balances.openLoansAcd) < this.params.loanNoLimitAllowance) {
-            maxLoanWithInterest = this.params.loanNoLimitAllowance - this.balances.openLoansAcd;
-        } else {
-            maxLoanWithInterest =
-                this.balances.lockedAcdPool * this.params.loanToLockRatioLoanLimit - this.balances.openLoansAcd;
-        }
+        const allowedByLtdDifferencePt =
+            this.balances.lockedAcdPool * (1 + this.params.ltdDifferenceLimit) - this.balances.openLoansAcd;
 
-        let maxLoan = 0;
-        if (maxLoanWithInterest > 0) {
-            // TODO: part of these calcs implemented in loan.manager too. Make a common getter or move all this there?
-            const loanProduct = this.loanProducts[productId];
-            const interestPt = (1 + loanProduct.interestPt) ** (loanProduct.repaymentPeriodInDays / 365) - 1;
-            maxLoan = (maxLoanWithInterest / (1 + interestPt)).toFixed(4);
-        }
+        const allowedByLtdDifferenceAmount =
+            this.balances.openLoansAcd > this.balances.lockedAcdPool + this.params.allowedLtdDifferenceAmount
+                ? 0
+                : this.balances.lockedAcdPool + this.params.allowedLtdDifferenceAmount - this.balances.openLoansAcd;
+
+        const maxLoan = Math.max(allowedByLtdDifferenceAmount, allowedByLtdDifferencePt);
+        const maxLoanWithMinLoanLimit = maxLoan < this.loanProducts[productId].minimumLoanInAcd ? 0 : maxLoan;
 
         // console.debug(
         //     `maxBorrowableAmount calcs: totalLock: ${this.balances.lockedAcdPool} totalLoan: ${
         //         this.balances.openLoansAcd
         //     }
-        //     loanToDepositRatio: ${this.loanToDepositRatio} loanToLockRatioLockLimit: ${
-        //         this.params.loanToLockRatioLockLimit
-        //     }
-        //     maxLoan: ${maxLoan} maxLoanWithInterest: ${maxLoanWithInterest}`
+        //     loanToDepositRatio: ${this.loanToDepositRatio} ltdDifferenceLimit: ${
+        //         this.params.ltdDifferenceLimit
+        //     } minimumLoanAmount: ${this.loanProducts[productId].minimumLoanInAcd}
+        //     maxLoan: ${maxLoanWithMinLoanLimit} allowedByLtdDifferenceAmount: ${allowedByLtdDifferenceAmount} allowedByLtdDifferencePt: ${allowedByLtdDifferencePt}`
         // );
 
-        return maxLoan;
+        return maxLoanWithMinLoanLimit;
     },
 
     get maxLockableAmount() {
-        let maxLock;
-        // TODO: part of these calcs implemented in freezer too. Make a common getter or move all this there?
-        const allowedByLockLimitWithInterest =
-            this.balances.openLoansAcd / this.params.loanToLockRatioLockLimit - this.balances.lockedAcdPool;
+        // TODO: interest cals implemented in freezer too. Make a common getter somewhere?
         const interestPt = (1 + this.params.lockedAcdInterestPercentage) ** (this.params.lockTimeInDays / 365) - 1;
         const allowedByEarning = this.balances.interestEarnedPool / interestPt;
-        const allowedByLockLimit = allowedByLockLimitWithInterest / (1 + interestPt);
 
-        if (Math.round(this.balances.lockedAcdPool) < this.params.lockNoLimitAllowance) {
-            maxLock = Math.min(
-                Math.max(allowedByLockLimit, this.params.lockNoLimitAllowance - this.balances.lockedAcdPool),
-                allowedByEarning
-            );
-        } else {
-            maxLock = Math.min(allowedByLockLimit, allowedByEarning);
-        }
+        const allowedByLtdDifferencePt =
+            this.balances.openLoansAcd / (1 - this.params.ltdDifferenceLimit) - this.balances.lockedAcdPool;
 
-        maxLock = maxLock < 0 ? 0 : maxLock;
+        const allowedByLtdDifferenceAmount =
+            this.balances.openLoansAcd > this.balances.lockedAcdPool + this.params.allowedLtdDifferenceAmount
+                ? 0
+                : this.balances.openLoansAcd - this.balances.lockedAcdPool + this.params.allowedLtdDifferenceAmount;
+
+        const maxLock = Math.min(Math.max(allowedByLtdDifferencePt, allowedByLtdDifferenceAmount), allowedByEarning);
+
+        const maxLockWithMinLockLimit = maxLock < this.params.minimumLockAmount ? 0 : maxLock;
 
         // console.debug(
-        //     `maxLockableAmount calcs: totalLock: ${this.balances.lockedAcdPool} totalLoan: ${this.balances.openLoansAcd}
-        //     loanToDepositRatio: ${this.loanToDepositRatio}
-        //     loanToLockRatioLockLimit: ${this.params.loanToLockRatioLockLimit} earned interestPool: ${
-        //         this.balances.interestEarnedPool
-        //     }
-        //     maxLock: ${maxLock} allowedByLockLimitWithInterest: ${allowedByLockLimitWithInterest}
-        //     allowedByLockLimit: ${allowedByLockLimit} allowedByEarning: ${allowedByEarning}`
+        //     `maxLockableAmount calcs: totalLock: ${this.balances.lockedAcdPool} totalLoan: ${
+        //         this.balances.openLoansAcd
+        //     } earned interestPool: ${this.balances.interestEarnedPool}
+        //     loanToDepositRatio: ${this.loanToDepositRatio} ltdDifferenceLimit: ${
+        //         this.params.ltdDifferenceLimit
+        //     } minimumLockAmount: ${this.params.minimumLockAmount}
+        //     maxLock: ${maxLockWithMinLockLimit} allowedByLtdDifferencePt: ${allowedByLtdDifferencePt}
+        //     allowedByLtdDifferenceAmount: ${allowedByLtdDifferenceAmount} allowedByEarning: ${allowedByEarning}`
         // );
 
-        return maxLock;
+        return maxLockWithMinLockLimit;
     }
 };

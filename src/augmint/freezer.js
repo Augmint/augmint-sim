@@ -44,7 +44,7 @@ function lockACD(actorId, acdAmount) {
     // move acd user -> lock
     augmint.balances.interestEarnedPool -= interestInAcd;
     augmint.actors[actorId].balances.acd -= acdAmount;
-    augmint.balances.lockedAcdPool += interestInAcd + acdAmount;
+    augmint.balances.lockedAcdPool += acdAmount;
 
     const lockId = counter;
     counter++;
@@ -53,6 +53,7 @@ function lockACD(actorId, acdAmount) {
     locks[actorId] = locks[actorId] || {};
     locks[actorId][lockId] = {
         id: lockId,
+        lockedAmount: acdAmount,
         acdValue: interestInAcd + acdAmount,
         lockedUntil: clock.getTime() + augmint.params.lockTimeInDays * ONE_DAY_IN_SECS
     };
@@ -79,7 +80,7 @@ function releaseACD(actorId, lockId) {
     }
 
     // move acd lock -> user
-    augmint.balances.lockedAcdPool -= lock.acdValue;
+    augmint.balances.lockedAcdPool -= lock.lockedAmount;
     augmint.actors[actorId].balances.acd += lock.acdValue;
 
     // FIXME: uncomment these once changed to BigNumber

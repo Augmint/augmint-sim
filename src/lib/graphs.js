@@ -263,7 +263,7 @@ const graphs = [
         },
         datasets: [
             {
-            func: augmint => { return augmint.params.loanToLockRatioLoanLimit; },
+            func: augmint => (1 + augmint.params.ltdDifferenceLimit),
                 options: {
                         label: 'loan limit',
                         borderDash: DASHED_LINE,
@@ -272,7 +272,7 @@ const graphs = [
                     }
             },
             {
-            func: augmint => { return augmint.params.loanToLockRatioLockLimit; },
+            func: augmint => ( 1 - augmint.params.ltdDifferenceLimit),
                 options: {
                         label: 'lock limit',
                         borderDash: DASHED_LINE,

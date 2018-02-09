@@ -3,8 +3,6 @@
 const augmintOptions = {
     balances: { interestEarnedPool: 5000 /* genesis */ },
     params: {
-        loanToLockRatioLoanLimit: 1.2, // don't allow new loans if it's more
-        loanToLockRatioLockLimit: 0.8, // don't allow new locks if it's less
         exchangeFeePercentage: 0.003,
         marketLoanInterestRate: 0.14, // what do we compete with?  actor's demand for loans depends on it
         marketLockInterestRate: 0.06, // what do we compete with? actor's demand for locks depends on it
@@ -12,13 +10,9 @@ const augmintOptions = {
         lockTimeInDays: 30,
         ethUsdTrendSampleDays: 5, // how many days to inspect for rates.ethToUsdTrend calculation)
         minimumLockAmount: 100, // without interest
-        lockNoLimitAllowance: 500 /* in token - if totalLockAmount is below this then a new lock is allowed
-                                     up to this amount even if it will bring the loanToDepositRatio BELOW
-                                     loanToDepositLoanLimit
-                                     (interest earned account balance still applies a limit on top of it) */,
-        loanNoLimitAllowance: 500 /* in token - if totalLoanAmount is below this then a new loan is allowed
-                                     up this amount even if it will bring the loanToDepositRatio
-                                     ABOVE loanToDepositLoanLimit */,
+        ltdDifferenceLimit: 0.2 /* allow lock or loan if Loan To Deposut ratio stay within 1 +- this param  */,
+        allowedLtdDifferenceAmount: 5000 /* in token - if totalLoan and totalLock difference is less than that
+                                            then allow loan or lock even if ltdDifference limit would go off with it */,
         loanProduct: {
             minimumLoanInAcd: 100,
             loanCollateralRatio: 0.6,
