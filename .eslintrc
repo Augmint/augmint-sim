@@ -3,16 +3,17 @@
     parserOptions: { ecmaVersion: 7 },
     env: { node: true, es6: true, browser: true},
     rules: {
-         max-len: 'off',
-        'no-console': 'off',
+        max-len: 'off',
+        no-console: 'off',
+        indent: ["warn", 4],
         semi: ['error', 'always'],
-        'new-cap': 'off',
+        new-cap: 'off',
         strict: ['error', 'global'],
-        'no-underscore-dangle': 'off',
-        'no-use-before-define': 'error',
-        'no-unused-vars': ['warn', { vars: 'all', args: 'none' }],
-        'eol-last': 'off',
+        no-underscore-dangle: 'off',
+        no-use-before-define: 'error',
+        no-unused-vars: ['warn', { vars: 'all', args: 'none' }],
+        eol-last: 'off',
         quotes: ['error', 'single'],
-        'comma-dangle': 'warn'
+        comma-dangle: 'warn'
     }
 }

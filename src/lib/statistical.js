@@ -46,4 +46,3 @@ function leastSquares(X, Y, computeError, ret) {
 module.exports = {
     leastSquares
 };
-
