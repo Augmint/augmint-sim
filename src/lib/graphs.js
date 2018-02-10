@@ -347,99 +347,95 @@ const graphs = [
 ];
 
 function init(wrapper) {
-  Chart.defaults.global.responsive = false;
-  Chart.defaults.global.maintainAspectRatio = true;
-  Chart.defaults.global.title.display = true;
-  Chart.defaults.global.tooltips.enabled = false;
-  Chart.defaults.global.animation.duration = 0;
-  Chart.defaults.global.hover.mode = null;
-  Chart.defaults.global.legend.display = false;
-  Chart.defaults.global.elements.line.tension = 0;
-  Chart.defaults.global.elements.line.borderWidth = 2;
-  Chart.defaults.global.elements.line.borderColor = DEFAULT_COLOR;
-  Chart.defaults.global.elements.line.backgroundColor = DEFAULT_COLOR_BG;
-  Chart.defaults.global.elements.point.radius = 0;
-  Chart.scaleService.updateScaleDefaults('linear', {
-    ticks: {
-      min: 0,
-      suggestedMax: 10
-    }
-  });
-
-  graphs.forEach(graph => {
-    const canvas = document.createElement('canvas');
-    wrapper.appendChild(canvas);
-
-    canvas.height = 250;
-    //canvas.width = 300;
-    canvas.width =
-      graph.title === 'ETH/USD' || graph.title === 'Open ACD Demand \'000s' || graph.title === 'Loan to Lock Ratio'
-        ? 920
-        : 300;
-
-    graph.canvas = canvas;
-    graph.ctx = canvas.getContext('2d');
-    graph.xData = [];
-    graph.datasetsPassed = [];
-    graph.datasets.forEach(dataset => {
-      dataset.yData = [];
-      graph.datasetsPassed.push(
-        Object.assign(
-          {
-            label: dataset.options ? dataset.options.label || graph.title : 'NA',
-            data: dataset.yData
-          },
-          dataset.options
-        )
-      );
+    Chart.defaults.global.responsive = false;
+    Chart.defaults.global.maintainAspectRatio = true;
+    Chart.defaults.global.title.display = true;
+    Chart.defaults.global.tooltips.enabled = false;
+    Chart.defaults.global.animation.duration = 0;
+    Chart.defaults.global.hover.mode = null;
+    Chart.defaults.global.legend.display = false;
+    Chart.defaults.global.elements.line.tension = 0;
+    Chart.defaults.global.elements.line.borderWidth = 2;
+    Chart.defaults.global.elements.line.borderColor = DEFAULT_COLOR;
+    Chart.defaults.global.elements.line.backgroundColor = DEFAULT_COLOR_BG;
+    Chart.defaults.global.elements.point.radius = 0;
+    Chart.scaleService.updateScaleDefaults('linear', {
+        ticks: {
+            min: 0,
+            suggestedMax: 10
+        }
     });
-    graph.chart = new Chart(graph.ctx, {
-      type: graph.type || 'line',
-      data: {
-        labels: graph.xData,
-        datasets: graph.datasetsPassed
-      },
-      options: Object.assign(
-        {
-          title: { text: graph.title }
-        },
-        graph.options
-      )
+
+    graphs.forEach(graph => {
+        const canvas = document.createElement('canvas');
+        wrapper.appendChild(canvas);
+
+        canvas.height = 250;
+        //canvas.width = 300;
+        canvas.width =
+            graph.title === 'ETH/USD' ||
+            graph.title === 'Open ACD Demand \'000s' ||
+            graph.title === 'Loan to Lock Ratio' ? 920 : 300;
+
+        graph.canvas = canvas;
+        graph.ctx = canvas.getContext('2d');
+        graph.xData = [];
+        graph.datasetsPassed = [];
+        graph.datasets.forEach(dataset => {
+            dataset.yData = [];
+            graph.datasetsPassed.push(
+                Object.assign(
+                    {
+                        label: dataset.options ? dataset.options.label || graph.title : 'NA',
+                        data: dataset.yData
+                    },
+                    dataset.options
+                )
+            );
+        });
+        graph.chart = new Chart(graph.ctx, {
+            type: graph.type || 'line',
+            data: {
+                labels: graph.xData,
+                datasets: graph.datasetsPassed
+            },
+            options: Object.assign(
+                {
+                    title: { text: graph.title }
+                },
+                graph.options
+            )
+        });
     });
-  });
 }
 
 function update(timeInSecs, augmint) {
-  graphs.forEach(graph => {
-    // update data for graphs:
-    graph.xData.push(Math.floor(timeInSecs / ONE_DAY_IN_SECS));
-    graph.datasets.forEach(dataset => {
-      dataset.yData.push(dataset.func(augmint));
-      if (
-        dataset.yData.length > 365 &&
-        graph.title !== 'ETH/USD' &&
-        graph.title !== 'Open ACD Demand \'000s' &&
-        graph.title !== 'Loan to Lock Ratio'
-      ) {
-        dataset.yData.shift();
-      }
+    graphs.forEach(graph => {
+        // update data for graphs:
+        graph.xData.push(Math.floor(timeInSecs / ONE_DAY_IN_SECS));
+        graph.datasets.forEach(dataset => {
+            dataset.yData.push(dataset.func(augmint));
+            if (dataset.yData.length > 365 &&
+                graph.title !== 'ETH/USD' &&
+                graph.title !== 'Open ACD Demand \'000s' &&
+                graph.title !== 'Loan to Lock Ratio') {
+                    dataset.yData.shift();
+            }
+        });
+
+        if (graph.xData.length > 365 &&
+            graph.title !== 'ETH/USD' &&
+            graph.title !== 'Open ACD Demand \'000s' &&
+            graph.title !== 'Loan to Lock Ratio') {
+                graph.xData.shift();
+        }
+
+        // redraw:
+        graph.chart.update();
     });
-
-    if (
-      graph.xData.length > 365 &&
-      graph.title !== 'ETH/USD' &&
-      graph.title !== 'Open ACD Demand \'000s' &&
-      graph.title !== 'Loan to Lock Ratio'
-    ) {
-      graph.xData.shift();
-    }
-
-    // redraw:
-    graph.chart.update();
-  });
 }
 
 module.exports = {
-  init,
-  update
+    init,
+    update
 };
