@@ -50,6 +50,21 @@ module.exports = {
     locks: {},
     exchange: null, // set by simulation.init()
 
+    issueAcd(amount) {
+        this.actors.reserve.balances.acd += amount;
+        return this.actors.reserve.balances.acd;
+    },
+
+    burnAcd(amount) {
+        if (amount > this.actors.reserve.balances.acd) {
+            throw new Error(
+                `Tried to burn ${amount} from reserve but reserve balance only ${this.actors.reserve.balances.acd}`
+            );
+        }
+        this.actors.reserve.balances.acd -= amount;
+        return this.actors.reserve.balances.acd;
+    },
+
     // TODO: move these under balances.
     get reserveAcd() {
         return this.actors ? this.actors.reserve.balances.acd : 0;
