@@ -69,7 +69,6 @@ We are seeking for great minds to extend our core team. Contribution in any area
 Drop us an email: hello@augmint.cc
 or say hi on our [Discord server](https://discord.gg/PwDmsnu)
 
-**[Development environment setup](https://github.com/Augmint/augmint-web/blob/master/docs/developmentEnvironment.md)**
 
 ## Authors
 
