@@ -16,49 +16,51 @@ class LockerBasic extends Actor {
     constructor(id, balances, state, _params = {}) {
         super(id, balances, state, Object.assign({}, defaultParams, _params));
         this.waitingForBuyOrder = false;
-        this.wantToLockAmount = 0;
+        this.wantToLock = false;
+        this.canLockAmount = 0;
+        this.aimingToLockAmount = 0;
     }
 
     executeMoves(state) {
         const { currentTime } = state.meta;
         const augmintInterest = state.augmint.params.lockedAcdInterestPercentage;
         const marketInterest = state.augmint.params.marketLockInterestRate;
-        const acdAvailable = this.convertUsdToAcd(this.usdBalance) + this.acdBalance;
+        const acdAvailable = this.convertUsdToAcd(this.usdBalance) + this.acdBalance + this.ownAcdOrdersSum;
         const maxLockableAmount = state.augmint.maxLockableAmount;
+        const marketChance = Math.min(1, augmintInterest / (marketInterest * this.params.INTEREST_SENSITIVITY));
 
-        /* if there is no lock and we widn't already placed a buy ACD order for USD
-           or market/augmint conditions changed then (re)calculate if we want to take a loan and how much */
+        /* if there is no lock then calculate if we want to take a loan */
+        if (this.locks.length === 0) {
+            this.wantToLock = state.utils.byChanceInADay(this.params.CHANCE_TO_LOCK * marketChance);
+            this.aimingToLockAmount =
+                Math.round(Math.min(acdAvailable, this.params.WANTS_TO_LOCK_AMOUNT) * 10000) / 10000;
+        }
+        /* if there is no lock  OR
+      already want to lock and market/augmint conditions changed
+      then (re)calculate if we want to take a loan and how much */
         if (
-            (this.locks.length === 0 && !this.waitingForBuyOrder) ||
-            ((this.lastAugmintInterest != augmintInterest ||
-                this.lastMarketInterest != marketInterest ||
-                this.lastMaxLockableAmount != maxLockableAmount) &&
-                this.wantToLockAmount > 0)
+            this.wantToLock &&
+            (this.lastAugmintInterest != augmintInterest || this.lastMarketInterest != marketInterest)
         ) {
-            const marketChance = Math.min(1, augmintInterest / (marketInterest * this.params.INTEREST_SENSITIVITY));
-            const wantToLock = state.utils.byChanceInADay(this.params.CHANCE_TO_LOCK * marketChance);
-            const aimingToLockAmount = wantToLock ? Math.min(acdAvailable, this.params.WANTS_TO_LOCK_AMOUNT) : 0;
+            this.aimingToLockAmount = Math.min(acdAvailable, this.params.WANTS_TO_LOCK_AMOUNT);
+            // TODO: recalculate if with new conditions we still want with new interest conditions
+            //   (requires marketchance calcualtion refactor)
+        }
 
-            /* calc how much we can lock */
-            if (aimingToLockAmount > 0) {
-                this.wantToLockAmount = Math.min(aimingToLockAmount, acdAvailable, maxLockableAmount);
-                this.wantToLockAmount =
-                    this.wantToLockAmount < state.augmint.params.minimumLockAmount ? 0 : this.wantToLockAmount;
+        /* calc / recalc how much we can actually lock */
+        if (this.aimingToLockAmount > 0) {
+            this.canLockAmount = Math.min(this.aimingToLockAmount, maxLockableAmount);
+            this.canLockAmount = this.canLockAmount < state.augmint.params.minimumLockAmount ? 0 : this.canLockAmount;
 
-                // console.debug(
-                //     `**** Willing to LOCK. this.wantToLockAmount: ${
-                //         this.wantToLockAmount
-                //     }  maxLockableAmount: ${maxLockableAmount} acdAvailable: ${acdAvailable} minimumLockAmount: ${
-                //         state.augmint.params.minimumLockAmount
-                //     }`
-                // );
-            } else {
-                this.wantToLockAmount = 0;
-            }
-            this.waitingForBuyOrder = false; // reset it in order to recaulculate how much ACD we need to buy on exchange
-            this.lastAugmintInterest = augmintInterest;
-            this.lastMarketInterest = marketInterest;
-            this.lastMaxLockableAmount = maxLockableAmount;
+            // console.debug(
+            //   `**** Willing to LOCK. this.canLockAmount: ${this.canLockAmount}  aimingToLockAmount: ${
+            //     this.aimingToLockAmount
+            //   } maxLockableAmount: ${maxLockableAmount} acdAvailable: ${acdAvailable} minimumLockAmount: ${
+            //     state.augmint.params.minimumLockAmount
+            //   }`
+            // );
+        } else {
+            this.canLockAmount = 0;
         }
 
         /* release lock RELEASE_DELAY_DAYS later than could unlock */
@@ -73,11 +75,16 @@ class LockerBasic extends Actor {
         }
 
         // Buy ACD for lock we want
-        if (this.acdBalance < this.wantToLockAmount) {
-            // need to always calculate the amount rquired because wantToLockAmount might have changed
-            //        (augmint or market params changed after the order was placed)
+        if (this.acdBalance < this.canLockAmount) {
+            // need to always calculate the amount required because canLockAmount might have changed
             //  since the iteration it was calculated and the first order was placed
-            const needToBuy = this.wantToLockAmount - this.acdBalance - this.ownAcdOrdersSum;
+            //        (augmint or market params changed after the order was placed)
+            const needToBuy = this.canLockAmount - this.acdBalance - this.ownAcdOrdersSum;
+            // console.debug(
+            //   `** ACD BUY. needToBuy: ${needToBuy} canLockAmount: ${this.canLockAmount} acdBalance: ${
+            //     this.acdBalance
+            //   } ownAcdOrdersSum: ${this.ownAcdOrdersSum}`
+            // );
             if (needToBuy > 0) {
                 this.buyEthWithUsd(needToBuy);
                 this.buyACD(needToBuy);
@@ -86,15 +93,18 @@ class LockerBasic extends Actor {
         }
 
         /* Lock if we want and can */
-        if (this.wantToLockAmount > 0 && this.acdBalance >= this.wantToLockAmount) {
+        if (this.canLockAmount > 0 && this.acdBalance >= this.canLockAmount) {
             // console.debug(
-            //     `**** GOING to LOCK. lockAmountNow: ${
-            //         this.wantToLockAmount
-            //     } maxLockableAmount: ${maxLockableAmount} acdBalance: ${this.acdBalance}`
+            //   `**** GOING to LOCK. canLockAmount: ${this.canLockAmount} maxLockableAmount: ${maxLockableAmount} acdBalance: ${
+            //     this.acdBalance
+            //   }`
             // );
 
-            if (this.lockACD(this.wantToLockAmount)) {
+            if (this.lockACD(this.canLockAmount)) {
+                this.aimingToLockAmount = 0;
+                this.canLockAmount = 0;
                 this.waitingForBuyOrder = false;
+                this.wantToLock = false;
             } else {
                 console.error('Cound\'t lock'); // just in case... this shouldn't happen and lockAcd logs warnings too
             }
@@ -102,10 +112,19 @@ class LockerBasic extends Actor {
 
         /* sell ACD which we don't want to lock  */
         if (
-            !this.waitingForBuyOrder &&
+            this.aimingToLockAmount < this.acdBalance &&
             state.utils.byChanceInADay(this.params.CHANCE_TO_SELL_ALL_ACD && this.acdBalance > 0)
         ) {
-            this.sellACD(this.acdBalance);
+            // console.debug(
+            //   `**** Selling ACD. this.canLockAmount: ${this.canLockAmount}  aimingToLockAmount: ${
+            //     this.aimingToLockAmount
+            //   } acdBalance: ${
+            //     this.acdBalance
+            //   } maxLockableAmount: ${maxLockableAmount} acdAvailable: ${acdAvailable} minimumLockAmount: ${
+            //     state.augmint.params.minimumLockAmount
+            //   }`
+            // );
+            this.sellACD(this.acdBalance - this.aimingToLockAmount);
         }
 
         /* sell ETH balance to USD */
@@ -117,6 +136,12 @@ class LockerBasic extends Actor {
         if (state.meta.iteration % state.params.stepsPerDay === 0) {
             this.params.WANTS_TO_LOCK_AMOUNT *= (1 + this.params.WANTS_TO_LOCK_AMOUNT_GROWTH_PA) ** (1 / 365);
         }
+
+        /* save market conditions to be able to check in next iteration if they changed */
+        this.lastAugmintInterest = augmintInterest;
+        this.lastMarketInterest = marketInterest;
+        this.lastMaxLockableAmount = maxLockableAmount;
+
         super.executeMoves(state);
     }
 }

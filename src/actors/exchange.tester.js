@@ -23,22 +23,22 @@ class ExchangeTester extends Actor {
         }
 
         switch (currentStage) {
-            case 1:
-                this.buyACD(1000);
-                break;
-            case 2:
-                this.buyACD(1000);
-                break;
-            case 3:
-                this.sellACD(1500);
-                break;
-            case 4:
-                this.sellACD(1500);
-                break;
-            case 5:
-                this.buyACD(1000);
-                break;
-            default:
+        case 1:
+            this.buyACD(1000);
+            break;
+        case 2:
+            this.buyACD(1000);
+            break;
+        case 3:
+            this.sellACD(1500);
+            break;
+        case 4:
+            this.sellACD(1500);
+            break;
+        case 5:
+            this.buyACD(1000);
+            break;
+        default:
         }
 
         this.setKey('stage', this.getKey('stage') + 1);

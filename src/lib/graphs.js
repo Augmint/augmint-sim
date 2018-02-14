@@ -66,6 +66,42 @@ const graphs = [
         }]
     },
     {
+        title: 'Loan to Lock Ratio',
+        options: {
+            title: { display: false },
+            scales: { yAxes: [ {ticks: { suggestedMin: 0.5, suggestedMax: 1.5 } } ] },
+            legend: { display: true },
+            tooltips: { enabled: true , mode: 'index', intersect: false}
+        },
+        datasets: [
+            {
+                func: augmint => (1 + augmint.params.ltdDifferenceLimit),
+                options: {
+                    label: 'loan limit',
+                    borderDash: DASHED_LINE,
+                    borderColor: OPEN_LOANS_COLOR,
+                    backgroundColor: TRANSPARENT
+                }
+            },
+            {
+                func: augmint => ( 1 - augmint.params.ltdDifferenceLimit),
+                options: {
+                    label: 'lock limit',
+                    borderDash: DASHED_LINE,
+                    borderColor: LOCKED_ACD_COLOR,
+                    backgroundColor: TRANSPARENT
+                }
+            },
+            {
+                func: augmint => { return augmint.loanToDepositRatio; },
+                options: {
+                    label: 'current loan to lock ratio',
+                    borderColor: DEFAULT_COLOR,
+                    backgroundColor: TRANSPARENT
+                }
+            }]
+    },
+    {
         title: 'Open ACD user demand (% of total ACD)',
         options: { scales: { yAxes: [ {ticks: {min: undefined} }]}},
         datasets: [{
@@ -175,37 +211,37 @@ const graphs = [
         datasets: [{
             func: augmint => { return augmint.params.lockedAcdInterestPercentage * 100; },
             options: {
-                    label: 'lock interest %',
-                    borderColor: LOCKED_ACD_COLOR,
-                    backgroundColor: TRANSPARENT
-                }
-            },
-            {
-            func: augmint => { return augmint.loanProducts[0].interestPt * 100; },
-                options: {
-                        label: 'loan interest %',
-                        borderColor: OPEN_LOANS_COLOR,
-                        backgroundColor: TRANSPARENT
-                    }
-            },
-            {
-            func: augmint => { return augmint.params.marketLockInterestRate * 100; },
-                options: {
-                    label: 'mkt lock %',
-                    borderDash: DASHED_LINE,
-                    borderColor: LOCKED_ACD_COLOR,
-                    backgroundColor: TRANSPARENT
-                }
-            },
-            {
-            func: augmint => { return augmint.params.marketLoanInterestRate * 100; },
-                options: {
-                        label: 'mkt loan %',
-                        borderDash: DASHED_LINE,
-                        borderColor: OPEN_LOANS_COLOR,
-                        backgroundColor: TRANSPARENT
-                    }
+                label: 'lock interest %',
+                borderColor: LOCKED_ACD_COLOR,
+                backgroundColor: TRANSPARENT
             }
+        },
+        {
+            func: augmint => { return augmint.loanProducts[0].interestPt * 100; },
+            options: {
+                label: 'loan interest %',
+                borderColor: OPEN_LOANS_COLOR,
+                backgroundColor: TRANSPARENT
+            }
+        },
+        {
+            func: augmint => { return augmint.params.marketLockInterestRate * 100; },
+            options: {
+                label: 'mkt lock %',
+                borderDash: DASHED_LINE,
+                borderColor: LOCKED_ACD_COLOR,
+                backgroundColor: TRANSPARENT
+            }
+        },
+        {
+            func: augmint => { return augmint.params.marketLoanInterestRate * 100; },
+            options: {
+                label: 'mkt loan %',
+                borderDash: DASHED_LINE,
+                borderColor: OPEN_LOANS_COLOR,
+                backgroundColor: TRANSPARENT
+            }
+        }
         ]
     },
     {
@@ -239,10 +275,10 @@ const graphs = [
         datasets: [{
             func: augmint => { return augmint.maxLockableAmount; },
             options: {
-                    label: 'maxLockable',
-                    borderColor: LOCKED_ACD_COLOR,
-                    backgroundColor: TRANSPARENT
-                }
+                label: 'maxLockable',
+                borderColor: LOCKED_ACD_COLOR,
+                backgroundColor: TRANSPARENT
+            }
         },
         {
             func: augmint => { return augmint.maxBorrowableAmount(0); },
@@ -251,42 +287,6 @@ const graphs = [
                 borderColor: OPEN_LOANS_COLOR,
                 backgroundColor: TRANSPARENT
             }
-        }]
-    },
-    {
-        title: 'Loan to Lock Ratio',
-        options: {
-            title: { display: false },
-            scales: { yAxes: [ {ticks: { suggestedMin: 0.5, suggestedMax: 1.5 } } ] },
-            legend: { display: true },
-            tooltips: { enabled: true , mode: 'index', intersect: false}
-        },
-        datasets: [
-            {
-            func: augmint => { return augmint.params.loanToLockRatioLoanLimit; },
-                options: {
-                        label: 'loan limit',
-                        borderDash: DASHED_LINE,
-                        borderColor: OPEN_LOANS_COLOR,
-                        backgroundColor: TRANSPARENT
-                    }
-            },
-            {
-            func: augmint => { return augmint.params.loanToLockRatioLockLimit; },
-                options: {
-                        label: 'lock limit',
-                        borderDash: DASHED_LINE,
-                        borderColor: LOCKED_ACD_COLOR,
-                        backgroundColor: TRANSPARENT
-                    }
-            },
-            {
-            func: augmint => { return augmint.loanToDepositRatio; },
-                options: {
-                    label: 'current loan to lock ratio',
-                    borderColor: DEFAULT_COLOR,
-                    backgroundColor: TRANSPARENT
-                }
         }]
     },
     {
@@ -299,10 +299,10 @@ const graphs = [
         datasets: [{
             func: augmint => { return augmint.balances.lockedAcdPool; },
             options: {
-                    label: 'locked',
-                    borderColor: LOCKED_ACD_COLOR,
-                    backgroundColor: TRANSPARENT
-                }
+                label: 'locked',
+                borderColor: LOCKED_ACD_COLOR,
+                backgroundColor: TRANSPARENT
+            }
         },
         {
             func: augmint => { return augmint.balances.openLoansAcd; },
@@ -372,7 +372,10 @@ function init(wrapper) {
 
         canvas.height = 250;
         //canvas.width = 300;
-        canvas.width = graph.title === 'ETH/USD' || graph.title === 'Open ACD Demand \'000s' ? 920 : 300;
+        canvas.width =
+            graph.title === 'ETH/USD' || graph.title === 'Open ACD Demand \'000s' || graph.title === 'Loan to Lock Ratio'
+                ? 920
+                : 300;
 
         graph.canvas = canvas;
         graph.ctx = canvas.getContext('2d');
@@ -412,12 +415,22 @@ function update(timeInSecs, augmint) {
         graph.xData.push(Math.floor(timeInSecs / ONE_DAY_IN_SECS));
         graph.datasets.forEach(dataset => {
             dataset.yData.push(dataset.func(augmint));
-            if (dataset.yData.length > 365 && graph.title !== 'ETH/USD' && graph.title !== 'Open ACD Demand \'000s') {
+            if (
+                dataset.yData.length > 365 &&
+                graph.title !== 'ETH/USD' &&
+                graph.title !== 'Open ACD Demand \'000s' &&
+                graph.title !== 'Loan to Lock Ratio'
+            ) {
                 dataset.yData.shift();
             }
         });
 
-        if (graph.xData.length > 365 && graph.title !== 'ETH/USD' && graph.title !== 'Open ACD Demand \'000s') {
+        if (
+            graph.xData.length > 365 &&
+            graph.title !== 'ETH/USD' &&
+            graph.title !== 'Open ACD Demand \'000s' &&
+            graph.title !== 'Loan to Lock Ratio'
+        ) {
             graph.xData.shift();
         }
 

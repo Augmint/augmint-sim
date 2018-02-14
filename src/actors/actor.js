@@ -149,6 +149,20 @@ class Actor {
         return ret;
     }
 
+    issueAcd(acdAmount) {
+        // only reserve actors should call it
+        const ret = augmint.issueAcd(acdAmount);
+        logger.logMove(this.id, 'Reserve Issued ACD', { acdAmount: acdAmount, newReserveBalance: ret });
+        return ret;
+    }
+
+    burnAcd(acdAmount) {
+        // only reserve actors should call it
+        const ret = augmint.burnAcd(acdAmount);
+        logger.logMove(this.id, 'Reserve Burned ACD', { acdAmount: acdAmount, newReserveBalance: ret });
+        return ret;
+    }
+
     buyEthWithUsd(usdAmount) {
         let ret = exchange.buyEthWithUsd(this.id, usdAmount);
         logger.logMove(this.id, 'buyEth order', { usdAmount: usdAmount });

@@ -11,17 +11,19 @@ class ReserveBasic extends Actor {
     executeMoves(state) {
         // TODO: add some delay in intervention (ie intervene only after a couple of ticks)
         const acdDemand = this.getAcdDemand();
-        if (acdDemand < 0 && this.ethBalance > 0) {
+        if (acdDemand === 0) {
+            this.burnAcd(this.acdBalance);
+        } else if (acdDemand < 0 && this.ethBalance > 0) {
             this.buyACD(
                 Math.min(this.convertEthToAcd(this.ethBalance), -acdDemand) //+ this.getAugmintBalance('openLoansAcd')
             );
         } else if (acdDemand > 0) {
-            let convertEthInAcd = Math.max(acdDemand - this.acdBalance, 0);
-            if (convertEthInAcd > 0) {
-                convertEthInAcd = Math.min(convertEthInAcd, this.convertEthToAcd(this.ethBalance));
-                this.convertReserveEthToAcd(convertEthInAcd);
+            const newIssueNeeded = Math.max(acdDemand, 0);
+            if (newIssueNeeded > 0) {
+                this.issueAcd(newIssueNeeded);
             }
-            this.sellACD(Math.min(this.acdBalance, acdDemand));
+
+            this.sellACD(acdDemand);
         }
     }
 }

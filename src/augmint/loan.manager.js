@@ -38,10 +38,8 @@ function getLoanProducts() {
 function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     if (loanAmountInAcd > augmint.maxBorrowableAmount(loanProductId)) {
         console.warn(
-            `actor (id: ${actorId} tried to get a ${loanAmountInAcd} for product id ${loanProductId}
-                but the max borrowable amount is ${augmint.maxBorrowableAmount(
-                    loanProductId
-                )}. Augmint didn't give any loan.`
+            `takeLoan() failed. Actor (${actorId}) tried to get ${loanAmountInAcd} for product id ${loanProductId}
+                but the max borrowable amount is ${augmint.maxBorrowableAmount(loanProductId)}.`
         );
         return false;
     }
@@ -53,6 +51,11 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     }
 
     if (loanAmountInAcd < loanProduct.minimumLoanInAcd) {
+        console.warn(
+            `takeLoan() failed. Actor (${actorId}) tried to get ${loanAmountInAcd} but the minimum borrowable amount is ${
+                loanProduct.minimumLoanInAcd
+            } for product id ${loanProductId}.`
+        );
         return false;
     }
 
@@ -81,7 +84,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     // MINT acd -> user/interest pool
     augmint.actors[actorId].balances.acd += loanAmountInAcd;
 
-    augmint.balances.openLoansAcd += loanAmountInAcd + premiumInAcd;
+    augmint.balances.openLoansAcd += loanAmountInAcd;
     const loanId = counter;
     counter++;
 
@@ -120,7 +123,7 @@ function repayLoan(actorId, loanId) {
     augmint.actors[actorId].balances.acd -= loan.repaymentDue;
     augmint.balances.interestEarnedPool += loan.premiumInAcd;
 
-    augmint.balances.openLoansAcd -= loan.repaymentDue;
+    augmint.balances.openLoansAcd -= loan.loanAmountInAcd;
     // FIXME: uncomment these once changed to BigNumber
     // // sanity check (NB: totalAcd is calculated on the fly by a getter)
     // if (augmint.totalAcd < 0) {
@@ -171,7 +174,7 @@ function collectDefaultedLoan(actorId, loanId) {
     //     throw new AugmintError('collateralHeld has gone negative: ', augmint.balances.collateralHeld);
     // }
 
-    augmint.balances.openLoansAcd -= loan.repaymentDue;
+    augmint.balances.openLoansAcd -= loan.loanAmountInAcd;
     augmint.balances.defaultedLoansAcd += loan.repaymentDue;
 
     // remove loan

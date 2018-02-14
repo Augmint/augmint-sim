@@ -44,8 +44,7 @@ function getParamsFromUI() {
             key === 'marketLockInterestRate' ||
             key === 'lockedAcdInterestPercentage' ||
             key === 'marketLoanInterestRate' ||
-            key === 'loanToLockRatioLoanLimit' ||
-            key === 'loanToLockRatioLockLimit'
+            key === 'ltdDifferenceLimit'
         ) {
             params[key] /= 100;
         }
@@ -60,6 +59,9 @@ function getParamsFromUI() {
     };
     //technical params
     params['ethUsdTrendSampleDays'] = Number.parseFloat(document.getElementById('ethUsdTrendSampleDays').value);
+    //actor params
+    //scenario.actors.reserve.balances.acd = Number.parseFloat(document.getElementById('reserveBalancesAcd').value);
+    //scenario.actors.reserve.balances.eth = Number.parseFloat(document.getElementById('reserveBalancesEth').value);
 
     return params;
 }
@@ -73,8 +75,7 @@ function updateUIFromParams() {
             key === 'marketLockInterestRate' ||
             key === 'lockedAcdInterestPercentage' ||
             key === 'marketLoanInterestRate' ||
-            key === 'loanToLockRatioLoanLimit' ||
-            key === 'loanToLockRatioLockLimit'
+            key === 'ltdDifferenceLimit'
         ) {
             augmint.params[key] = (augmint.params[key] * 100).toFixed(2);
         }
@@ -92,6 +93,9 @@ function updateUIFromParams() {
     ).toFixed(2);
     // technical params
     document.getElementById('ethUsdTrendSampleDays').value = augmint.params.ethUsdTrendSampleDays;
+    //actor params
+    //document.getElementById('reserveBalancesAcd').value = scenario.actors.reserve.balances.acd;
+    //document.getElementById('reserveBalancesEth').value = scenario.actors.reserve.balances.eth;
 }
 
 function togglePause() {
