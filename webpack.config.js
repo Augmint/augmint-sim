@@ -9,10 +9,10 @@ module.exports = {
         filename: 'bundle.js'
     },
     plugins: [
-        // Copy our app's index.html to the build folder.
+        // Copy our app's index.html and assets to the build folder.
         new CopyWebpackPlugin([
-            { from: './src/index.html', to: 'index.html' },
-            { from: './public', to: '' }
+            { from: 'src/index.html', to: '' },
+            { from: 'public', to: '' }
         ])
     ]
 };
