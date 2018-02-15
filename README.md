@@ -25,8 +25,10 @@ Use [augmintsim.netlify.com](https://augmintsim.netlify.com)
 
 Or for local install:
 
-* install: `npm install`
-* run: `npm run dev`
+(yarn install: https://yarnpkg.com/lang/en/docs/install/)
+
+* install: `yarn`
+* run: `yarn run dev`
 
 ## Augmint
 
