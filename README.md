@@ -21,7 +21,7 @@ _NB: The simulation's primary goal is to help the contributors and the Monetary 
 
 ## TO RUN:
 
-Use [augmintsim.netlify.com](https://augmintsim.netlify.com)
+Use [sim.augmint.cc](https://sim.augmint.cc)
 
 Or for local install:
 
@@ -70,8 +70,6 @@ We are seeking for great minds to extend our core team. Contribution in any area
 
 Drop us an email: hello@augmint.cc
 or say hi on our [Discord server](https://discord.gg/PwDmsnu)
-
-**[Development environment setup](docs/developmentEnvironment.md)**
 
 ## Authors
 
