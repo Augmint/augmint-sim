@@ -156,6 +156,8 @@ function populateRatesDropDown() {
 }
 
 function init() {
+    renderActorParamsGui();
+
     graphs.init(graphsWrapper);
     logger.init(simulation.getState, logTextArea);
 
@@ -237,6 +239,59 @@ function mainLoop() {
         doFrame = Date.now() - start > 10;
     }
     requestAnimationFrame(mainLoop);
+}
+
+function renderActorParamsGui() {
+    const panel = document.getElementById('actor-params-container');
+    const collapseButton = document.querySelector('.collapse-button');
+
+    collapseButton.addEventListener('click', collapse);
+    let content = '';
+
+    let actors = scenario.actors;
+
+    for (var name in actors){
+      if (actors.hasOwnProperty(name)) {
+         content+= getActorParamsBox(name,actors[name]);
+       }
+    }
+
+    Object.keys(actors).forEach(actorId => {
+        const actor = actors[actorId];
+        // console.log(JSON.stringify(actors[actorId]));
+    });
+
+    panel.innerHTML = content;
+}
+
+function getActorParamsBox(name, actor) {
+    let template = document.getElementById('actor-params-item').innerHTML;
+    template = template.replace('###NAME###', name);
+    template = template.replace('###TYPE###', actor.type);
+    if (actor.count!==undefined) {
+      template = template.replace('<span class="hidden">', '<span>');
+      template = template.replace('###COUNT###', actor.count);
+    }
+
+    template = template.replace('###BALANCES###', actor.balances);
+    return template;
+}
+
+function collapse() {
+    const style = document.querySelector('.collapse-panel').className;
+    const closed = style.indexOf('closed') !== -1;
+
+    if (closed) {
+      document.querySelector('.collapse-panel').className = 'collapse-panel';
+      document.querySelector('.collapse-button').innerHTML = '-';
+      document.querySelector('.collapse-content').className = 'collapse-content';
+
+    } else {
+      document.querySelector('.collapse-panel').className = 'collapse-panel closed';
+      document.querySelector('.collapse-button').innerHTML = '+';
+      document.querySelector('.collapse-content').className = 'collapse-content hidden';
+    }
+
 }
 
 window.addEventListener('load', () => {

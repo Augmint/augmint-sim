@@ -26,7 +26,7 @@
     .logo {
         margin-right: 15px;
         float: left;
-        width: 140px;     
+        width: 140px;
     }
 
     .flex-container {
@@ -42,6 +42,35 @@
         border-radius: 10px;
     }
 
+    .collapse-panel {
+        margin-top: 10px;
+        border-color: #aeaeae;
+        border-width: 1px;
+        border-style: dotted;
+        padding:5px;
+        border-radius: 10px;
+    }
+
+    .hidden {
+        display:none;
+    }
+
+    .collapse-button {
+      float:right;
+      font-size:20px;
+      margin-top: 10px;
+      border-width: 1px;
+      border-style: solid;
+      width: 30px;
+      height: 30px;
+      padding: 10px 5px 5px 5px;
+      border-color: #aeaeae;
+      color: #7e7878;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 20px;
+    }
+
     label {
         float: left;
         width: 290px;
@@ -52,6 +81,18 @@
         width: 75px;
         text-align: right;
     }
+
+    .actor-label{
+        width: 280px;
+        text-align: left;
+        font-size: 13px;
+    }
+
+    .actor-type{
+        width: 75px;
+        text-align: right;
+    }
+
     .graphs-wrapper {
         display: flex;
         flex-wrap: wrap;
@@ -111,8 +152,11 @@
         </div>
         <div class="flex-item">
             <h4>Actor params:</h4>
-            <label class="loanproduct-inputs">Defaulting fee (%): </label><input type="number" id="defaultFeePercentage"/><br/>
-            <label class="loanproduct-inputs">Min. loan ACD amount: </label><input type="number" id="minimumLoanInAcd"/><br/>
+            <div>
+              <label class="loanproduct-inputs">Defaulting fee (%): </label><input type="number" id="defaultFeePercentage"/><br/>
+              <label class="loanproduct-inputs">Min. loan ACD amount: </label><input type="number" id="minimumLoanInAcd"/><br/>
+              <label class="loanproduct-inputs">Min. loan ACD amount: </label><input type="number" id="minimumLoanInAcd"/><br/>
+            </div>
             <!--label class="reserveBalancesAcd">Reserve balances ACD: </label><input type="number" id="reserveBalancesAcd"/><br/>
             <label class="reserveBalancesEth">Reserve balances ETH: </label><input type="number" id="reserveBalancesEth"/><br/-->
             <br/>
@@ -123,6 +167,61 @@
             <br/>
         </div>
     </div>
+    <div class="collapse-panel closed">
+      <span class="collapse-button">+</span>
+      <h2>Initial params</h2>
+
+      <div class="collapse-content hidden">
+        <h4>Actor params</h4>
+
+        <div class="flex-container" id="actor-params-container">
+            <div id="actor-params-item">
+              <div class="flex-item">
+                  <h4>###NAME###</h4>
+                  <label class="technical-inputs actor-label">type: </label><span class="actor-type"/>###TYPE###</span><br/>
+                  <span class="hidden"><label class="technical-inputs actor-label">count: </label><input type="number" value="###COUNT###"/><br/></span>
+                  <h5>balances</h5>
+                  <label class="technical-inputs actor-label">USD: </label><input type="number" value="###BALANCES###"/><br/>
+                  <h5>params</h5>
+                  <label class="technical-inputs actor-label">WANTS_TO_LOCK_AMOUNT: </label><input type="number" placeholder="10000"/><br/>
+                  <label class="technical-inputs actor-label">WANTS_TO_LOCK_AMOUNT_GROWTH_PA: </label><input type="number" placeholder="1"/><br/>
+                  <br/>
+              </div>
+            </div>
+            <div class="flex-item">
+                <h4>Random locker</h4>
+                <label class="technical-inputs actor-label">type: </label><span class="actor-type"/>LockerBasic</span><br/>
+                <label class="technical-inputs actor-label">count: </label><input type="number" placeholder="50"/><br/>
+                <label class="technical-inputs actor-label">balances: </label><input type="number" placeholder="&infin;"/><br/>
+                <h5>params</h5>
+                <label class="technical-inputs actor-label">WANTS_TO_LOCK_AMOUNT: </label><input type="number" placeholder="10000"/><br/>
+                <label class="technical-inputs actor-label">WANTS_TO_LOCK_AMOUNT_GROWTH_PA: </label><input type="number" placeholder="1"/><br/>
+                <br/>
+            </div>
+            <div class="flex-item">
+                <h4>randomAllSellBorrower</h4>
+                <label class="technical-inputs actor-label">type: </label><span class="actor-type"/>BorrowerBasic</span><br/>
+                <label class="technical-inputs actor-label">count: </label><input type="number" placeholder="5"/><br/>
+                <br/>
+            </div>
+            <div class="flex-item">
+                <h4>randomKeeperBorrower</h4>
+                <label class="technical-inputs actor-label">type: </label><span class="actor-type"/>BorrowerBasic</span><br/>
+                <label class="technical-inputs actor-label">count: </label><input type="number" placeholder="50"/><br/>
+                <br/>
+            </div>
+        </div>
+        <h3>Other params:</h3>
+        <div>
+          <div class="flex-item">
+              <h4>Technical params:</h4>
+              <label class="technical-inputs">ethUsdTrendSampleDays: </label><input type="number" id="ethUsdTrendSampleDays"/><br/>
+              <br/>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <p>Days Passed: <span class="clock">0</span> </p>
 
     <div class="graphs-wrapper"></div>
