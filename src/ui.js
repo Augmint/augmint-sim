@@ -6,6 +6,7 @@ const rates = require('./augmint/rates.js');
 const graphs = require('./lib/graphs.js');
 const scenario = require('./scenarios/base.js');
 const AugmintError = require('./augmint/augmint.error.js');
+const ActorDirectory = require('./actors/actor.directory.js');
 
 // DOM elements
 const clockElem = document.querySelector('.clock');
@@ -18,11 +19,14 @@ const logWrapper = document.querySelector('.log-wrapper');
 const logTextArea = document.querySelector('.log-textarea');
 const ratesDropDown = document.querySelector('.rates-dropdown');
 const inputs = Array.from(document.querySelectorAll('.sim-inputs input'));
+
 const graphsWrapper = document.querySelector('.graphs-wrapper');
 const errorMsg = document.querySelector('.error-msg');
 
+
 let lastRender = -1;
 let paused = true;
+let started = false;
 let logVisible = false;
 let benchmarkStart;
 let benchmarkItCt;
@@ -101,6 +105,10 @@ function updateUIFromParams() {
 function togglePause() {
     paused = !paused;
 
+    if (!started) {
+      simulation.addActorsFromGui(getActorsFromGui());
+    }
+
     if (paused) {
         // pausing sim:
         let runTime = Date.now() - benchmarkStart;
@@ -116,6 +124,8 @@ function togglePause() {
             'iteration count:' + benchmarkItCt + ' running time: ' + runTime + 'ms'
         );
     } else {
+        started = true;
+
         // restarting sim:
         benchmarkStart = Date.now();
         benchmarkItCt = 0;
@@ -123,6 +133,12 @@ function togglePause() {
         inputs.forEach(input => {
             input.disabled = true;
         });
+
+        const actorInputs = Array.from(document.querySelectorAll('.actor-inputs input'));
+        actorInputs.forEach(input => {
+            input.disabled = true;
+        });
+
         simulation.patchAugmintParams(getParamsFromUI());
     }
 }
@@ -196,7 +212,6 @@ function init() {
     });
     updateUIFromParams();
 
-    simulation.addActors(scenario.actors);
 }
 
 function render() {
@@ -258,7 +273,6 @@ function renderActorParamsGui() {
 
     Object.keys(actors).forEach(actorId => {
         const actor = actors[actorId];
-        // console.log(JSON.stringify(actors[actorId]));
     });
 
     panel.innerHTML = content;
@@ -273,7 +287,29 @@ function getActorParamsBox(name, actor) {
       template = template.replace('###COUNT###', actor.count);
     }
 
-    template = template.replace('###BALANCES###', actor.balances);
+    let balancesContent = '';
+    for (var bal in actor.balances){
+      if (actor.balances.hasOwnProperty(bal)) {
+          balancesContent+=
+            '<label class="technical-inputs actor-label">'+bal+': </label><input data-actor-balancename="'+bal+'" data-actor-param="balance" type="number" value="'+actor.balances[bal]+'"/><br/>';
+       }
+    }
+    template = template.replace('###BALANCES###', balancesContent);
+
+    if (actor.params===undefined) {
+      template = template.replace('<h5>params</h5>', '');
+      template = template.replace('###PARAMS###', '');
+    } else {
+      let paramsContent = '';
+      for (var p in actor.params){
+        if (actor.params.hasOwnProperty(p)) {
+            paramsContent+=
+              '<label class="technical-inputs actor-label small-label">'+p+': </label><input data-actor-paramname="'+p+'" data-actor-param="param" type="number" value="'+actor.params[p]+'"/><br/>';
+         }
+    }
+    template = template.replace('###PARAMS###', paramsContent);
+    }
+
     return template;
 }
 
@@ -291,7 +327,62 @@ function collapse() {
       document.querySelector('.collapse-button').innerHTML = '+';
       document.querySelector('.collapse-content').className = 'collapse-content hidden';
     }
+}
 
+function getActorsFromGui() {
+          const actors = new Set();
+
+          var actor = {};
+          let paramItems = Array.from(document.querySelectorAll('.actor-item'));
+
+          paramItems.forEach(paramItem => {
+            let actorType = '';
+            let actorName = '';
+            let balances = {};
+            let params = {};
+            let count = null;
+            // console.log('____________');
+            let itemsWithData = Array.from(paramItem.querySelectorAll('[data-actor-param]'));
+            itemsWithData.forEach(dataItem => {
+                  if (dataItem.getAttribute('data-actor-param')=='name') {
+                    // console.log('NAME:'+dataItem.innerHTML);
+                    actorName=dataItem.innerHTML;
+                  }
+
+                  if (dataItem.getAttribute('data-actor-param')=='type') {
+                    // console.log('TYPE:'+dataItem.innerHTML);
+                    actorType=dataItem.innerHTML;
+                  }
+
+                  if (dataItem.getAttribute('data-actor-param')=='count') {
+                    if (dataItem.parentElement.className=='hidden') {
+                        // console.log('NO COUNT PARAMETER');
+                      } else {
+                        // console.log('COUNT:'+dataItem.value);
+                        count = dataItem.value;
+                    }
+                  }
+
+                  if (dataItem.getAttribute('data-actor-param')=='balance') {
+                          // console.log("BALANCE:("+dataItem.getAttribute('data-actor-balancename')+")"+dataItem.value);
+                          balances[dataItem.getAttribute('data-actor-balancename')]=parseInt(dataItem.value);
+                  }
+
+                  if (dataItem.getAttribute('data-actor-param')=='param') {
+                          // console.log("param: "+dataItem.getAttribute('data-actor-paramname')+" = "+dataItem.value);
+                          params[dataItem.getAttribute('data-actor-paramname')]=parseFloat(dataItem.value);
+                  }
+            });
+            const actor = new ActorDirectory[actorType](actorName, balances, null, params);
+            actor.balances = balances;
+            actor.parameters = params;
+            // console.log(balances);
+            if(count!==null) {
+              actor.count=parseInt(count);
+            }
+            actors.add(actor);
+          });
+          return actors;
 }
 
 window.addEventListener('load', () => {

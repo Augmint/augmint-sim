@@ -42,6 +42,75 @@
         border-radius: 10px;
     }
 
+
+    label {
+        float: left;
+        width: 290px;
+        margin-left: 10px;
+    }
+
+    input[type=number]{
+        width: 75px;
+        text-align: right;
+    }
+
+    .graphs-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .graphs-wrapper canvas {
+        margin-right: 10px;
+    }
+
+    .error-msg p {
+        color: rgb(230, 88, 88);
+        margin: 0 0 15px 0;
+    }
+
+    /* actor css */
+    .actor-label{
+        width: 280px;
+        text-align: left;
+        margin-left: 10px;
+        float:left;
+        font-size: 13px;
+    }
+
+    .actor-item {
+      background-color: #e1e3ec;
+      margin-bottom: 15px;
+    }
+
+    .actor-inputs > h4{
+      margin-left: 0px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      text-align: center;
+      border-bottom: solid;
+      border-bottom-width: 1px;
+      border-bottom-color: #aeaeae;
+      background-color:  #abb5e9;
+      margin-top: -10px;
+      padding-top: 10px;
+    }
+
+    .actor-inputs > h5 {
+      text-align: center;
+      border-top: dotted;
+      border-top-width: 1px;
+      border-top-color: #aeaeae;
+    }
+
+    .small-label {
+      font-size: 10px;
+    }
+
+    .actor-type{
+        width: 75px;
+        text-align: right;
+    }
+
     .collapse-panel {
         margin-top: 10px;
         border-color: #aeaeae;
@@ -69,42 +138,6 @@
       text-align: center;
       vertical-align: middle;
       line-height: 20px;
-    }
-
-    label {
-        float: left;
-        width: 290px;
-        margin-left: 10px;
-    }
-
-    input[type=number]{
-        width: 75px;
-        text-align: right;
-    }
-
-    .actor-label{
-        width: 280px;
-        text-align: left;
-        font-size: 13px;
-    }
-
-    .actor-type{
-        width: 75px;
-        text-align: right;
-    }
-
-    .graphs-wrapper {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
-    .graphs-wrapper canvas {
-        margin-right: 10px;
-    }
-
-    .error-msg p {
-        color: rgb(230, 88, 88);
-        margin: 0 0 15px 0;
     }
 
 </style>
@@ -173,59 +206,29 @@
 
       <div class="collapse-content hidden">
         <h4>Actor params</h4>
-
+        <!-- actor template -->
         <div class="flex-container" id="actor-params-container">
             <div id="actor-params-item">
-              <div class="flex-item">
-                  <h4>###NAME###</h4>
-                  <label class="technical-inputs actor-label">type: </label><span class="actor-type"/>###TYPE###</span><br/>
-                  <span class="hidden"><label class="technical-inputs actor-label">count: </label><input type="number" value="###COUNT###"/><br/></span>
+              <div class="flex-item actor-item">
+                <div class="actor-inputs">
+                  <h4 data-actor-param="name" >###NAME###</h4>
+                  <label class="technical-inputs actor-label">type: </label><span data-actor-param="type" class="actor-type"/>###TYPE###</span><br/>
+                  <span class="hidden"><label class="technical-inputs actor-label">count: </label><input type="number" data-actor-param="count" value="###COUNT###"/><br/></span>
                   <h5>balances</h5>
-                  <label class="technical-inputs actor-label">USD: </label><input type="number" value="###BALANCES###"/><br/>
+                    ###BALANCES###
                   <h5>params</h5>
-                  <label class="technical-inputs actor-label">WANTS_TO_LOCK_AMOUNT: </label><input type="number" placeholder="10000"/><br/>
-                  <label class="technical-inputs actor-label">WANTS_TO_LOCK_AMOUNT_GROWTH_PA: </label><input type="number" placeholder="1"/><br/>
-                  <br/>
+                    ###PARAMS###
+                </div>
               </div>
             </div>
-            <div class="flex-item">
-                <h4>Random locker</h4>
-                <label class="technical-inputs actor-label">type: </label><span class="actor-type"/>LockerBasic</span><br/>
-                <label class="technical-inputs actor-label">count: </label><input type="number" placeholder="50"/><br/>
-                <label class="technical-inputs actor-label">balances: </label><input type="number" placeholder="&infin;"/><br/>
-                <h5>params</h5>
-                <label class="technical-inputs actor-label">WANTS_TO_LOCK_AMOUNT: </label><input type="number" placeholder="10000"/><br/>
-                <label class="technical-inputs actor-label">WANTS_TO_LOCK_AMOUNT_GROWTH_PA: </label><input type="number" placeholder="1"/><br/>
-                <br/>
-            </div>
-            <div class="flex-item">
-                <h4>randomAllSellBorrower</h4>
-                <label class="technical-inputs actor-label">type: </label><span class="actor-type"/>BorrowerBasic</span><br/>
-                <label class="technical-inputs actor-label">count: </label><input type="number" placeholder="5"/><br/>
-                <br/>
-            </div>
-            <div class="flex-item">
-                <h4>randomKeeperBorrower</h4>
-                <label class="technical-inputs actor-label">type: </label><span class="actor-type"/>BorrowerBasic</span><br/>
-                <label class="technical-inputs actor-label">count: </label><input type="number" placeholder="50"/><br/>
-                <br/>
-            </div>
         </div>
-        <h3>Other params:</h3>
-        <div>
-          <div class="flex-item">
-              <h4>Technical params:</h4>
-              <label class="technical-inputs">ethUsdTrendSampleDays: </label><input type="number" id="ethUsdTrendSampleDays"/><br/>
-              <br/>
-          </div>
-        </div>
-      </div>
+        <!--end of actor template -->
+       </div>
     </div>
 
     <p>Days Passed: <span class="clock">0</span> </p>
 
     <div class="graphs-wrapper"></div>
-
     <script src="bundle.js"></script>
 
 </body>

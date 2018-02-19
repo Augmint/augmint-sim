@@ -89,6 +89,16 @@ function addActors(newActors) {
     });
 }
 
+function addActorsFromGui(newActors) {
+    newActors.forEach(actor => {
+        let count = actor.count ? actor.count : 1;
+        for (let i = 0; i < count; i++) {
+            let name = count > 1 ? actor.id + '_' + (i + 1) : actor.id;
+            actors.add(new ActorDirectory[actor.constructor.name](name, actor.balances, actor.state, actor.parameters));
+        }
+    });
+ }
+
 function setState(state) {
     clock.setTime(state.meta.currentTime || 0);
 
@@ -104,6 +114,9 @@ module.exports = {
     init,
     incrementBy,
     addActors,
+    addActorsFromGui,
+    getActors,
+    removeActors,
     setSimulationParams,
     getState,
     patchAugmintParams,
