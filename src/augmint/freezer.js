@@ -1,10 +1,10 @@
 // allows freezing/unfreezing of funds
 
-'use strict';
+"use strict";
 
 //const AugmintError = require('../augmint/augmint.error.js');
-const augmint = require('./augmint.js');
-const clock = require('../lib/clock.js');
+const augmint = require("./augmint.js");
+const clock = require("../lib/clock.js");
 
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const locks = augmint.locks;

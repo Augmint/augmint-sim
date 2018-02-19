@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const augmintOptions = {
     balances: { interestEarnedPool: 5000 /* genesis, loan from stakeholders */ },
@@ -37,7 +37,7 @@ const actors = {
     //     }
     // },
     alwaysLocker: {
-        type: 'LockerBasic',
+        type: "LockerBasic",
         balances: {
             usd: 100000000 // 'unlimited' USD, lock demand adjusted with WANTS_TO_LOCK_AMOUNT
         },
@@ -51,7 +51,7 @@ const actors = {
         }
     },
     randomLocker: {
-        type: 'LockerBasic',
+        type: "LockerBasic",
         count: 30,
         balances: {
             usd: 100000000 // 'unlimited' USD, lock demand adjusted with WANTS_TO_LOCK_AMOUNT
@@ -66,7 +66,7 @@ const actors = {
         }
     },
     allSellBorrower: {
-        type: 'BorrowerBasic',
+        type: "BorrowerBasic",
         count: 5,
         balances: {
             eth: 500000 // unlimited ETH - demand adjusted with params
@@ -83,7 +83,7 @@ const actors = {
         }
     },
     randomKeeperBorrower: {
-        type: 'BorrowerBasic',
+        type: "BorrowerBasic",
         count: 50,
         balances: {
             eth: 500000 // unlimited ETH - demand adjusted with params
@@ -107,7 +107,7 @@ const actors = {
         It's is special actor, don't change the name of it ('reserve').
         Leave this actor as last so that end of day snapshots are reflecting after intervention state on graphs.
     */
-    reserve: { type: 'ReserveBasic', balances: { acd: 0, eth: 0 } } //reserve acd //reserve eth
+    reserve: { type: "ReserveBasic", balances: { acd: 0, eth: 0 } } //reserve acd //reserve eth
 };
 
 module.exports = {

@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
-const rates = require('./rates.json');
-const clock = require('../lib/clock');
-const statistical = require('../lib/statistical.js');
-const AugmintError = require('../augmint/augmint.error.js');
+const rates = require("./rates.json");
+const clock = require("../lib/clock");
+const statistical = require("../lib/statistical.js");
+const AugmintError = require("../augmint/augmint.error.js");
 
 let dayAdjust = 0;
 let ethUsdHist = [];
@@ -13,11 +13,11 @@ function updateRates(state) {
     const augmint = state.augmint;
     if (!rates[day]) {
         throw new AugmintError(
-            'No ETH/USD historic price available for day ' +
+            "No ETH/USD historic price available for day " +
                 day +
-                '\nLast date available: ' +
+                "\nLast date available: " +
                 rates[day - 1].date +
-                '\ndayAdjust: ' +
+                "\ndayAdjust: " +
                 dayAdjust
         );
     }
