@@ -106,6 +106,7 @@ function togglePause() {
 
     if (!started) {
         simulation.addActorsFromGui(getActorsFromGui());
+        showParamChangeAlert();
     }
 
     if (paused) {
@@ -256,9 +257,10 @@ function mainLoop() {
 
 function renderActorParamsGui() {
     const panel = document.getElementById("actor-params-container");
-    const collapseButton = document.querySelector(".collapse-button");
+    const collapsePanel = document.querySelector(".collapse-bar");
 
-    collapseButton.addEventListener("click", collapse);
+    collapsePanel.addEventListener("click", collapse);
+
     let content = "";
 
     let actors = scenario.actors;
@@ -329,7 +331,7 @@ function collapse() {
 
     if (closed) {
         document.querySelector(".collapse-panel").className = "collapse-panel";
-        document.querySelector(".collapse-button").innerHTML = "-";
+        document.querySelector(".collapse-button").innerHTML = "&minus;";
         document.querySelector(".collapse-content").className = "collapse-content";
     } else {
         document.querySelector(".collapse-panel").className = "collapse-panel closed";
@@ -338,10 +340,13 @@ function collapse() {
     }
 }
 
+function showParamChangeAlert() {
+    document.querySelector(".actor-alert").className = "actor-alert";
+}
+
 function getActorsFromGui() {
     const actors = new Set();
 
-    var actor = {};
     let paramItems = Array.from(document.querySelectorAll(".actor-item"));
 
     paramItems.forEach(paramItem => {

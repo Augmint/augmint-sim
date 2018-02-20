@@ -38,6 +38,7 @@ const actors = {
     // },
     alwaysLocker: {
         type: "LockerBasic",
+        count: 1,
         balances: {
             usd: 100000000 // 'unlimited' USD, lock demand adjusted with WANTS_TO_LOCK_AMOUNT
         },
@@ -107,7 +108,7 @@ const actors = {
         It's is special actor, don't change the name of it ('reserve').
         Leave this actor as last so that end of day snapshots are reflecting after intervention state on graphs.
     */
-    reserve: { type: "ReserveBasic", balances: { acd: 0, eth: 0 } } //reserve acd //reserve eth
+    reserve: { type: "ReserveBasic", count: 1, balances: { acd: 0, eth: 0 } } //reserve acd //reserve eth
 };
 
 module.exports = {

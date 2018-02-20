@@ -55,6 +55,11 @@
         text-align: right;
     }
 
+    input:disabled{
+        background-color: #837c7c;
+        cursor:not-allowed;
+    }
+
     .graphs-wrapper {
         display: flex;
         flex-wrap: wrap;
@@ -70,7 +75,7 @@
     }
 
     /* actor css */
-    .actor-label{
+    .actor-label {
         width: 280px;
         text-align: left;
         margin-left: 10px;
@@ -78,9 +83,31 @@
         font-size: 13px;
     }
 
+    .actor-alert {
+      background-color: #2196F3;
+      color: white;
+      padding: 10px;
+      padding-top: 20px;
+      margin: 20px;
+      max-width: 50%;
+      overflow: hidden;
+    }
+
+    .alert-icon {
+      margin-top:-15px;
+      margin-right: 10px;
+      font-size: 45px;
+      float: left;
+    }
+
+    .actor-type-label {
+      width: inherit;
+    }
+
     .actor-item {
-      background-color: #e1e3ec;
+      background-color: #eeeeee;
       margin-bottom: 15px;
+      padding-bottom: 10px;
     }
 
     .actor-inputs > h4{
@@ -91,7 +118,7 @@
       border-bottom: solid;
       border-bottom-width: 1px;
       border-bottom-color: #aeaeae;
-      background-color:  #abb5e9;
+      background-color:  #bcc6d0;
       margin-top: -10px;
       padding-top: 10px;
     }
@@ -110,6 +137,7 @@
     .actor-type{
         width: 75px;
         text-align: right;
+        margin-left: 9px;
     }
 
     .collapse-panel {
@@ -117,8 +145,29 @@
         border-color: #aeaeae;
         border-width: 1px;
         border-style: dotted;
-        padding:5px;
         border-radius: 10px;
+    }
+
+    .collapse-panel.closed {
+        border-width: 0;
+    }
+
+    .collapse-bar > h4 {
+      display: inline;
+    }
+
+    .closed > .collapse-bar {
+      border-bottom-left-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+
+    .collapse-bar {
+      margin-right: -1px;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+      cursor: pointer;
+      line-height: 35px;
+      background-color: #e4eae6;
     }
 
     .hidden {
@@ -126,19 +175,17 @@
     }
 
     .collapse-button {
-      float:right;
-      font-size:20px;
-      margin-top: 10px;
-      border-width: 1px;
-      border-style: solid;
-      width: 30px;
-      height: 30px;
-      padding: 10px 5px 5px 5px;
-      border-color: #aeaeae;
-      color: #7e7878;
-      text-align: center;
-      vertical-align: middle;
-      line-height: 20px;
+        margin-left: 10px;
+        border-width: 1px;
+        border-style: solid;
+        width: 30px;
+        height: 30px;
+        padding: 1px 4px 1px 4px;
+        border-color: #aeaeae;
+        color: #7e7878;
+        text-align: center;
+        vertical-align: middle;
+        line-height: 20px;
     }
 
 </style>
@@ -185,7 +232,7 @@
             <br/>
         </div>
         <div class="flex-item">
-            <h4>Actor params:</h4>
+            <h4>Actors:</h4>
             <div>
               <label class="loanproduct-inputs">Defaulting fee (%): </label><input type="number" id="defaultFeePercentage"/><br/>
               <label class="loanproduct-inputs">Min. loan ACD amount: </label><input type="number" id="minimumLoanInAcd"/><br/>
@@ -201,10 +248,14 @@
         </div>
     </div>
     <div class="collapse-panel closed">
-      <span class="collapse-button">+</span>
-      <h2>Initial params</h2>
-
+      <div class="collapse-bar">
+        <span class="collapse-button">+</span>
+        <h4>Initial params</h4>
+      </div>
       <div class="collapse-content hidden">
+        <div class="actor-alert hidden">
+          <span class="alert-icon">⚠</span> You can only change the parameters <b>before</b> you started the simulation. To change the initial parameters reset the simulation (reload the page).
+        </div>
         <h4>Actor params</h4>
         <!-- actor template -->
         <div class="flex-container" id="actor-params-container">
@@ -212,9 +263,9 @@
               <div class="flex-item actor-item">
                 <div class="actor-inputs">
                   <h4 data-actor-param="name" >###NAME###</h4>
-                  <label class="technical-inputs actor-label">type: </label><span data-actor-param="type" class="actor-type">###TYPE###</span><br/>
+                  <span data-actor-param="type" class="actor-type">###TYPE###</span><br/>
                   <span class="hidden"><label class="technical-inputs actor-label">count: </label><input type="number" data-actor-param="count" value="###COUNT###"/><br/></span>
-                  <h5>balances</h5>
+                  <h5>Starting balance</h5>
                     ###BALANCES###
                   <h5>params</h5>
                     ###PARAMS###
