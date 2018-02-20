@@ -1,6 +1,6 @@
 // stores all state for the simulation
 
-'use strict';
+"use strict";
 
 // TODO: add transferFeePt param (and transferAcdWithFee functions)
 // TODO: would prefer proper setters/getters, but this is cool for now...
@@ -74,7 +74,7 @@ module.exports = {
     },
 
     get reserveAcdOnExchange() {
-        return this.exchange.getActorSellAcdOrdersSum('reserve');
+        return this.exchange.getActorSellAcdOrdersSum("reserve");
     },
 
     get netAcdDemand() {
@@ -127,7 +127,7 @@ module.exports = {
 
     get loanToDepositRatio() {
         // checking against 1 b/c of rounding issues (need to move to BigNumber)
-        return this.balances.lockedAcdPool < 1 ? 'N/A' : this.balances.openLoansAcd / this.balances.lockedAcdPool;
+        return this.balances.lockedAcdPool < 1 ? "N/A" : this.balances.openLoansAcd / this.balances.lockedAcdPool;
     },
 
     /* for maxBorrowableAmount &  maxLockableAmount calculation logic see:

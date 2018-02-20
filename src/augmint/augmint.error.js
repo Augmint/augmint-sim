@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 function AugmintError(message) {
     if (!(this instanceof AugmintError)) {
@@ -6,12 +6,12 @@ function AugmintError(message) {
     }
 
     // plain-english/human-readable message describing the error
-    this.message = message || '';
+    this.message = message || "";
 
     Error.captureStackTrace(this, AugmintError);
 }
 
 AugmintError.prototype = Object.create(Error.prototype);
-AugmintError.prototype.name = 'AugmintError';
+AugmintError.prototype.name = "AugmintError";
 
 module.exports = AugmintError;

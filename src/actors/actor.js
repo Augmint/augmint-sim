@@ -1,12 +1,12 @@
 // a class which encapulates an actor's behaviour, and an interface with which to interact with augmint etc.
 
-'use strict';
+"use strict";
 
-const augmint = require('../augmint/augmint.js');
-const loanManager = require('../augmint/loan.manager.js');
-const logger = require('../lib/logger.js');
-const freezer = require('../augmint/freezer.js');
-const exchange = require('../augmint/exchange.js');
+const augmint = require("../augmint/augmint.js");
+const loanManager = require("../augmint/loan.manager.js");
+const logger = require("../lib/logger.js");
+const freezer = require("../augmint/freezer.js");
+const exchange = require("../augmint/exchange.js");
 const defaultParams = {
     ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
     USD_BALANCE_GROWTH_PA: 0 /* USD balance grows daily by pa. % to simulate growth */
@@ -139,57 +139,57 @@ class Actor {
     // MOVE SET:
     buyACD(acdAmount) {
         let ret = exchange.buyACD(this.id, acdAmount);
-        logger.logMove(this.id, 'buyAcd order', { acdAmount: acdAmount });
+        logger.logMove(this.id, "buyAcd order", { acdAmount: acdAmount });
         return ret;
     }
 
     sellACD(acdAmount) {
         let ret = exchange.sellACD(this.id, acdAmount);
-        logger.logMove(this.id, 'sellAcd order', { acdAmount: acdAmount });
+        logger.logMove(this.id, "sellAcd order", { acdAmount: acdAmount });
         return ret;
     }
 
     issueAcd(acdAmount) {
         // only reserve actors should call it
         const ret = augmint.issueAcd(acdAmount);
-        logger.logMove(this.id, 'Reserve Issued ACD', { acdAmount: acdAmount, newReserveBalance: ret });
+        logger.logMove(this.id, "Reserve Issued ACD", { acdAmount: acdAmount, newReserveBalance: ret });
         return ret;
     }
 
     burnAcd(acdAmount) {
         // only reserve actors should call it
         const ret = augmint.burnAcd(acdAmount);
-        logger.logMove(this.id, 'Reserve Burned ACD', { acdAmount: acdAmount, newReserveBalance: ret });
+        logger.logMove(this.id, "Reserve Burned ACD", { acdAmount: acdAmount, newReserveBalance: ret });
         return ret;
     }
 
     buyEthWithUsd(usdAmount) {
         let ret = exchange.buyEthWithUsd(this.id, usdAmount);
-        logger.logMove(this.id, 'buyEth order', { usdAmount: usdAmount });
+        logger.logMove(this.id, "buyEth order", { usdAmount: usdAmount });
         return ret;
     }
 
     sellEthForUsd(usdAmount) {
         let ret = exchange.sellEthForUsd(this.id, usdAmount);
-        logger.logMove(this.id, 'sellEth order', { usdAmount: usdAmount });
+        logger.logMove(this.id, "sellEth order", { usdAmount: usdAmount });
         return ret;
     }
 
     lockACD(acdAmount) {
         let ret = freezer.lockACD(this.id, acdAmount);
-        logger.logMove(this.id, 'lockACD', { acdAmount: acdAmount });
+        logger.logMove(this.id, "lockACD", { acdAmount: acdAmount });
         return ret;
     }
 
     releaseACD(lockId) {
         let ret = freezer.releaseACD(this.id, lockId);
-        logger.logMove(this.id, 'releaseACD', { lockId: lockId });
+        logger.logMove(this.id, "releaseACD", { lockId: lockId });
         return ret;
     }
 
     takeLoan(loanProductId, loanAmountInAcd) {
         let ret = loanManager.takeLoan(this.id, loanProductId, loanAmountInAcd);
-        logger.logMove(this.id, 'takeLoan', {
+        logger.logMove(this.id, "takeLoan", {
             loanProductId: loanProductId,
             loanAmountInAcd: loanAmountInAcd
         });
@@ -198,12 +198,12 @@ class Actor {
 
     repayLoan(loanId) {
         let ret = loanManager.repayLoan(this.id, loanId);
-        logger.logMove(this.id, 'repayLoan', { loanId: loanId });
+        logger.logMove(this.id, "repayLoan", { loanId: loanId });
         return ret;
     }
 
     convertReserveEthToAcd(acdAmount) {
-        logger.logMove(this.id, 'convertReserveEthToAcd', { acdAmount: acdAmount, acdBalance: this.acdBalance });
+        logger.logMove(this.id, "convertReserveEthToAcd", { acdAmount: acdAmount, acdBalance: this.acdBalance });
         return exchange.convertReserveEthToAcd(acdAmount);
     }
 }

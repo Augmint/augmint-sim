@@ -1,11 +1,11 @@
 // keeps track of loans
 
-'use strict';
+"use strict";
 
-const AugmintError = require('../augmint/augmint.error.js');
-const augmint = require('./augmint.js');
-const clock = require('../lib/clock.js');
-const logger = require('../lib/logger.js');
+const AugmintError = require("../augmint/augmint.error.js");
+const augmint = require("./augmint.js");
+const clock = require("../lib/clock.js");
+const logger = require("../lib/logger.js");
 
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const loanProducts = augmint.loanProducts;
@@ -47,7 +47,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     const loanProduct = loanProducts[loanProductId];
 
     if (!loanProduct) {
-        throw new AugmintError('takeLoan() error: Invalid loanProduct Id:' + loanProductId);
+        throw new AugmintError("takeLoan() error: Invalid loanProduct Id:" + loanProductId);
     }
 
     if (loanAmountInAcd < loanProduct.minimumLoanInAcd) {
@@ -67,12 +67,12 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
 
     if (augmint.actors[actorId].balances.eth < collateralInEth) {
         console.error(
-            'takeLoan() eth balance below collateral required ',
+            "takeLoan() eth balance below collateral required ",
             actorId,
-            'Balance (ETH) ' + augmint.actors[actorId].balances.eth,
-            'Collateral required (ETH): ' + collateralInEth,
-            'Loan wanted (ACD): ' + loanAmountInAcd,
-            'ethToAcd: ' + augmint.rates.ethToAcd
+            "Balance (ETH) " + augmint.actors[actorId].balances.eth,
+            "Collateral required (ETH): " + collateralInEth,
+            "Loan wanted (ACD): " + loanAmountInAcd,
+            "ethToAcd: " + augmint.rates.ethToAcd
         );
         return false;
     }
@@ -105,7 +105,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
 
 function repayLoan(actorId, loanId) {
     if (!loans[actorId] || !loans[actorId][loanId]) {
-        throw new AugmintError('repayLoan() error. Invalid actorId (' + actorId + ') or loanId(' + loanId + ')');
+        throw new AugmintError("repayLoan() error. Invalid actorId (" + actorId + ") or loanId(" + loanId + ")");
     }
 
     const loan = loans[actorId][loanId];
@@ -179,7 +179,7 @@ function collectDefaultedLoan(actorId, loanId) {
 
     // remove loan
     delete loans[actorId][loanId];
-    logger.logMove(actorId, 'collectDefaultedLoan', { loanId: loanId, repaymentDue: loan.repaymentDue });
+    logger.logMove(actorId, "collectDefaultedLoan", { loanId: loanId, repaymentDue: loan.repaymentDue });
 }
 
 function collectAllDefaultedLoans() {
