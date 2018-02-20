@@ -15,10 +15,8 @@
 		"dev-win": "set NODE_ENV=development & webpack-dev-server --host 0.0.0.0 --progress --colors --content-base dist/  --watch --hot --inline --config  webpack.config.js"
     },
     "devDependencies": {
-        "browserify": "14.5.0",
-        "copy-webpack-plugin": "4.3.0",
-        "watchify": "3.9.0",
-        "webpack": "3.10.0",
-        "webpack-dev-server": "2.9.7"
+        "copy-webpack-plugin": "4.4.1",
+        "webpack": "3.11.0",
+        "webpack-dev-server": "2.11.1"
     }
 }
