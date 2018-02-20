@@ -1,13 +1,13 @@
-'use strict';
+"use strict";
 
-const augmint = require('../augmint/augmint.js');
-const exchange = require('../augmint/exchange.js');
-const loanManager = require('../augmint/loan.manager.js');
-const logger = require('./logger.js');
-const clock = require('./clock.js');
-const rates = require('../augmint/rates.js');
-const ActorDirectory = require('../actors/actor.directory.js');
-const RandomSeed = require('random-seed');
+const augmint = require("../augmint/augmint.js");
+const exchange = require("../augmint/exchange.js");
+const loanManager = require("../augmint/loan.manager.js");
+const logger = require("./logger.js");
+const clock = require("./clock.js");
+const rates = require("../augmint/rates.js");
+const ActorDirectory = require("../actors/actor.directory.js");
+const RandomSeed = require("random-seed");
 
 let params = {};
 let iteration = 0;
@@ -83,8 +83,18 @@ function addActors(newActors) {
         const actor = newActors[actorId];
         let count = actor.count ? actor.count : 1;
         for (let i = 0; i < count; i++) {
-            let name = count > 1 ? actorId + '_' + (i + 1) : actorId;
+            let name = count > 1 ? actorId + "_" + (i + 1) : actorId;
             actors.add(new ActorDirectory[actor.type](name, actor.balances, actor.state, actor.params));
+        }
+    });
+}
+
+function addActorsFromGui(newActors) {
+    newActors.forEach(actor => {
+        let count = actor.count ? actor.count : 1;
+        for (let i = 0; i < count; i++) {
+            let name = count > 1 ? actor.id + "_" + (i + 1) : actor.id;
+            actors.add(new ActorDirectory[actor.constructor.name](name, actor.balances, actor.state, actor.parameters));
         }
     });
 }
@@ -104,6 +114,7 @@ module.exports = {
     init,
     incrementBy,
     addActors,
+    addActorsFromGui,
     setSimulationParams,
     getState,
     patchAugmintParams,

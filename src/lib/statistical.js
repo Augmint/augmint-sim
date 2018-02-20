@@ -1,13 +1,13 @@
 /* statistical functions. leastSquares is based on https://github.com/jprichardson/least-squares/blob/master/lib/least-squares.js */
-'use strict';
+"use strict";
 
 function leastSquares(X, Y, computeError, ret) {
-    if (typeof computeError == 'object') {
+    if (typeof computeError == "object") {
         ret = computeError;
         computeError = false;
     }
 
-    if (typeof ret == 'undefined') ret = {};
+    if (typeof ret == "undefined") ret = {};
 
     var sumX = 0;
     var sumY = 0;

@@ -1,10 +1,10 @@
-'use strict';
+"use strict";
 /* loanCollateralRatio adjustment based on ETH/USD trend
  TODO: log moves and params it changes
  TODO: add params of intervention
 */
-const Actor = require('./actor.js');
-const loanManager = require('../augmint/loan.manager.js');
+const Actor = require("./actor.js");
+const loanManager = require("../augmint/loan.manager.js");
 const defaultParams = {
     HIGH_COLLATERAL_RATIO: 0.3, // collateral ratio when ETH/USD trend above high trigger
     MID_COLLATERAL_RATIO: 0.6, // collateral ratio when ETH/USD trend b/w low & high triggers
