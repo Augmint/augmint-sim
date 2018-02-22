@@ -3,7 +3,7 @@
 
 # Augmint - Stable Digital Tokens - Simulator
 
-Augmint is a decentralised stable cryptocurrency on Ethereum. Read more about the concept on [www.augmint.cc](http://www.augmint.cc)
+Augmint is a decentralised stable cryptocurrency on Ethereum. Read more about the concept on [www.augmint.cc](https://www.augmint.cc)
 
 This simulation is running on historical ETH/USD prices.
 
