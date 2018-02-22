@@ -169,6 +169,11 @@ function togglePause() {
             input.disabled = false;
         });
 
+        const loadproductInputs = Array.from(document.querySelectorAll(".loanproduct-input-container input"));
+        loadproductInputs.forEach(input => {
+            input.disabled = false;
+        });
+
         console.debug(
             "Benchmark: iterations/sec: ",
             benchmarkItCt / (runTime / 1000),
@@ -182,6 +187,11 @@ function togglePause() {
         benchmarkItCt = 0;
         pauseBtn.innerHTML = "Pause";
         inputs.forEach(input => {
+            input.disabled = true;
+        });
+
+        const loadproductInputs = Array.from(document.querySelectorAll(".loanproduct-input-container input"));
+        loadproductInputs.forEach(input => {
             input.disabled = true;
         });
 
