@@ -81,7 +81,7 @@ function incrementBy(_timeStep = params.timeStep) {
 function addActors(newActors) {
     Object.keys(newActors).forEach(actorId => {
         const actor = newActors[actorId];
-        const count = actor.count;
+        const count = actor.count ? actor.count : 0;
         for (let i = 0; i < count; i++) {
             const name = count > 1 ? actorId + "_" + (i + 1) : actorId;
             actors.add(new ActorDirectory[actor.type](name, actor.balances, actor.state, actor.params));
@@ -91,7 +91,7 @@ function addActors(newActors) {
 
 function addActorsFromGui(newActors) {
     newActors.forEach(actor => {
-        const count = actor.count;
+        const count = actor.count ? actor.count : 0;
         for (let i = 0; i < count; i++) {
             const name = count > 1 ? actor.id + "_" + (i + 1) : actor.id;
             actors.add(new ActorDirectory[actor.constructor.name](name, actor.balances, actor.state, actor.parameters));
