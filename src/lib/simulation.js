@@ -113,7 +113,7 @@ function setState(state) {
 module.exports = {
     init,
     incrementBy,
-    // addActors,
+    addActors,
     addActorsFromGui,
     setSimulationParams,
     getState,
