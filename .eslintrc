@@ -13,7 +13,7 @@
         no-use-before-define: 'error',
         no-unused-vars: ['warn', { vars: 'all', args: 'none' }],
         eol-last: 'off',
-        quotes: ['error', 'single'],
+        quotes: ['error', 'double'],
         comma-dangle: 'warn'
     }
 }

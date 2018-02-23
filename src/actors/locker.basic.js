@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const Actor = require('./actor.js');
+const Actor = require("./actor.js");
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const defaultParams = {
     RELEASE_DELAY_DAYS: 1,
@@ -106,7 +106,7 @@ class LockerBasic extends Actor {
                 this.waitingForBuyOrder = false;
                 this.wantToLock = false;
             } else {
-                console.error('Cound\'t lock'); // just in case... this shouldn't happen and lockAcd logs warnings too
+                console.error("Cound't lock"); // just in case... this shouldn't happen and lockAcd logs warnings too
             }
         }
 

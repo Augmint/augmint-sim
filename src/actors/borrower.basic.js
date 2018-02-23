@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-const AugmintError = require('../augmint/augmint.error.js');
-const Actor = require('./actor.js');
+const AugmintError = require("../augmint/augmint.error.js");
+const Actor = require("./actor.js");
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const defaultParams = {
     REPAY_X_DAYS_BEFORE: 1,
@@ -113,10 +113,10 @@ class BorrowerBasic extends Actor {
                 if (!this.repayLoan(this.loans[0].id)) {
                     throw new AugmintError(
                         this.id +
-                            ' couldn\'t repay.\n' +
-                            'repaymentDue: ' +
+                            " couldn't repay.\n" +
+                            "repaymentDue: " +
                             repaymentDue +
-                            '\nACD borrower balance: ' +
+                            "\nACD borrower balance: " +
                             this.acdBalance
                     );
                 }

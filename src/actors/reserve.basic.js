@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const Actor = require('./actor.js');
+const Actor = require("./actor.js");
 const defaultParams = {};
 
 class ReserveBasic extends Actor {

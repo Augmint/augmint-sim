@@ -1,10 +1,10 @@
 // the augmint exchange
 
-'use strict';
+"use strict";
 
-const AugmintError = require('../augmint/augmint.error.js');
-const augmint = require('./augmint.js');
-const logger = require('../lib/logger.js');
+const AugmintError = require("../augmint/augmint.error.js");
+const augmint = require("./augmint.js");
+const logger = require("../lib/logger.js");
 const orderBook = augmint.orderBook;
 
 function convertEthToUsd(ethAmount) {
@@ -69,7 +69,7 @@ function buyACD(actorId, acdAmount) {
         augmint.balances.exchangeAcd -= sellAmount;
         augmint.actors[actorId].balances.acd += sellAmount - feesInAcd;
         augmint.balances.acdFeesEarned += feesInAcd;
-        logger.logMove(actorId, 'Order match', {
+        logger.logMove(actorId, "Order match", {
             buyer: actorId,
             seller: sellOrder.actorId,
             ethAmount: ethAmount,
@@ -136,7 +136,7 @@ function sellACD(actorId, acdAmount) {
         // acd: exchange -> buyer
         augmint.balances.exchangeAcd -= buyAmount;
         augmint.actors[buyOrder.actorId].balances.acd += buyAmount;
-        logger.logMove(actorId, 'Order match', {
+        logger.logMove(actorId, "Order match", {
             buyer: buyOrder.actorId,
             seller: actorId,
             ethAmount: ethAmount,
@@ -173,17 +173,17 @@ function sellACD(actorId, acdAmount) {
 
 function convertReserveEthToAcd(acdAmount) {
     // SELL ETH from reserve and issue ACD  TODO: reconsider the accounting of this
-    if (augmint.actors['reserve'].balances.eth < this.convertAcdToEth(acdAmount)) {
+    if (augmint.actors["reserve"].balances.eth < this.convertAcdToEth(acdAmount)) {
         throw new AugmintError(
-            ' convertReserveEthToAcd:  reserve ETH balance of ' +
-                augmint.actors['reserve'].balances.eth +
-                ' ETH is not enough to buy ' +
+            " convertReserveEthToAcd:  reserve ETH balance of " +
+                augmint.actors["reserve"].balances.eth +
+                " ETH is not enough to buy " +
                 acdAmount +
-                ' ACD'
+                " ACD"
         );
     }
-    augmint.actors['reserve'].balances.eth -= this.convertAcdToEth(acdAmount);
-    augmint.actors['reserve'].balances.acd += acdAmount;
+    augmint.actors["reserve"].balances.eth -= this.convertAcdToEth(acdAmount);
+    augmint.actors["reserve"].balances.acd += acdAmount;
 }
 
 function sellEthForUsd(actorId, usdAmount) {
@@ -194,10 +194,10 @@ function sellEthForUsd(actorId, usdAmount) {
     }
     if (ethAmount > augmint.actors[actorId].balances.eth) {
         console.error(
-            'insufficient ETH balance to sell ETH ' + actorId,
-            ' usdAmount:' + usdAmount,
-            ' ethAmount: ' + ethAmount,
-            'eth balance: ',
+            "insufficient ETH balance to sell ETH " + actorId,
+            " usdAmount:" + usdAmount,
+            " ethAmount: " + ethAmount,
+            "eth balance: ",
             augmint.actors[actorId].balances.eth
         );
         return false;
@@ -211,10 +211,10 @@ function buyEthWithUsd(actorId, usdAmount) {
     const ethAmount = convertUsdToEth(usdAmount);
     if (usdAmount > augmint.actors[actorId].balances.usd) {
         console.error(
-            'insufficient USD balance to buy ETH ' + actorId,
-            ' usdAmount:' + usdAmount,
-            ' ethAmount: ' + ethAmount,
-            'eth balance: ',
+            "insufficient USD balance to buy ETH " + actorId,
+            " usdAmount:" + usdAmount,
+            " ethAmount: " + ethAmount,
+            "eth balance: ",
             augmint.actors[actorId].balances.eth
         );
         return false;

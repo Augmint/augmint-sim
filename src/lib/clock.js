@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 // in seconds
