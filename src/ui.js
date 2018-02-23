@@ -62,9 +62,6 @@ function getParamsFromUI() {
     };
     //technical params
     params["ethUsdTrendSampleDays"] = Number.parseFloat(document.getElementById("ethUsdTrendSampleDays").value);
-    //actor params
-    //scenario.actors.reserve.balances.acd = Number.parseFloat(document.getElementById('reserveBalancesAcd').value);
-    //scenario.actors.reserve.balances.eth = Number.parseFloat(document.getElementById('reserveBalancesEth').value);
 
     return params;
 }
@@ -96,9 +93,57 @@ function updateUIFromParams() {
     ).toFixed(2);
     // technical params
     document.getElementById("ethUsdTrendSampleDays").value = augmint.params.ethUsdTrendSampleDays;
-    //actor params
-    //document.getElementById('reserveBalancesAcd').value = scenario.actors.reserve.balances.acd;
-    //document.getElementById('reserveBalancesEth').value = scenario.actors.reserve.balances.eth;
+}
+
+function getActorsFromGui() {
+    const actors = new Set();
+
+    let paramItems = Array.from(document.querySelectorAll(".actor-item"));
+
+    paramItems.forEach(paramItem => {
+        let actorType = "";
+        let actorName = "";
+        let balances = {};
+        let params = {};
+        let count = null;
+        let itemsWithData = Array.from(paramItem.querySelectorAll("[data-actor-param]"));
+        itemsWithData.forEach(dataItem => {
+            if (dataItem.getAttribute("data-actor-param") == "name") {
+                actorName = dataItem.innerHTML;
+            }
+
+            if (dataItem.getAttribute("data-actor-param") == "type") {
+                actorType = dataItem.innerHTML;
+            }
+
+            if (dataItem.getAttribute("data-actor-param") == "count") {
+                if (dataItem.parentElement.className != "hidden") {
+                    count = dataItem.value;
+                }
+            }
+
+            if (dataItem.getAttribute("data-actor-param") == "balance") {
+                balances[dataItem.getAttribute("data-actor-balancename")] = parseInt(dataItem.value);
+            }
+
+            if (dataItem.getAttribute("data-actor-param") == "param") {
+                params[dataItem.getAttribute("data-actor-paramname")] = parseFloat(dataItem.value);
+            }
+        });
+        const actor = new ActorDirectory[actorType](actorName, balances, null, params);
+        actor.balances = balances;
+        actor.parameters = params;
+        // console.log(balances);
+        if (count !== null) {
+            actor.count = parseInt(count);
+        }
+        actors.add(actor);
+    });
+    return actors;
+}
+
+function showParamChangeAlert() {
+    document.querySelector(".actor-alert").className = "actor-alert";
 }
 
 function togglePause() {
@@ -118,6 +163,11 @@ function togglePause() {
             input.disabled = false;
         });
 
+        const loadproductInputs = Array.from(document.querySelectorAll(".loanproduct-input-container input"));
+        loadproductInputs.forEach(input => {
+            input.disabled = false;
+        });
+
         console.debug(
             "Benchmark: iterations/sec: ",
             benchmarkItCt / (runTime / 1000),
@@ -131,6 +181,11 @@ function togglePause() {
         benchmarkItCt = 0;
         pauseBtn.innerHTML = "Pause";
         inputs.forEach(input => {
+            input.disabled = true;
+        });
+
+        const loadproductInputs = Array.from(document.querySelectorAll(".loanproduct-input-container input"));
+        loadproductInputs.forEach(input => {
             input.disabled = true;
         });
 
@@ -169,6 +224,85 @@ function populateRatesDropDown() {
         }
         resolve();
     });
+}
+
+function collapse() {
+    const style = document.querySelector(".collapse-panel").className;
+    const closed = style.indexOf("closed") !== -1;
+
+    if (closed) {
+        document.querySelector(".collapse-panel").className = "collapse-panel";
+        document.querySelector(".collapse-button").innerHTML = "&minus;";
+        document.querySelector(".collapse-content").className = "collapse-content";
+    } else {
+        document.querySelector(".collapse-panel").className = "collapse-panel closed";
+        document.querySelector(".collapse-button").innerHTML = "+";
+        document.querySelector(".collapse-content").className = "collapse-content hidden";
+    }
+}
+
+function getActorParamsBox(name, actor) {
+    let template = document.getElementById("actor-params-item").innerHTML;
+    template = template.replace("###NAME###", name);
+    template = template.replace("###TYPE###", actor.type);
+    if (actor.count !== undefined) {
+        template = template.replace('<span class="hidden">', "<span>");
+        template = template.replace("###COUNT###", actor.count);
+    }
+
+    let balancesContent = "";
+    for (var bal in actor.balances) {
+        if (actor.balances.hasOwnProperty(bal)) {
+            balancesContent +=
+                '<label class="technical-inputs actor-label">' +
+                bal +
+                ': </label><input data-actor-balancename="' +
+                bal +
+                '" data-actor-param="balance" type="number" value="' +
+                actor.balances[bal] +
+                '"/><br/>';
+        }
+    }
+    template = template.replace("###BALANCES###", balancesContent);
+
+    if (actor.params === undefined) {
+        template = template.replace("<h5>params</h5>", "");
+        template = template.replace("###PARAMS###", "");
+    } else {
+        let paramsContent = "";
+        for (var p in actor.params) {
+            if (actor.params.hasOwnProperty(p)) {
+                paramsContent +=
+                    '<label class="technical-inputs actor-label small-label">' +
+                    p +
+                    ': </label><input data-actor-paramname="' +
+                    p +
+                    '" data-actor-param="param" type="number" value="' +
+                    actor.params[p] +
+                    '"/><br/>';
+            }
+        }
+        template = template.replace("###PARAMS###", paramsContent);
+    }
+
+    return template;
+}
+
+function renderActorParamsGui() {
+    const panel = document.getElementById("actor-params-container");
+    const collapsePanel = document.querySelector(".collapse-bar");
+
+    collapsePanel.addEventListener("click", collapse);
+
+    let content = "";
+
+    for (var name in scenario.actors) {
+        if (scenario.actors.hasOwnProperty(name)) {
+            content += getActorParamsBox(name, scenario.actors[name]);
+        }
+    }
+
+    panel.innerHTML = content;
 }
 
 function init() {
@@ -253,148 +387,6 @@ function mainLoop() {
         doFrame = Date.now() - start > 10;
     }
     requestAnimationFrame(mainLoop);
-}
-
-function renderActorParamsGui() {
-    const panel = document.getElementById("actor-params-container");
-    const collapsePanel = document.querySelector(".collapse-bar");
-
-    collapsePanel.addEventListener("click", collapse);
-
-    let content = "";
-
-    let actors = scenario.actors;
-
-    for (var name in actors) {
-        if (actors.hasOwnProperty(name)) {
-            content += getActorParamsBox(name, actors[name]);
-        }
-    }
-
-    Object.keys(actors).forEach(actorId => {
-        const actor = actors[actorId];
-    });
-
-    panel.innerHTML = content;
-}
-
-function getActorParamsBox(name, actor) {
-    let template = document.getElementById("actor-params-item").innerHTML;
-    template = template.replace("###NAME###", name);
-    template = template.replace("###TYPE###", actor.type);
-    if (actor.count !== undefined) {
-        template = template.replace('<span class="hidden">', "<span>");
-        template = template.replace("###COUNT###", actor.count);
-    }
-
-    let balancesContent = "";
-    for (var bal in actor.balances) {
-        if (actor.balances.hasOwnProperty(bal)) {
-            balancesContent +=
-                '<label class="technical-inputs actor-label">' +
-                bal +
-                ': </label><input data-actor-balancename="' +
-                bal +
-                '" data-actor-param="balance" type="number" value="' +
-                actor.balances[bal] +
-                '"/><br/>';
-        }
-    }
-    template = template.replace("###BALANCES###", balancesContent);
-
-    if (actor.params === undefined) {
-        template = template.replace("<h5>params</h5>", "");
-        template = template.replace("###PARAMS###", "");
-    } else {
-        let paramsContent = "";
-        for (var p in actor.params) {
-            if (actor.params.hasOwnProperty(p)) {
-                paramsContent +=
-                    '<label class="technical-inputs actor-label small-label">' +
-                    p +
-                    ': </label><input data-actor-paramname="' +
-                    p +
-                    '" data-actor-param="param" type="number" value="' +
-                    actor.params[p] +
-                    '"/><br/>';
-            }
-        }
-        template = template.replace("###PARAMS###", paramsContent);
-    }
-
-    return template;
-}
-
-function collapse() {
-    const style = document.querySelector(".collapse-panel").className;
-    const closed = style.indexOf("closed") !== -1;
-
-    if (closed) {
-        document.querySelector(".collapse-panel").className = "collapse-panel";
-        document.querySelector(".collapse-button").innerHTML = "&minus;";
-        document.querySelector(".collapse-content").className = "collapse-content";
-    } else {
-        document.querySelector(".collapse-panel").className = "collapse-panel closed";
-        document.querySelector(".collapse-button").innerHTML = "+";
-        document.querySelector(".collapse-content").className = "collapse-content hidden";
-    }
-}
-
-function showParamChangeAlert() {
-    document.querySelector(".actor-alert").className = "actor-alert";
-}
-
-function getActorsFromGui() {
-    const actors = new Set();
-
-    let paramItems = Array.from(document.querySelectorAll(".actor-item"));
-
-    paramItems.forEach(paramItem => {
-        let actorType = "";
-        let actorName = "";
-        let balances = {};
-        let params = {};
-        let count = null;
-        // console.log('____________');
-        let itemsWithData = Array.from(paramItem.querySelectorAll("[data-actor-param]"));
-        itemsWithData.forEach(dataItem => {
-            if (dataItem.getAttribute("data-actor-param") == "name") {
-                // console.log('NAME:'+dataItem.innerHTML);
-                actorName = dataItem.innerHTML;
-            }
-
-            if (dataItem.getAttribute("data-actor-param") == "type") {
-                // console.log('TYPE:'+dataItem.innerHTML);
-                actorType = dataItem.innerHTML;
-            }
-
-            if (dataItem.getAttribute("data-actor-param") == "count") {
-                if (dataItem.parentElement.className == "hidden") {
-                    // console.log('NO COUNT PARAMETER');
-                } else {
-                    // console.log('COUNT:'+dataItem.value);
-                    count = dataItem.value;
-                }
-            }
-
-            if (dataItem.getAttribute("data-actor-param") == "balance") {
-                balances[dataItem.getAttribute("data-actor-balancename")] = parseInt(dataItem.value);
-            }
-
-            if (dataItem.getAttribute("data-actor-param") == "param") {
-                params[dataItem.getAttribute("data-actor-paramname")] = parseFloat(dataItem.value);
-            }
-        });
-        const actor = new ActorDirectory[actorType](actorName, balances, null, params);
-        actor.balances = balances;
-        actor.parameters = params;
-        // console.log(balances);
-        if (count !== null) {
-            actor.count = parseInt(count);
-        }
-        actors.add(actor);
-    });
-    return actors;
 }
 
 window.addEventListener("load", () => {

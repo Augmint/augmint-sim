@@ -9,7 +9,7 @@ const rates = require("../augmint/rates.js");
 const ActorDirectory = require("../actors/actor.directory.js");
 const RandomSeed = require("random-seed");
 
-let params = {};
+const params = {};
 let iteration = 0;
 let random = new RandomSeed(params.randomSeed);
 
@@ -81,9 +81,9 @@ function incrementBy(_timeStep = params.timeStep) {
 function addActors(newActors) {
     Object.keys(newActors).forEach(actorId => {
         const actor = newActors[actorId];
-        let count = actor.count ? actor.count : 1;
+        const count = actor.count;
         for (let i = 0; i < count; i++) {
-            let name = count > 1 ? actorId + "_" + (i + 1) : actorId;
+            const name = count > 1 ? actorId + "_" + (i + 1) : actorId;
             actors.add(new ActorDirectory[actor.type](name, actor.balances, actor.state, actor.params));
         }
     });
@@ -91,9 +91,9 @@ function addActors(newActors) {
 
 function addActorsFromGui(newActors) {
     newActors.forEach(actor => {
-        let count = actor.count ? actor.count : 1;
+        const count = actor.count;
         for (let i = 0; i < count; i++) {
-            let name = count > 1 ? actor.id + "_" + (i + 1) : actor.id;
+            const name = count > 1 ? actor.id + "_" + (i + 1) : actor.id;
             actors.add(new ActorDirectory[actor.constructor.name](name, actor.balances, actor.state, actor.parameters));
         }
     });

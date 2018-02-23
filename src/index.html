@@ -56,7 +56,8 @@
     }
 
     input:disabled{
-        background-color: #837c7c;
+        background-color: #b3b3b3;
+        color: black;
         cursor:not-allowed;
     }
 
@@ -163,6 +164,7 @@
 
     .collapse-bar {
       margin-right: -1px;
+      margin-top: -1px;
       border-top-left-radius: 10px;
       border-top-right-radius: 10px;
       cursor: pointer;
@@ -219,17 +221,19 @@
             <h4>Monetary params:</h4>
             <!-- <label>Exchange Fees (%): <input type="number" value="0" data-key="exchangeFeePercentage"/></label> -->
             <div class="sim-inputs">
-            <label>Market deposit interest pa. (%): </label><input type="number" data-key="marketLockInterestRate" /><br/>
-            <label>Locked ACD premium pa. (%): </label><input type="number" data-key="lockedAcdInterestPercentage"/><br/>
-            <label>Market loan interest pa. (%): </label><input type="number" data-key="marketLoanInterestRate"/><br/>
-            <label>Loan to deposit ratio range limit (%): </label><input type="number" step="1" data-key="ltdDifferenceLimit"/><br/>
-            <label>Allowed total loan and lock difference: </label><input type="number" step="1" data-key="allowedLtdDifferenceAmount"/><br/>
-            <label>Lock Time (days): </label><input type="number" value="30" data-key="lockTimeInDays"/><br/>
+              <label>Market deposit interest pa. (%): </label><input type="number" data-key="marketLockInterestRate" /><br/>
+              <label>Locked ACD premium pa. (%): </label><input type="number" data-key="lockedAcdInterestPercentage"/><br/>
+              <label>Market loan interest pa. (%): </label><input type="number" data-key="marketLoanInterestRate"/><br/>
+              <label>Loan to deposit ratio range limit (%): </label><input type="number" step="1" data-key="ltdDifferenceLimit"/><br/>
+              <label>Allowed total loan and lock difference: </label><input type="number" step="1" data-key="allowedLtdDifferenceAmount"/><br/>
+              <label>Lock Time (days): </label><input type="number" value="30" data-key="lockTimeInDays"/><br/>
             </div>
-            <label class="loanproduct-inputs">Loan term (days): </label><input type="number" id="repaymentPeriodInDays"/><br/>
-            <label class="loanproduct-inputs">Loan ACD Interest pa. (%): </label><input type="number" id="loanInterestPt"/><br/>
-            <label class="loanproduct-inputs">Loan collateral ratio (%): </label><input type="number" id="loanCollateralRatio"/><br/>
-            <br/>
+            <div class="loanproduct-input-container">
+              <label class="loanproduct-inputs">Loan term (days): </label><input type="number" id="repaymentPeriodInDays"/><br/>
+              <label class="loanproduct-inputs">Loan ACD Interest pa. (%): </label><input type="number" id="loanInterestPt"/><br/>
+              <label class="loanproduct-inputs">Loan collateral ratio (%): </label><input type="number" id="loanCollateralRatio"/><br/>
+              <br/>
+            </div>
         </div>
         <div class="flex-item">
             <h4>Actors:</h4>
@@ -237,8 +241,6 @@
               <label class="loanproduct-inputs">Defaulting fee (%): </label><input type="number" id="defaultFeePercentage"/><br/>
               <label class="loanproduct-inputs">Min. loan ACD amount: </label><input type="number" id="minimumLoanInAcd"/><br/>
             </div>
-            <!--label class="reserveBalancesAcd">Reserve balances ACD: </label><input type="number" id="reserveBalancesAcd"/><br/>
-            <label class="reserveBalancesEth">Reserve balances ETH: </label><input type="number" id="reserveBalancesEth"/><br/-->
             <br/>
         </div>
         <div class="flex-item">
@@ -262,7 +264,7 @@
             <div id="actor-params-item">
               <div class="flex-item actor-item">
                 <div class="actor-inputs">
-                  <h4 data-actor-param="name" >###NAME###</h4>
+                  <h4 data-actor-param="name">###NAME###</h4>
                   <span data-actor-param="type" class="actor-type">###TYPE###</span><br/>
                   <span class="hidden"><label class="technical-inputs actor-label">count: </label><input type="number" data-actor-param="count" value="###COUNT###"/><br/></span>
                   <h5>Starting balance</h5>
