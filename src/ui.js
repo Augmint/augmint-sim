@@ -11,6 +11,7 @@ const ActorDirectory = require("./actors/actor.directory.js");
 // DOM elements
 const clockElem = document.querySelector(".clock");
 const pauseBtn = document.querySelector(".pause-btn");
+const restartBtn = document.querySelector(".restart-btn");
 const dumpStateBtn = document.querySelector(".dumpState-btn");
 const dumpIterationLogBtn = document.querySelector(".dumpIterationLog-btn");
 const dumpMovesLogBtn = document.querySelector(".dumpMovesLog-btn");
@@ -152,6 +153,10 @@ function showParamChangeAlert() {
     document.querySelector(".actor-alert").className = "actor-alert";
 }
 
+function hideParamChangeAlert() {
+    document.querySelector(".actor-alert").className = "actor-alert hidden";
+}
+
 function togglePause() {
     paused = !paused;
 
@@ -163,6 +168,7 @@ function togglePause() {
     if (paused) {
         // pausing sim:
         let runTime = Date.now() - benchmarkStart;
+        restartBtn.disabled = false;
         pauseBtn.innerHTML = "Continue";
         updateUIFromParams();
         inputs.forEach(input => {
@@ -181,8 +187,9 @@ function togglePause() {
         );
     } else {
         started = true;
+        restartBtn.disabled = true;
 
-        // restarting sim:
+        // Continuing the sim:
         benchmarkStart = Date.now();
         benchmarkItCt = 0;
         pauseBtn.innerHTML = "Pause";
@@ -311,6 +318,32 @@ function renderActorParamsGui() {
     panel.innerHTML = content;
 }
 
+function restart() {
+    hideParamChangeAlert();
+    const actorInputs = Array.from(document.querySelectorAll(".actor-inputs input"));
+    actorInputs.forEach(input => {
+        input.disabled = false;
+    });
+    lastRender = -1;
+    clockElem.innerHTML = "0";
+    started = false;
+    graphs.clear(graphsWrapper);
+    graphs.init(graphsWrapper);
+    logger.init(simulation.getState, logTextArea);
+
+    restartBtn.disabled = true;
+    simulation.clearState(simulation.getState());
+    simulation.init({
+        simulationParams: {
+            randomSeed: "change this for different repeatable results. or do not pass for a random seed",
+            timeStep: 60 * 60 * 4 // 4 hours
+        },
+        // TODO: move all balances and params to UI
+        augmintOptions: scenario.augmintOptions
+    });
+    updateUIFromParams();
+}
+
 function init() {
     renderActorParamsGui();
 
@@ -318,6 +351,9 @@ function init() {
     logger.init(simulation.getState, logTextArea);
 
     populateRatesDropDown();
+
+    restartBtn.disabled = true;
+    restartBtn.addEventListener("click", restart);
 
     pauseBtn.addEventListener("click", togglePause);
     ratesDropDown.addEventListener("change", () => ratesDropDownOnChange(ratesDropDown.value));

@@ -110,6 +110,14 @@ function setState(state) {
     patchAugmintParams(state.augmint.params);
 }
 
+function clearState(state) {
+    clock.setTime(0);
+    state.meta.currentTime = clock.getTime();
+    state.meta.currentDay = 0;
+    actors.clear();
+    setState(state);
+}
+
 module.exports = {
     init,
     incrementBy,
@@ -120,5 +128,6 @@ module.exports = {
     patchAugmintParams,
     patchAugmintBalances,
     setState,
+    clearState,
     byChanceInADay
 };
