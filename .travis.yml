@@ -14,7 +14,7 @@ install:
       fi
 before_script:
     - greenkeeper-lockfile-update
-    - yarn build
+    - yarn build:development # temporaly not yarn build:production until errors with minified bundle are not resolved
     - yarn serve:production &
 script:
     - yarn test

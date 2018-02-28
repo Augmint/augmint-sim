@@ -4,7 +4,7 @@
 # Augmint - Stable Digital Tokens - Simulator
 
 [![Build Status](https://travis-ci.org/Augmint/augmint-sim.svg?branch=staging)](https://travis-ci.org/Augmint/augmint-sim)
-[![Greenkeeper badge](https://badges.greenkeeper.io/Augmint/augmint-contracts.svg)](https://greenkeeper.io/)
+[![Greenkeeper badge](https://badges.greenkeeper.io/Augmint/augmint-sim.svg)](https://greenkeeper.io/)
 [![Discord](https://img.shields.io/discord/407574313810788364.svg)](https://discord.gg/PwDmsnu)
 [![license](https://img.shields.io/github/license/Augmint/augmint-sim.svg)](https://github.com/Augmint/augmint-sim/blob/master/LICENSE)
 
