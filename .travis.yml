@@ -1,0 +1,31 @@
+language: node_js
+cache:
+  directories:
+    - "node_modules"
+before_install:
+    - export BRANCH="${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}"
+    - yarn global add greenkeeper-lockfile@1
+install:
+    - |
+      if [[ $BRANCH == "greenkeeper/"* ]]; then
+        echo Greenkeeper build using .yarnrc.greenkeeper; cp .yarnrc.greenkeeper .yarnrc; yarn install;
+      else
+        echo Normal build using .yarnrc and --frozen-lockfile option; yarn install --frozen-lockfile;
+      fi
+before_script:
+    - greenkeeper-lockfile-update
+    - yarn build
+    - yarn serve:production &
+script:
+    - yarn test
+# discord webhooks hack until this is released: https://github.com/travis-ci/travis-tasks/pull/71
+after_script:
+    - greenkeeper-lockfile-upload
+after_success:
+  - wget https://raw.githubusercontent.com/k3rn31p4nic/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh success https://discordapp.com/api/webhooks/418374581749809171/cJ8pkKO40Uoud2BU-rI_EqAvssHT2r60_6CTl00ds96_jfv1B_c_iukZjhWbg9qzcbhe
+after_failure:
+  - wget https://raw.githubusercontent.com/k3rn31p4nic/travis-ci-discord-webhook/master/send.sh
+  - chmod +x send.sh
+  - ./send.sh failure https://discordapp.com/api/webhooks/418374581749809171/cJ8pkKO40Uoud2BU-rI_EqAvssHT2r60_6CTl00ds96_jfv1B_c_iukZjhWbg9qzcbhe
