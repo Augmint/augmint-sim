@@ -14,6 +14,7 @@ install:
       fi
 before_script:
     - greenkeeper-lockfile-update
+    - yarn prod
 script:
     - yarn test
 # discord webhooks hack until this is released: https://github.com/travis-ci/travis-tasks/pull/71

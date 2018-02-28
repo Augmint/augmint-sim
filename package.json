@@ -11,6 +11,8 @@
     },
     "scripts": {
         "build": "webpack",
+        "prod":
+            "NODE_ENV=production webpack-dev-server --host 0.0.0.0 --progress --colors --content-base dist/  --inline --config  webpack.config.js",
         "test": "echo tests were invoked but no tests yet. Returning success.",
         "dev":
             "NODE_ENV=development webpack-dev-server --host 0.0.0.0 --progress --colors --content-base dist/  --watch --hot --inline --config  webpack.config.js",
