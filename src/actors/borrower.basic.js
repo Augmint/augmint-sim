@@ -86,12 +86,10 @@ class BorrowerBasic extends Actor {
             this.sellACD(this.acdBalance);
         }
 
-        /* BUY ACD in advance for repayment */
         if (willRepaySoon) {
+            /* BUY ACD in advance for repayment */
             if (
                 this.acdBalance < repaymentDue &&
-                /* rare edge case when ethValue recovered since last tick but
-                    there would not be enough time to buy acd. We let it default, not even trying to buy ACD : */
                 !this.triedToBuyForRepayment &&
                 timeUntilRepayment >= state.meta.timeStep
             ) {
@@ -102,22 +100,31 @@ class BorrowerBasic extends Actor {
                 this.triedToBuyForRepayment = true;
             }
 
+            /* Couldn't buy ACD on time or rare edge case when ethValue recovered since last tick but
+                there would not be enough time to buy acd. We let it default, not even trying to buy ACD : */
+            if (this.acdBalance < repaymentDue && timeUntilRepayment < state.meta.timeStep) {
+                console.debug(
+                    `${this.id} didn't have enough balance to repay on time. Loan will default.
+    currentDay: ${state.meta.currentDay} timeStep: ${state.meta.timeStep}
+    Likely collateral value recovered too late to buy ACD or couldn't buy ACD on time.
+    repaymentDue: ${repaymentDue} ACD borrower balance: ${this.acdBalance}
+    collateralValueAcd: ${collateralValueAcd}
+    triedToBuyForRepayment: ${this.triedToBuyForRepayment ? "true" : "false"}`
+                );
+            }
+
             /* Repay REPAY_X_DAYS_BEFORE maturity  */
             if (
                 repaymentDue < collateralValueAcd &&
                 timeUntilRepayment <= this.params.REPAY_X_DAYS_BEFORE * ONE_DAY_IN_SECS &&
-                (this.acdBalance >= repaymentDue ||
-                    (timeUntilRepayment < state.meta.timeStep && this.triedToBuyForRepayment))
+                this.acdBalance >= repaymentDue
             ) {
                 // repays ACD:
                 if (!this.repayLoan(this.loans[0].id)) {
                     throw new AugmintError(
-                        this.id +
-                            " couldn't repay.\n" +
-                            "repaymentDue: " +
-                            repaymentDue +
-                            "\nACD borrower balance: " +
-                            this.acdBalance
+                        `${this.id} couldn't repay, loanManager.repayLoan() returned false.
+                            repaymentDue: ${repaymentDue} ACD borrower balance: ${this.acdBalance}
+                            collateralValueAcd: ${collateralValueAcd}`
                     );
                 }
             }
