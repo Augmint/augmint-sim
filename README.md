@@ -3,6 +3,11 @@
 
 # Augmint - Stable Digital Tokens - Simulator
 
+[![Build Status](https://travis-ci.org/Augmint/augmint-sim.svg?branch=staging)](https://travis-ci.org/Augmint/augmint-sim)
+[![Greenkeeper badge](https://badges.greenkeeper.io/Augmint/augmint-sim.svg)](https://greenkeeper.io/)
+[![Discord](https://img.shields.io/discord/407574313810788364.svg)](https://discord.gg/PwDmsnu)
+[![license](https://img.shields.io/github/license/Augmint/augmint-sim.svg)](https://github.com/Augmint/augmint-sim/blob/master/LICENSE)
+
 Augmint is a decentralised stable cryptocurrency on Ethereum. Read more about the concept on [www.augmint.cc](https://www.augmint.cc)
 
 This simulation is running on historical ETH/USD prices.
@@ -28,7 +33,7 @@ Or for local install:
 (yarn install: https://yarnpkg.com/lang/en/docs/install/)
 
 * install: `yarn`
-* run: `yarn run dev`
+* run: `yarn dev`
 
 ## Augmint
 
@@ -68,8 +73,11 @@ Augmint is an open and transparent project.
 
 We are seeking for great minds to extend our core team. Contribution in any area is much appreciated: development, testing, UX&UI design, legal, marketing spreading the word etc.
 
-Drop us an email: hello@augmint.cc
-or say hi on our [Discord server](https://discord.gg/PwDmsnu)
+## Get in touch
+
+Drop us an email: hello@augmint.cc  
+ or  
+say hi on our [Discord server](https://discord.gg/PwDmsnu): [![Discord](https://img.shields.io/discord/407574313810788364.svg)](https://discord.gg/PwDmsnu)
 
 ## Authors
 
