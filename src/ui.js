@@ -155,6 +155,7 @@ function togglePause() {
     paused = !paused;
 
     if (!started) {
+        console.log("adding params from gui");
         simulation.addActorsFromGui(getActorsFromGui());
         showParamChangeAlert();
     }
@@ -253,21 +254,21 @@ function getActorParamsBox(name, actor) {
     template = template.replace("###NAME###", name);
     template = template.replace("###TYPE###", actor.type);
     if (actor.count !== undefined) {
-        template = template.replace('<span class="hidden">', "<span>");
-        template = template.replace("###COUNT###", actor.count);
+        template = template.replace("<span class=\"hidden\">", "<span>");
+        template = template.replace("999999", actor.count);
     }
 
     let balancesContent = "";
     for (var bal in actor.balances) {
         if (actor.balances.hasOwnProperty(bal)) {
             balancesContent +=
-                '<label class="technical-inputs actor-label">' +
+                "<label class=\"technical-inputs actor-label\">" +
                 bal +
-                ': </label><input data-actor-balancename="' +
+                ": </label><input data-actor-balancename=\"" +
                 bal +
-                '" data-actor-param="balance" type="number" value="' +
+                "\" data-actor-param=\"balance\" type=\"number\" value=\"" +
                 actor.balances[bal] +
-                '"/><br/>';
+                "\"/><br/>";
         }
     }
     template = template.replace("###BALANCES###", balancesContent);
@@ -280,13 +281,13 @@ function getActorParamsBox(name, actor) {
         for (var p in actor.params) {
             if (actor.params.hasOwnProperty(p)) {
                 paramsContent +=
-                    '<label class="technical-inputs actor-label small-label">' +
+                    "<label class=\"technical-inputs actor-label small-label\">" +
                     p +
-                    ': </label><input data-actor-paramname="' +
+                    ": </label><input data-actor-paramname=\"" +
                     p +
-                    '" data-actor-param="param" type="number" value="' +
+                    "\" data-actor-param=\"param\" type=\"number\" value=\"" +
                     actor.params[p] +
-                    '"/><br/>';
+                    "\"/><br/>";
             }
         }
         template = template.replace("###PARAMS###", paramsContent);
@@ -313,6 +314,7 @@ function renderActorParamsGui() {
 }
 
 function restart() {
+    console.error("restart happened");
     hideParamChangeAlert();
     const actorInputs = Array.from(document.querySelectorAll(".actor-inputs input"));
     actorInputs.forEach(input => {
@@ -323,10 +325,9 @@ function restart() {
     started = false;
     graphs.clear(graphsWrapper);
     graphs.init(graphsWrapper);
-    logger.init(simulation.getState, logTextArea);
 
     restartBtn.disabled = true;
-    simulation.clearState(simulation.getState());
+    logger.init(simulation.getState, logTextArea);
     simulation.init({
         simulationParams: {
             randomSeed: "change this for different repeatable results. or do not pass for a random seed",
@@ -335,7 +336,7 @@ function restart() {
         // TODO: move all balances and params to UI
         augmintOptions: scenario.augmintOptions
     });
-    updateUIFromParams();
+    simulation.patchAugmintParams(getParamsFromUI());
 }
 
 function init() {

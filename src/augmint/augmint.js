@@ -1,5 +1,4 @@
 // stores all state for the simulation
-
 "use strict";
 
 // TODO: add transferFeePt param (and transferAcdWithFee functions)
@@ -32,7 +31,7 @@ module.exports = {
         minimumLockAmount: 100, // without interest
         ltdDifferenceLimit: 0.2 /* allow lock or loan if Loan To Deposut ratio stay within 1 +/- this param  */,
         allowedLtdDifferenceAmount: 5000 /* in token - if totalLoan and totalLock difference is less than this
-                                            then allow loan or lock even if ltdDifference limit would go off with it */
+                                             then allow loan or lock even if ltdDifference limit would go off with it */
     },
 
     rates: {
@@ -49,6 +48,59 @@ module.exports = {
     loans: {},
     locks: {},
     exchange: null, // set by simulation.init()
+
+    init() {
+        console.log("init called:");
+        this.actors = {};
+
+        this.balances = {
+            // acd:
+            acdFeesEarned: 0,
+            lockedAcdPool: 0,
+            openLoansAcd: 0,
+            defaultedLoansAcd: 0,
+            interestEarnedPool: 0,
+            exchangeAcd: 0,
+            // eth:
+            ethFeesEarned: 0,
+            collateralHeld: 0,
+            exchangeEth: 0
+        };
+
+        this.params = {
+            marketLoanInterestRate: 0.18, // what do we compete with?  actor's demand for loans depends on it
+            marketLockInterestRate: 0.04, // what do we compete with? actor's demand for locks depends on it
+            exchangeFeePercentage: 0.1,
+            lockedAcdInterestPercentage: 0.5,
+            lockTimeInDays: 365,
+            ethUsdTrendSampleDays: 3, // how many days to inspect for rates.ethToUsdTrend calculation)
+            minimumLockAmount: 100, // without interest
+            ltdDifferenceLimit: 0.2 /* allow lock or loan if Loan To Deposut ratio stay within 1 +/- this param  */,
+            allowedLtdDifferenceAmount: 5000 /* in token - if totalLoan and totalLock difference is less than this
+                                              then allow loan or lock even if ltdDifference limit would go off with it */
+        };
+        this.rates = {
+            ethToAcd: 1, // i.e. price per acd in eth
+            ethToUsd: 1,
+            ethToUsdTrend: 0
+        };
+
+        for (let i = this.orderBook.buy.length; i > 0; i--) {
+            this.orderBook.buy.pop();
+        }
+
+        for (let i = this.orderBook.sell.length; i > 0; i--) {
+            this.orderBook.sell.pop();
+        }
+
+        for (let i = this.loanProducts; i > 0; i--) {
+            this.loanProducts.pop();
+        }
+
+        this.loans = {};
+        this.locks = {};
+        this.exchange = null;
+    },
 
     issueAcd(amount) {
         this.actors.reserve.balances.acd += amount;

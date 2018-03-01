@@ -34,6 +34,9 @@ function patchAugmintBalances(balances) {
 }
 
 function init(initParams) {
+    iteration = 0;
+    clock.setTime(0);
+    augmint.init();
     augmint.exchange = exchange; // TODO: dirty hack. make this and/or augmint a class?
     setSimulationParams(initParams.simulationParams);
     patchAugmintBalances(initParams.augmintOptions.balances);
@@ -64,6 +67,22 @@ function getState() {
     };
 }
 
+// function getRestartedState() {
+//     return {
+//         meta: {
+//             currentTime: 0,
+//             currentDay: 0,
+//             timeStep: params.timeStep,
+//             stepsPerDay: params.stepsPerDay,
+//             iteration: 0
+//         },
+//         augmint: augmint,
+//         exchange: exchange,
+//         utils: { byChanceInADay: byChanceInADay, byChance: byChance }, // TODO: do it nicer. maybe make simulation a class
+//         params: params
+//     };
+// }
+
 function incrementBy(_timeStep = params.timeStep) {
     logger.logIteration();
     rates.updateRates(getState());
@@ -90,11 +109,23 @@ function addActors(newActors) {
 }
 
 function addActorsFromGui(newActors) {
+    // console.error("size:" + actors.size);
     newActors.forEach(actor => {
         const count = actor.count ? actor.count : 0;
         for (let i = 0; i < count; i++) {
             const name = count > 1 ? actor.id + "_" + (i + 1) : actor.id;
             actors.add(new ActorDirectory[actor.constructor.name](name, actor.balances, actor.state, actor.parameters));
+            // console.log(
+            //     actor.constructor.name +
+            //         " " +
+            //         name +
+            //         " " +
+            //         JSON.stringify(actor.balances) +
+            //         " " +
+            //         JSON.stringify(actor.state) +
+            //         " " +
+            //         JSON.stringify(actor.parameters)
+            // );
         }
     });
 }
@@ -104,19 +135,16 @@ function setState(state) {
 
     actors.clear();
     addActors(state.augmint.actors);
-
     patchAugmintBalances(state.augmint.balances);
-
     patchAugmintParams(state.augmint.params);
 }
 
-function clearState(state) {
-    clock.setTime(0);
-    state.meta.currentTime = clock.getTime();
-    state.meta.currentDay = 0;
-    actors.clear();
-    setState(state);
-}
+// function clearState() {
+//     iteration = 0;
+//     setState(getRestartedState());
+//     const a = getState();
+//     console.log("iteration:" + a.meta.iteration);
+// }
 
 module.exports = {
     init,
@@ -128,6 +156,5 @@ module.exports = {
     patchAugmintParams,
     patchAugmintBalances,
     setState,
-    clearState,
     byChanceInADay
 };
