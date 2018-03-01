@@ -206,6 +206,10 @@ class Actor {
         logger.logMove(this.id, "convertReserveEthToAcd", { acdAmount: acdAmount, acdBalance: this.acdBalance });
         return exchange.convertReserveEthToAcd(acdAmount);
     }
+
+    toJSON() {
+        return "A";
+    }
 }
 
 module.exports = Actor;

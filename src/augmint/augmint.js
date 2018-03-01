@@ -96,7 +96,7 @@ module.exports = {
         for (let i = this.loanProducts; i > 0; i--) {
             this.loanProducts.pop();
         }
-
+        this.loanProducts = [];
         this.loans = {};
         this.locks = {};
         this.exchange = null;
@@ -119,14 +119,14 @@ module.exports = {
 
     // TODO: move these under balances.
     get reserveAcd() {
-        return this.actors ? this.actors.reserve.balances.acd : 0;
+        return this.actors && this.actors.reserve ? this.actors.reserve.balances.acd : 0;
     },
     get reserveEth() {
         return this.actors && this.actors.reserve ? this.actors.reserve.balances.eth : 0;
     },
 
     get reserveAcdOnExchange() {
-        return this.exchange.getActorSellAcdOrdersSum("reserve");
+        return this.exchange ? this.exchange.getActorSellAcdOrdersSum("reserve") : 0;
     },
 
     get netAcdDemand() {
@@ -238,5 +238,18 @@ module.exports = {
         // );
 
         return maxLockWithMinLockLimit;
+    },
+    debugState() {
+        console.log(JSON.stringify(this));
+
+        // console.log("actors:" + JSON.stringify(this.actors));
+        // console.log(JSON.stringify(this.balances).replace("\\\"", "\""));
+        // console.log(JSON.stringify(this.params).replace("\\\"", "\""));
+        // console.log(JSON.stringify(this.rates).replace("\\\"", "\""));
+        // console.log(JSON.stringify(this.orderBook).replace("\\\"", "\""));
+        // console.log(JSON.stringify(this.loanProducts).replace("\\\"", "\""));
+        // console.log(JSON.stringify(this.loans).replace("\\\"", "\""));
+        // console.log(JSON.stringify(this.locks).replace("\\\"", "\""));
+        // console.log(JSON.stringify(this.reserveAcd).replace("\\\"", "\""));
     }
 };

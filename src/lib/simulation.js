@@ -37,10 +37,13 @@ function init(initParams) {
     iteration = 0;
     clock.setTime(0);
     augmint.init();
+
     augmint.exchange = exchange; // TODO: dirty hack. make this and/or augmint a class?
     setSimulationParams(initParams.simulationParams);
     patchAugmintBalances(initParams.augmintOptions.balances);
     patchAugmintParams(initParams.augmintOptions.params);
+    console.error("last line of init");
+    augmint.debugState();
 }
 
 function byChanceInADay(dailyChance) {
