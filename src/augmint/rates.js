@@ -1,5 +1,8 @@
 "use strict";
 
+const bigNums = require("../lib/bigNums.js");
+const Acd = bigNums.BigAcd;
+
 const rates = require("./rates.json");
 const clock = require("../lib/clock");
 const statistical = require("../lib/statistical.js");
@@ -21,8 +24,8 @@ function updateRates(state) {
                 dayAdjust
         );
     }
-    augmint.rates.ethToAcd = rates[day].open;
-    augmint.rates.ethToUsd = rates[day].open;
+    augmint.rates.ethToAcd = Acd(rates[day].open);
+    augmint.rates.ethToUsd = Acd(rates[day].open);
     ethUsdHist.push(augmint.rates.ethToUsd);
     if (ethUsdHist.length > augmint.params.ethUsdTrendSampleDays * state.meta.stepsPerDay) {
         ethUsdHist.shift();

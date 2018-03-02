@@ -414,7 +414,7 @@ function update(timeInSecs, augmint) {
         // update data for graphs:
         graph.xData.push(Math.floor(timeInSecs / ONE_DAY_IN_SECS));
         graph.datasets.forEach(dataset => {
-            dataset.yData.push(dataset.func(augmint));
+            dataset.yData.push(parseFloat(dataset.func(augmint)));
             if (
                 dataset.yData.length > 365 &&
                 graph.title !== "ETH/USD" &&

@@ -7,6 +7,11 @@ const augmint = require("./augmint.js");
 const clock = require("../lib/clock.js");
 const logger = require("../lib/logger.js");
 
+const bigNums = require("../lib/bigNums.js");
+const Eth = bigNums.BigEth;
+const Acd = bigNums.BigAcd;
+const Pt = bigNums.BigPt;
+
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const loanProducts = augmint.loanProducts;
 const loans = augmint.loans;
@@ -36,7 +41,7 @@ function getLoanProducts() {
 }
 
 function takeLoan(actorId, loanProductId, loanAmountInAcd) {
-    if (loanAmountInAcd > augmint.maxBorrowableAmount(loanProductId)) {
+    if (loanAmountInAcd.gt(augmint.maxBorrowableAmount(loanProductId))) {
         console.warn(
             `takeLoan() failed. Actor (${actorId}) tried to get ${loanAmountInAcd} for product id ${loanProductId}
                 but the max borrowable amount is ${augmint.maxBorrowableAmount(loanProductId)}.`
@@ -50,7 +55,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
         throw new AugmintError("takeLoan() error: Invalid loanProduct Id:" + loanProductId);
     }
 
-    if (loanAmountInAcd < loanProduct.minimumLoanInAcd) {
+    if (loanAmountInAcd.lt(loanProduct.minimumLoanInAcd)) {
         console.warn(
             `takeLoan() failed. Actor (${actorId}) tried to get ${loanAmountInAcd} but the minimum borrowable amount is ${
                 loanProduct.minimumLoanInAcd
@@ -59,13 +64,13 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
         return false;
     }
 
-    const collateralInEth = augmint.exchange.convertAcdToEth(loanAmountInAcd) / loanProduct.loanCollateralRatio;
-    const interestPt = (1 + loanProduct.interestPt) ** (loanProduct.repaymentPeriodInDays / 365) - 1;
-    const premiumInAcd = loanAmountInAcd * interestPt;
-    const repaymentDue = premiumInAcd + loanAmountInAcd;
+    const collateralInEth = augmint.exchange.convertAcdToEth(loanAmountInAcd).div(loanProduct.loanCollateralRatio); // we should use ROUND_DOWN (0) here
+    const interestPt = Pt(loanProduct.interestPt.add(1) ** (loanProduct.repaymentPeriodInDays / 365) - 1);
+    const premiumInAcd = loanAmountInAcd.mul(interestPt).round(bigNums.ACD_DP, 0); // ROUND_DOWN
+    const repaymentDue = premiumInAcd.add(loanAmountInAcd);
     const repayBy = clock.getTime() + loanProduct.repaymentPeriodInDays * ONE_DAY_IN_SECS;
 
-    if (augmint.actors[actorId].balances.eth < collateralInEth) {
+    if (augmint.actors[actorId].balances.eth.lt(collateralInEth)) {
         console.error(
             "takeLoan() eth balance below collateral required ",
             actorId,
@@ -78,13 +83,13 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     }
 
     // move collateral user -> augmint
-    augmint.actors[actorId].balances.eth -= collateralInEth;
-    augmint.balances.collateralHeld += collateralInEth;
+    augmint.actors[actorId].balances.eth = augmint.actors[actorId].balances.eth.sub(collateralInEth);
+    augmint.balances.collateralHeld = augmint.balances.collateralHeld.add(collateralInEth);
 
     // MINT acd -> user/interest pool
-    augmint.actors[actorId].balances.acd += loanAmountInAcd;
+    augmint.actors[actorId].balances.acd = augmint.actors[actorId].balances.acd.add(loanAmountInAcd);
 
-    augmint.balances.openLoansAcd += loanAmountInAcd;
+    augmint.balances.openLoansAcd = augmint.balances.openLoansAcd.add(loanAmountInAcd);
     const loanId = counter;
     counter++;
 
@@ -110,7 +115,7 @@ function repayLoan(actorId, loanId) {
 
     const loan = loans[actorId][loanId];
 
-    if (augmint.actors[actorId].balances.acd < loan.repaymentDue) {
+    if (augmint.actors[actorId].balances.acd.lt(loan.repaymentDue)) {
         console.warn(
             `actor (id: ${actorId} tried to repay ${loan.repaymentDue} but actor's balance is ${
                 augmint.actors[actorId].balances.acd
@@ -120,24 +125,24 @@ function repayLoan(actorId, loanId) {
     }
 
     // burn loan amount (disbursed) acd and move interest to interestEarned
-    augmint.actors[actorId].balances.acd -= loan.repaymentDue;
-    augmint.balances.interestEarnedPool += loan.premiumInAcd;
+    augmint.actors[actorId].balances.acd = augmint.actors[actorId].balances.acd.sub(loan.repaymentDue);
+    augmint.balances.interestEarnedPool = augmint.balances.interestEarnedPool.add(loan.premiumInAcd);
 
-    augmint.balances.openLoansAcd -= loan.loanAmountInAcd;
-    // FIXME: uncomment these once changed to BigNumber
-    // // sanity check (NB: totalAcd is calculated on the fly by a getter)
-    // if (augmint.totalAcd < 0) {
-    //     throw new AugmintError('totalAcd has gone negative: ', augmint.totalAcd);
-    // }
+    augmint.balances.openLoansAcd = augmint.balances.openLoansAcd.add(loan.loanAmountInAcd);
+
+    // sanity check (NB: totalAcd is calculated on the fly by a getter)
+    if (augmint.totalAcd.lt(0)) {
+        throw new AugmintError("totalAcd has gone negative: ", augmint.totalAcd);
+    }
 
     // move collateral augmint -> user
-    augmint.balances.collateralHeld -= loan.collateralInEth;
-    augmint.actors[actorId].balances.eth += loan.collateralInEth;
-    // FIXME: uncomment these once changed to BigNumber
-    // // sanity check
-    // if (augmint.balances.collateralHeld < 0) {
-    //     throw new AugmintError('collateralHeld has gone negative: ', augmint.balances.collateralHeld);
-    // }
+    augmint.balances.collateralHeld = augmint.balances.collateralHeld.sub(loan.collateralInEth);
+    augmint.actors[actorId].balances.eth = augmint.actors[actorId].balances.eth.add(loan.collateralInEth);
+
+    // sanity check
+    if (augmint.balances.collateralHeld.lt(0)) {
+        throw new AugmintError("collateralHeld has gone negative: ", augmint.balances.collateralHeld);
+    }
 
     // remove loan
     delete loans[actorId][loanId];
@@ -161,21 +166,26 @@ function collectDefaultedLoan(actorId, loanId) {
         return false;
     }
 
-    const targetDefaultFeeInEth = augmint.exchange.convertAcdToEth(loan.repaymentDue) * (1 + loan.defaultFeePercentage);
-    const actualDefaultFeeInEth = Math.min(loan.collateralInEth, targetDefaultFeeInEth);
+    const targetDefaultFeeInEth = augmint.exchange
+        .convertAcdToEth(loan.repaymentDue)
+        .mul(loan.defaultFeePercentage.add(1))
+        .round(bigNums.ETH_DP, 0); // ROUND_DOWN
+    const actualDefaultFeeInEth = Eth(Math.min(loan.collateralInEth, targetDefaultFeeInEth)); // we should use ROUND_DOWN (0) here
 
     // move collateral -> augmint reserves/user
-    augmint.balances.collateralHeld -= loan.collateralInEth;
-    augmint.actors.reserve.balances.eth += actualDefaultFeeInEth;
-    augmint.actors[actorId].balances.eth += loan.collateralInEth - actualDefaultFeeInEth;
-    // FIXME: uncomment these once changed to BigNumber
-    // // sanity check
-    // if (augmint.balances.collateralHeld < 0) {
-    //     throw new AugmintError('collateralHeld has gone negative: ', augmint.balances.collateralHeld);
-    // }
+    augmint.balances.collateralHeld = augmint.balances.collateralHeld.sub(loan.collateralInEth);
+    augmint.actors.reserve.balances.eth = augmint.actors.reserve.balances.eth.add(actualDefaultFeeInEth);
+    augmint.actors[actorId].balances.eth = augmint.actors[actorId].balances.eth
+        .add(loan.collateralInEth)
+        .sub(actualDefaultFeeInEth);
 
-    augmint.balances.openLoansAcd -= loan.loanAmountInAcd;
-    augmint.balances.defaultedLoansAcd += loan.repaymentDue;
+    // sanity check
+    if (augmint.balances.collateralHeld.lt(0)) {
+        throw new AugmintError("collateralHeld has gone negative: ", augmint.balances.collateralHeld);
+    }
+
+    augmint.balances.openLoansAcd = augmint.balances.openLoansAcd.sub(loan.loanAmountInAcd);
+    augmint.balances.defaultedLoansAcd = augmint.balances.defaultedLoansAcd.add(loan.repaymentDue);
 
     // remove loan
     delete loans[actorId][loanId];

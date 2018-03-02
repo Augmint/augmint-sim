@@ -2,7 +2,10 @@
 
 "use strict";
 
-//const AugmintError = require('../augmint/augmint.error.js');
+const bigNums = require("../lib/bigNums.js");
+const Pt = bigNums.BigPt;
+
+const AugmintError = require("../augmint/augmint.error.js");
 const augmint = require("./augmint.js");
 const clock = require("../lib/clock.js");
 
@@ -12,7 +15,7 @@ const locks = augmint.locks;
 let counter = 0;
 
 function lockACD(actorId, acdAmount) {
-    if (acdAmount > augmint.maxLockableAmount || acdAmount < augmint.params.minimumLockAmount) {
+    if (acdAmount.gt(augmint.maxLockableAmount) || acdAmount.lt(augmint.params.minimumLockAmount)) {
         console.warn(
             `actor (id: ${actorId} tried to lock ${acdAmount} but the max: ${augmint.maxLockableAmount}. and min: ${
                 augmint.params.minimumLockAmount
@@ -20,10 +23,8 @@ function lockACD(actorId, acdAmount) {
         );
         return false;
     }
-    const interestPt = (1 + augmint.params.lockedAcdInterestPercentage) ** (augmint.params.lockTimeInDays / 365) - 1;
-    const interestInAcd = acdAmount * interestPt;
 
-    if (augmint.actors[actorId].balances.acd < acdAmount) {
+    if (augmint.actors[actorId].balances.acd.lt(acdAmount)) {
         console.warn(
             `actor (id: ${actorId} tried to lock ${acdAmount} but actor's balance is ${
                 augmint.actors[actorId].balances.acd
@@ -32,7 +33,12 @@ function lockACD(actorId, acdAmount) {
         return false;
     }
 
-    if (augmint.balances.interestEarnedPool < interestInAcd) {
+    const interestPt = Pt(
+        augmint.params.lockedAcdInterestPercentage.add(1) ** (augmint.params.lockTimeInDays / 365) - 1
+    );
+    const interestInAcd = acdAmount.mul(interestPt).round(bigNums.ACD_DP, 0); // ROUND_DOWN
+
+    if (augmint.balances.interestEarnedPool.lt(interestInAcd)) {
         console.warn(
             `actor (id: ${actorId} tried to lock ${acdAmount} but interestEarnedPool balance is ${
                 augmint.balances.interestEarnedPool
@@ -42,9 +48,9 @@ function lockACD(actorId, acdAmount) {
     }
 
     // move acd user -> lock
-    augmint.balances.interestEarnedPool -= interestInAcd;
-    augmint.actors[actorId].balances.acd -= acdAmount;
-    augmint.balances.lockedAcdPool += acdAmount;
+    augmint.balances.interestEarnedPool = augmint.balances.interestEarnedPool.sub(interestInAcd);
+    augmint.actors[actorId].balances.acd = augmint.actors[actorId].balances.acd.sub(acdAmount);
+    augmint.balances.lockedAcdPool = augmint.balances.lockedAcdPool.add(acdAmount);
 
     const lockId = counter;
     counter++;
@@ -54,7 +60,7 @@ function lockACD(actorId, acdAmount) {
     locks[actorId][lockId] = {
         id: lockId,
         lockedAmount: acdAmount,
-        acdValue: interestInAcd + acdAmount,
+        acdValue: interestInAcd.add(acdAmount),
         lockedUntil: clock.getTime() + augmint.params.lockTimeInDays * ONE_DAY_IN_SECS
     };
 
@@ -80,14 +86,13 @@ function releaseACD(actorId, lockId) {
     }
 
     // move acd lock -> user
-    augmint.balances.lockedAcdPool -= lock.lockedAmount;
-    augmint.actors[actorId].balances.acd += lock.acdValue;
+    augmint.balances.lockedAcdPool = augmint.balances.lockedAcdPool.sub(lock.lockedAmount);
+    augmint.actors[actorId].balances.acd = augmint.actors[actorId].balances.acd.add(lock.acdValue);
 
-    // FIXME: uncomment these once changed to BigNumber
-    // // sanity check:
-    // if (augmint.balances.lockedAcdPool < 0) {
-    //     throw new AugmintError('lockedAcdPool has gone negative: ', augmint.balances.lockedAcdPool);
-    // }
+    // sanity check:
+    if (augmint.balances.lockedAcdPool.lt(0)) {
+        throw new AugmintError("lockedAcdPool has gone negative: ", augmint.balances.lockedAcdPool);
+    }
 
     // remove lock:
     delete locks[actorId][lockId];
