@@ -21,9 +21,9 @@
             "set NODE_ENV=development & webpack-dev-server --host 0.0.0.0 --progress --colors --content-base dist/  --watch --hot --inline --config  webpack.config.js"
     },
     "devDependencies": {
-        "copy-webpack-plugin": "4.4.2",
+        "copy-webpack-plugin": "4.4.3",
         "webpack": "4.0.1",
-        "webpack-cli": "2.0.9",
+        "webpack-cli": "2.0.10",
         "webpack-dev-server": "3.1.0"
     }
 }
