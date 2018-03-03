@@ -65,7 +65,6 @@ function getState() {
 }
 
 function incrementBy(_timeStep = params.timeStep) {
-    logger.logIteration();
 
     rates.updateRates(getState());
 

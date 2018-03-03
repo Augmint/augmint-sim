@@ -1,6 +1,5 @@
 "use strict";
 const clock = require("./clock.js");
-let printEachIteration = false;
 let printEachMove = true;
 
 let simulationState;
@@ -19,8 +18,6 @@ const augmintStatusHeader = [
     " ethFeesEarned",
     " collateralHeld"
 ];
-const iterationLogHeader = ["day", " iteration"].concat(augmintStatusHeader);
-let iterationLog = new Array(iterationLogHeader);
 
 const movesConsoleLogHeader = [" day", " iteration", " actor", " move", " params"];
 const movesLogHeader = movesConsoleLogHeader.concat(augmintStatusHeader);
@@ -63,23 +60,6 @@ function toCsv(_array) {
     return ret;
 }
 
-function getAugmintStatusLog() {
-    const augmint = simulationState().augmint;
-    return [
-        augmint.rates.ethToUsd,
-        augmint.netAcdDemand,
-        augmint.reserveAcd,
-        augmint.reserveEth,
-        augmint.balances.acdFeesEarned,
-        augmint.balances.lockedAcdPool,
-        augmint.balances.openLoansAcd,
-        augmint.balances.defaultedLoansAcd,
-        augmint.balances.interestEarnedPool,
-        augmint.balances.ethFeesEarned,
-        augmint.balances.collateralHeld
-    ];
-}
-
 function logMove(actor, move, params) {
     const daysPassed = clock.getDay();
     const logItem = [daysPassed, simulationState().meta.iteration, actor, move, params];
@@ -89,24 +69,7 @@ function logMove(actor, move, params) {
         }
         addToLogTextArea("MOVE, " + toCsv(new Array(logItem)) + "\n");
     }
-    movesLog.push(logItem.concat(getAugmintStatusLog()));
-}
-
-function logIteration() {
-    const daysPassed = clock.getDay();
-    const logItem = [daysPassed, simulationState().meta.iteration].concat(getAugmintStatusLog());
-    if (printEachIteration) {
-        if (iterationLog.length === 1) {
-            addToLogTextArea("ITERATION, " + iterationLogHeader + "\n");
-        }
-        addToLogTextArea("ITERATION " + toCsv(new Array(logItem)) + "\n");
-    }
-    logMove("simulation", "New iteration", "");
-    iterationLog.push(logItem);
-}
-
-function printIterationLog() {
-    addToLogTextArea("===== ITERATION LOG =====\n" + toCsv(iterationLog) + "\n" + "===== /ITERATION LOG =====\n\n");
+    movesLog.push(logItem);
 }
 
 function printMovesLog() {
@@ -115,9 +78,7 @@ function printMovesLog() {
 
 module.exports = {
     init,
-    logIteration,
     logMove,
     print,
-    printIterationLog,
     printMovesLog
 };
