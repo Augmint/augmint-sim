@@ -6,6 +6,8 @@ before_install:
     - export BRANCH="${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}"
     - export PATH=$HOME/.yarn/bin:$PATH # fix for new build issue on travis: /home/travis/.travis/job_stages: line 57: ./node_modules/.bin/yarn: No such file or directory
     - yarn global add greenkeeper-lockfile@1
+    - which yarn
+    - echo $PATH
 install:
     - |
       if [[ $BRANCH == "greenkeeper/"* ]]; then
@@ -15,6 +17,7 @@ install:
       fi
 before_script:
     - greenkeeper-lockfile-update
+    - yarn --version && yarn bin && yarn webpack --version && yarn webpack --version
     - yarn build:development # temporaly not yarn build:production until errors with minified bundle are not resolved
     - yarn serve:production &
 script:
