@@ -75,7 +75,7 @@ const graphs = [
         },
         datasets: [
             {
-                func: augmint => (1 + augmint.params.ltdDifferenceLimit),
+                func: augmint => augmint.params.ltdDifferenceLimit.add(1),
                 options: {
                     label: "loan limit",
                     borderDash: DASHED_LINE,
@@ -84,7 +84,7 @@ const graphs = [
                 }
             },
             {
-                func: augmint => ( 1 - augmint.params.ltdDifferenceLimit),
+                func: augmint => augmint.params.ltdDifferenceLimit.mul(-1).add(1),
                 options: {
                     label: "lock limit",
                     borderDash: DASHED_LINE,
@@ -414,7 +414,7 @@ function update(timeInSecs, augmint) {
         // update data for graphs:
         graph.xData.push(Math.floor(timeInSecs / ONE_DAY_IN_SECS));
         graph.datasets.forEach(dataset => {
-            dataset.yData.push(dataset.func(augmint));
+            dataset.yData.push(parseFloat(dataset.func(augmint)));
             if (
                 dataset.yData.length > 365 &&
                 graph.title !== "ETH/USD" &&
