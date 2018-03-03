@@ -160,7 +160,6 @@ module.exports = {
             : allowedByLtdDifferencePt;
         const maxLoanWithMinLoanLimit = maxLoan.lt(this.loanProducts[productId].minimumLoanInAcd)
             ? Acd(0)
-            : maxLoan.round(bigNums.ACD_PT, 1);
 
         // console.debug(
         //     `maxBorrowableAmount calcs: totalLock: ${this.balances.lockedAcdPool} totalLoan: ${
@@ -171,6 +170,7 @@ module.exports = {
         //     } minimumLoanAmount: ${this.loanProducts[productId].minimumLoanInAcd}
         //     maxLoan: ${maxLoanWithMinLoanLimit} allowedByLtdDifferenceAmount: ${allowedByLtdDifferenceAmount} allowedByLtdDifferencePt: ${allowedByLtdDifferencePt}`
         // );
+            : maxLoan.round(bigNums.ACD_DP, 0);
 
         return maxLoanWithMinLoanLimit;
     },
@@ -198,7 +198,6 @@ module.exports = {
 
         const maxLockWithMinLockLimit = maxLock.lt(this.params.minimumLockAmount)
             ? Acd(0)
-            : maxLock.round(bigNums.ACD_PT, 1);
 
         // console.debug(
         //     `maxLockableAmount calcs: totalLock: ${this.balances.lockedAcdPool} totalLoan: ${
@@ -210,6 +209,7 @@ module.exports = {
         //     maxLock: ${maxLockWithMinLockLimit} allowedByLtdDifferencePt: ${allowedByLtdDifferencePt}
         //     allowedByLtdDifferenceAmount: ${allowedByLtdDifferenceAmount} allowedByEarning: ${allowedByEarning}`
         // );
+            : maxLock.round(bigNums.ACD_DP, 0);
 
         return maxLockWithMinLockLimit;
     }
