@@ -4,6 +4,7 @@ cache:
     - "node_modules"
 before_install:
     - export BRANCH="${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}"
+    - export PATH=$HOME/.yarn/bin:$PATH # fix for new build issue on travis: /home/travis/.travis/job_stages: line 57: ./node_modules/.bin/yarn: No such file or directory
     - yarn global add greenkeeper-lockfile@1
 install:
     - |
