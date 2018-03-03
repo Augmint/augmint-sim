@@ -128,7 +128,7 @@ function repayLoan(actorId, loanId) {
     augmint.actors[actorId].balances.acd = augmint.actors[actorId].balances.acd.sub(loan.repaymentDue);
     augmint.balances.interestEarnedPool = augmint.balances.interestEarnedPool.add(loan.premiumInAcd);
 
-    augmint.balances.openLoansAcd = augmint.balances.openLoansAcd.add(loan.loanAmountInAcd);
+    augmint.balances.openLoansAcd = augmint.balances.openLoansAcd.sub(loan.loanAmountInAcd);
 
     // sanity check (NB: totalAcd is calculated on the fly by a getter)
     if (augmint.totalAcd.lt(0)) {
