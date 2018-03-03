@@ -9,7 +9,6 @@ const ONE_DAY_IN_SECS = 24 * 60 * 60;
 const defaultParams = {
     REPAY_X_DAYS_BEFORE: 1,
     BUY_ACD_X_DAYS_BEFORE_REPAY: 1,
-    REPAYMENT_COST_ACD: Acd(5), // TODO: this should be global
     WANTS_TO_BORROW_AMOUNT: Acd(10000), // how much they want to borrow
     WANTS_TO_BORROW_AMOUNT_GROWTH_PA: Pt(0.1), // increase in demand % pa.
     CHANCE_TO_TAKE_LOAN: Pt(1), // % chance to take loan on a day (when there is no open loan)
@@ -34,6 +33,7 @@ class BorrowerBasic extends Actor {
         const loanProduct = state.augmint.loanProducts[0];
         let willRepaySoon = false;
         let timeUntilRepayment = 0;
+        let repaymentDueWithCost = Acd(0);
         let repaymentDue = Acd(0);
         let collateralValueAcd = Acd(0);
         let wantToTake = false;
@@ -42,14 +42,15 @@ class BorrowerBasic extends Actor {
 
         if (this.loans.length !== 0) {
             /* we have a loan, is repayment due? */
-            repaymentDue = this.loans[0].repaymentDue.add(this.params.REPAYMENT_COST_ACD);
+            repaymentDue = this.loans[0].repaymentDue;
+            repaymentDueWithCost = this.loans[0].repaymentDueWithCost;
             timeUntilRepayment = this.loans[0].repayBy - currentTime;
             collateralValueAcd = this.convertEthToAcd(this.loans[0].collateralInEth);
             willRepaySoon =
                 currentTime >=
                     this.loans[0].repayBy -
                         (this.params.BUY_ACD_X_DAYS_BEFORE_REPAY + this.params.REPAY_X_DAYS_BEFORE) * ONE_DAY_IN_SECS &&
-                repaymentDue.lt(collateralValueAcd); // TODO: move this last bit to loanManager? Unlikely that anyone would repay a loan if collateral value below repayment amount
+                repaymentDueWithCost.lt(collateralValueAcd); // TODO: move this last bit to loanManager? Unlikely that anyone would repay a loan if collateral value below repayment amount
         } else {
             /* no open loans , can we and do we want we take a new loan? */
             const augmintInterest = loanProduct.interestPt;
@@ -125,7 +126,7 @@ class BorrowerBasic extends Actor {
 
             /* Repay REPAY_X_DAYS_BEFORE maturity  */
             if (
-                repaymentDue.lt(collateralValueAcd) &&
+                repaymentDueWithCost.lt(collateralValueAcd) &&
                 timeUntilRepayment <= this.params.REPAY_X_DAYS_BEFORE * ONE_DAY_IN_SECS &&
                 this.acdBalance.gte(repaymentDue)
             ) {

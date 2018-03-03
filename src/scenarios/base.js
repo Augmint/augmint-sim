@@ -20,6 +20,7 @@ const augmintOptions = {
             5000
         ) /* in token - if totalLoan and totalLock difference is less than that
                                             then allow loan or lock even if ltdDifference limit would go off with it */,
+        loanRepaymentCost: Acd(5), // gas and other costs in ACD - used when deciding if a loan worth to repay
         loanProduct: {
             minimumLoanInAcd: Acd(100),
             loanCollateralRatio: Pt(0.6),

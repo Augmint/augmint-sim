@@ -38,8 +38,9 @@ module.exports = {
         ltdDifferenceLimit: Pt(0.2) /* allow lock or loan if Loan To Deposut ratio stay within 1 +/- this param  */,
         allowedLtdDifferenceAmount: Acd(
             5000
-        ) /* in token - if totalLoan and totalLock difference is less than this
-                                            then allow loan or lock even if ltdDifference limit would go off with it */
+        ) /*  if totalLoan and totalLock difference is less than this
+            then allow loan or lock even if ltdDifference limit would go off with it */,
+        loanRepaymentCost: Acd(5) // gas and other costs in ACD - used when deciding if a loan worth to repay
     },
 
     rates: {

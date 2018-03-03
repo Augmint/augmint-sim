@@ -102,6 +102,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
         loanAmountInAcd,
         premiumInAcd,
         repaymentDue,
+        repaymentDueWithCost: repaymentDue.add(augmint.params.loanRepaymentCost),
         defaultFeePercentage: loanProduct.defaultFeePercentage
     };
 

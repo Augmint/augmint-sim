@@ -16,7 +16,6 @@ const ActorDirectory = require("./actors/actor.directory.js");
 const clockElem = document.querySelector(".clock");
 const pauseBtn = document.querySelector(".pause-btn");
 const dumpStateBtn = document.querySelector(".dumpState-btn");
-const dumpIterationLogBtn = document.querySelector(".dumpIterationLog-btn");
 const dumpMovesLogBtn = document.querySelector(".dumpMovesLog-btn");
 const toggleLogBtn = document.querySelector(".toggleLog-btn");
 const logWrapper = document.querySelector(".log-wrapper");
@@ -321,13 +320,12 @@ function init() {
 
     pauseBtn.addEventListener("click", togglePause);
     ratesDropDown.addEventListener("change", () => ratesDropDownOnChange(ratesDropDown.value));
+
     dumpStateBtn.addEventListener("click", () => {
         simulation.patchAugmintParams(getParamsFromUI());
         logger.print(simulation.getState());
     });
-    dumpIterationLogBtn.addEventListener("click", () => {
-        logger.printIterationLog();
-    });
+
     dumpMovesLogBtn.addEventListener("click", () => {
         let startPos = logTextArea.textLength;
         logger.printMovesLog();
@@ -340,6 +338,7 @@ function init() {
         document.execCommand("copy");
         alert("Moves log CSV copied to clipboard");
     });
+
     toggleLogBtn.addEventListener("click", toggleLog);
 
     simulation.init({
@@ -359,14 +358,6 @@ function render() {
 
     // only re-render once per day:
     if (daysPassed > lastRender) {
-        // console.debug(
-        //     'daysPassed: ',
-        //     daysPassed,
-        //     'maxLockable: ',
-        //     state.augmint.maxLockableAmount,
-        //     'maxBorrowable: ',
-        //     state.augmint.maxBorrowableAmount
-        // );
         lastRender = daysPassed;
         clockElem.innerHTML = daysPassed;
         graphs.update(state.meta.currentTime, state.augmint);
