@@ -3,7 +3,6 @@
 const augmint = require("../augmint/augmint.js");
 const exchange = require("../augmint/exchange.js");
 const loanManager = require("../augmint/loan.manager.js");
-const logger = require("./logger.js");
 const clock = require("./clock.js");
 const rates = require("../augmint/rates.js");
 const ActorDirectory = require("../actors/actor.directory.js");

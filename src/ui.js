@@ -16,7 +16,6 @@ const ActorDirectory = require("./actors/actor.directory.js");
 const clockElem = document.querySelector(".clock");
 const pauseBtn = document.querySelector(".pause-btn");
 const dumpStateBtn = document.querySelector(".dumpState-btn");
-const dumpIterationLogBtn = document.querySelector(".dumpIterationLog-btn");
 const dumpMovesLogBtn = document.querySelector(".dumpMovesLog-btn");
 const toggleLogBtn = document.querySelector(".toggleLog-btn");
 const logWrapper = document.querySelector(".log-wrapper");
