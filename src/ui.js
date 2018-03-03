@@ -1,5 +1,9 @@
 "use strict";
 
+const bigNums = require("./lib/bigNums.js");
+const Acd = bigNums.BigAcd;
+const Pt = bigNums.BigPt;
+
 const simulation = require("./lib/simulation.js");
 const logger = require("./lib/logger.js");
 const rates = require("./augmint/rates.js");
@@ -41,7 +45,6 @@ function getParamsFromUI() {
             return;
         }
 
-        params[key] = value;
         //percentages
         if (
             key === "marketLockInterestRate" ||
@@ -49,19 +52,21 @@ function getParamsFromUI() {
             key === "marketLoanInterestRate" ||
             key === "ltdDifferenceLimit"
         ) {
-            params[key] /= 100;
+            params[key] = Pt(value).div(100);
+        } else {
+            params[key] = Acd(value);
         }
     });
 
     params.loanProduct = {
-        minimumLoanInAcd: Number.parseFloat(document.getElementById("minimumLoanInAcd").value),
-        loanCollateralRatio: Number.parseFloat(document.getElementById("loanCollateralRatio").value / 100),
-        interestPt: Number.parseFloat(document.getElementById("loanInterestPt").value / 100), // p.a.
-        repaymentPeriodInDays: Number.parseFloat(document.getElementById("repaymentPeriodInDays").value),
-        defaultFeePercentage: Number.parseFloat(document.getElementById("defaultFeePercentage").value / 100)
+        minimumLoanInAcd: Acd(document.getElementById("minimumLoanInAcd").value),
+        loanCollateralRatio: Pt(document.getElementById("loanCollateralRatio").value / 100),
+        interestPt: Pt(document.getElementById("loanInterestPt").value / 100), // p.a.
+        repaymentPeriodInDays: parseInt(document.getElementById("repaymentPeriodInDays").value),
+        defaultFeePercentage: Pt(document.getElementById("defaultFeePercentage").value / 100)
     };
     //technical params
-    params["ethUsdTrendSampleDays"] = Number.parseFloat(document.getElementById("ethUsdTrendSampleDays").value);
+    params["ethUsdTrendSampleDays"] = parseInt(document.getElementById("ethUsdTrendSampleDays").value);
 
     return params;
 }
@@ -82,7 +87,7 @@ function updateUIFromParams() {
         input.value = augmint.params[key];
     });
     // we assume there is only 1 loanProduct but it's fine for now
-    document.getElementById("minimumLoanInAcd").value = augmint.loanProducts[0].minimumLoanInAcd;
+    document.getElementById("minimumLoanInAcd").value = augmint.loanProducts[0].minimumLoanInAcd.toString();
     document.getElementById("loanCollateralRatio").value = (augmint.loanProducts[0].loanCollateralRatio * 100).toFixed(
         2
     );
@@ -122,12 +127,13 @@ function getActorsFromGui() {
                 }
             }
 
+            // FIXME: mark params as ETH, ACD or Pt
             if (dataItem.getAttribute("data-actor-param") == "balance") {
-                balances[dataItem.getAttribute("data-actor-balancename")] = parseInt(dataItem.value);
+                balances[dataItem.getAttribute("data-actor-balancename")] = Acd(dataItem.value);
             }
 
             if (dataItem.getAttribute("data-actor-param") == "param") {
-                params[dataItem.getAttribute("data-actor-paramname")] = parseFloat(dataItem.value);
+                params[dataItem.getAttribute("data-actor-paramname")] = Pt(dataItem.value);
             }
         });
         const actor = new ActorDirectory[actorType](actorName, balances, null, params);
@@ -246,7 +252,7 @@ function getActorParamsBox(name, actor) {
     template = template.replace("###NAME###", name);
     template = template.replace("###TYPE###", actor.type);
     if (actor.count !== undefined) {
-        template = template.replace('<span class="hidden">', "<span>");
+        template = template.replace("<span class=\"hidden\">", "<span>");
         template = template.replace("###COUNT###", actor.count);
     }
 
@@ -254,13 +260,13 @@ function getActorParamsBox(name, actor) {
     for (var bal in actor.balances) {
         if (actor.balances.hasOwnProperty(bal)) {
             balancesContent +=
-                '<label class="technical-inputs actor-label">' +
+                "<label class=\"technical-inputs actor-label\">" +
                 bal +
-                ': </label><input data-actor-balancename="' +
+                ": </label><input data-actor-balancename=\"" +
                 bal +
-                '" data-actor-param="balance" type="number" value="' +
+                "\" data-actor-param=\"balance\" type=\"number\" value=\"" +
                 actor.balances[bal] +
-                '"/><br/>';
+                "\"/><br/>";
         }
     }
     template = template.replace("###BALANCES###", balancesContent);
@@ -273,13 +279,13 @@ function getActorParamsBox(name, actor) {
         for (var p in actor.params) {
             if (actor.params.hasOwnProperty(p)) {
                 paramsContent +=
-                    '<label class="technical-inputs actor-label small-label">' +
+                    "<label class=\"technical-inputs actor-label small-label\">" +
                     p +
-                    ': </label><input data-actor-paramname="' +
+                    ": </label><input data-actor-paramname=\"" +
                     p +
-                    '" data-actor-param="param" type="number" value="' +
+                    "\" data-actor-param=\"param\" type=\"number\" value=\"" +
                     actor.params[p] +
-                    '"/><br/>';
+                    "\"/><br/>";
             }
         }
         template = template.replace("###PARAMS###", paramsContent);
@@ -380,6 +386,7 @@ function mainLoop() {
                 errorMsg.innerHTML = "<p>AugmintError: " + err.message + "</p>";
                 togglePause();
             } else {
+                errorMsg.innerHTML = "<p>Error: " + err.message + "</p>";
                 throw err;
             }
         }

@@ -1,6 +1,10 @@
 // a class which encapulates an actor's behaviour, and an interface with which to interact with augmint etc.
 
 "use strict";
+const bigNums = require("../lib/bigNums.js");
+const Acd = bigNums.BigAcd;
+const Eth = bigNums.BigEth;
+const Pt = bigNums.BigPt;
 
 const augmint = require("../augmint/augmint.js");
 const loanManager = require("../augmint/loan.manager.js");
@@ -8,8 +12,8 @@ const logger = require("../lib/logger.js");
 const freezer = require("../augmint/freezer.js");
 const exchange = require("../augmint/exchange.js");
 const defaultParams = {
-    ETH_BALANCE_GROWTH_PA: 0 /* ETH balance  grows daily by pa. % to simulate growth */,
-    USD_BALANCE_GROWTH_PA: 0 /* USD balance grows daily by pa. % to simulate growth */
+    ETH_BALANCE_GROWTH_PA: Pt(0) /* ETH balance  grows daily by pa. % to simulate growth */,
+    USD_BALANCE_GROWTH_PA: Pt(0) /* USD balance grows daily by pa. % to simulate growth */
 };
 
 class Actor {
@@ -17,9 +21,9 @@ class Actor {
         this.id = id;
         augmint.actors[this.id] = {
             balances: {
-                eth: balances.eth || 0,
-                acd: balances.acd || 0,
-                usd: balances.usd || 0
+                eth: balances.eth || Eth(0),
+                acd: balances.acd || Acd(0),
+                usd: balances.usd || Acd(0)
             },
             state: state || {},
             type: this.constructor.name,
@@ -34,23 +38,25 @@ class Actor {
         /* Call super.executeMoves(state) in child for these: */
         /* Add balance growth */
         if (state.meta.iteration % state.params.stepsPerDay === 0) {
-            this.ethBalance *= (1 + this.params.ETH_BALANCE_GROWTH_PA) ** (1 / 365);
-            this.usdBalance *= (1 + this.params.USD_BALANCE_GROWTH_PA) ** (1 / 365);
+            this.ethBalance = this.ethBalance.mul(
+                Pt(this.ethBalance.mul(this.params.ETH_BALANCE_GROWTH_PA.add(1)) ** (1 / 365))
+            );
+            this.usdBalance = this.usdBalance.mul(Pt(this.params.USD_BALANCE_GROWTH_PA.add(1) ** (1 / 365)));
         }
     }
 
     // STATE:
     // NB: I'm storing all state in augmint/loan manager/etc for the sake of making pausing/replaying etc. easier
     get acdBalance() {
-        return augmint.actors[this.id].balances.acd || 0;
+        return augmint.actors[this.id].balances.acd || Acd(0);
     }
 
     get ethBalance() {
-        return augmint.actors[this.id].balances.eth || 0;
+        return augmint.actors[this.id].balances.eth || Eth(0);
     }
 
     set ethBalance(newBal) {
-        augmint.actors[this.id].balances.eth = newBal;
+        augmint.actors[this.id].balances.eth = Eth(newBal);
     }
 
     get usdBalance() {
@@ -58,7 +64,7 @@ class Actor {
     }
 
     set usdBalance(newBal) {
-        augmint.actors[this.id].balances.usd = newBal;
+        augmint.actors[this.id].balances.usd = Acd(newBal);
     }
 
     get loans() {
@@ -138,73 +144,85 @@ class Actor {
 
     // MOVE SET:
     buyACD(acdAmount) {
-        let ret = exchange.buyACD(this.id, acdAmount);
-        logger.logMove(this.id, "buyAcd order", { acdAmount: acdAmount });
+        const ret = exchange.buyACD(this.id, acdAmount);
+        logger.logMove(this.id, "buyAcd order", { acdAmount: acdAmount.toString(), ret });
         return ret;
     }
 
     sellACD(acdAmount) {
-        let ret = exchange.sellACD(this.id, acdAmount);
-        logger.logMove(this.id, "sellAcd order", { acdAmount: acdAmount });
+        const ret = exchange.sellACD(this.id, acdAmount);
+        logger.logMove(this.id, "sellAcd order", { acdAmount: acdAmount.toString(), ret });
         return ret;
     }
 
     issueAcd(acdAmount) {
         // only reserve actors should call it
         const ret = augmint.issueAcd(acdAmount);
-        logger.logMove(this.id, "Reserve Issued ACD", { acdAmount: acdAmount, newReserveBalance: ret });
+        logger.logMove(this.id, "Reserve Issued ACD", {
+            acdAmount: acdAmount.toString(),
+            newReserveBalance: ret.toString()
+        });
         return ret;
     }
 
     burnAcd(acdAmount) {
         // only reserve actors should call it
         const ret = augmint.burnAcd(acdAmount);
-        logger.logMove(this.id, "Reserve Burned ACD", { acdAmount: acdAmount, newReserveBalance: ret });
+        logger.logMove(this.id, "Reserve Burned ACD", {
+            acdAmount: acdAmount.toString(),
+            newReserveBalance: ret.toString()
+        });
         return ret;
     }
 
     buyEthWithUsd(usdAmount) {
-        let ret = exchange.buyEthWithUsd(this.id, usdAmount);
-        logger.logMove(this.id, "buyEth order", { usdAmount: usdAmount });
+        const ret = exchange.buyEthWithUsd(this.id, usdAmount);
+        logger.logMove(this.id, "buyEth with USD order", { usdAmount: usdAmount.toString(), ret });
         return ret;
     }
 
-    sellEthForUsd(usdAmount) {
-        let ret = exchange.sellEthForUsd(this.id, usdAmount);
-        logger.logMove(this.id, "sellEth order", { usdAmount: usdAmount });
+    sellEthForUsd(ethAmount) {
+        const ret = exchange.sellEthForUsd(this.id, ethAmount);
+        logger.logMove(this.id, "sellEth for USD order", { ethAmount: ethAmount.toString(), ret });
         return ret;
     }
 
     lockACD(acdAmount) {
-        let ret = freezer.lockACD(this.id, acdAmount);
-        logger.logMove(this.id, "lockACD", { acdAmount: acdAmount });
+        const ret = freezer.lockACD(this.id, acdAmount);
+        logger.logMove(this.id, "lockACD", { acdAmount: acdAmount.toString(), ret });
         return ret;
     }
 
     releaseACD(lockId) {
-        let ret = freezer.releaseACD(this.id, lockId);
-        logger.logMove(this.id, "releaseACD", { lockId: lockId });
+        const ret = freezer.releaseACD(this.id, lockId);
+        logger.logMove(this.id, "releaseACD", { lockId, ret });
         return ret;
     }
 
     takeLoan(loanProductId, loanAmountInAcd) {
-        let ret = loanManager.takeLoan(this.id, loanProductId, loanAmountInAcd);
+        const ret = loanManager.takeLoan(this.id, loanProductId, loanAmountInAcd);
         logger.logMove(this.id, "takeLoan", {
-            loanProductId: loanProductId,
-            loanAmountInAcd: loanAmountInAcd
+            loanProductId,
+            loanAmountInAcd: loanAmountInAcd.toString(),
+            ret
         });
         return ret;
     }
 
     repayLoan(loanId) {
-        let ret = loanManager.repayLoan(this.id, loanId);
-        logger.logMove(this.id, "repayLoan", { loanId: loanId });
+        const ret = loanManager.repayLoan(this.id, loanId);
+        logger.logMove(this.id, "repayLoan", { loanId, ret });
         return ret;
     }
 
     convertReserveEthToAcd(acdAmount) {
-        logger.logMove(this.id, "convertReserveEthToAcd", { acdAmount: acdAmount, acdBalance: this.acdBalance });
-        return exchange.convertReserveEthToAcd(acdAmount);
+        const ret = exchange.convertReserveEthToAcd(acdAmount);
+        logger.logMove(this.id, "convertReserveEthToAcd", {
+            acdAmount: acdAmount.toString(),
+            acdBalance: this.acdBalance.toString(),
+            ret
+        });
+        return ret;
     }
 }
 
