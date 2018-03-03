@@ -61,8 +61,8 @@ function buyACD(actorId, acdAmount) {
 
         let ethAmount = convertAcdToEth(sellAmount);
 
-        if (sellOrder.amount.eq(acdAmount)) {
-            // if it will be fully filled from the sellorder then we deal with rounding diff
+        if (orderBook.buy.length === 0 && sellAmount.eq(acdAmount)) {
+            // if it this the only buy order and it would be fully filled from the sellorder then we deal with rounding diff
             // (issue only in sim b/c we store Acd amount instead of eth amount for buy Acd order)
             const roundingDiff = ethAmount.sub(augmint.balances.exchangeEth);
             if (roundingDiff.mul(10 ** bigNums.ETH_DP).gt(1)) {
