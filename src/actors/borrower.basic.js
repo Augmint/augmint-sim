@@ -38,7 +38,7 @@ class BorrowerBasic extends Actor {
         let collateralValueAcd = Acd(0);
         let wantToTake = false;
         let wantToTakeAmount = Acd(0);
-        let loanAmountNow = Acd(0);
+        let canTakeAmount = Acd(0);
 
         if (this.loans.length !== 0) {
             /* we have a loan, is repayment due? */
@@ -56,35 +56,37 @@ class BorrowerBasic extends Actor {
             const marketInterest = state.augmint.params.marketLoanInterestRate;
             const marketChance = Math.min(1, marketInterest / (augmintInterest * this.params.INTEREST_SENSITIVITY));
             wantToTake = state.utils.byChanceInADay(this.params.CHANCE_TO_TAKE_LOAN * marketChance);
-            if (wantToTake) {
-                wantToTakeAmount = Acd(
+            wantToTakeAmount = wantToTake
+                ? Acd(this.params.WANTS_TO_BORROW_AMOUNT.mul(loanProduct.loanCollateralRatio))
+                : Acd(0);
+
+            if (wantToTakeAmount.gt(0)) {
+                canTakeAmount = Acd(
                     Math.min(
-                        this.params.WANTS_TO_BORROW_AMOUNT.mul(loanProduct.loanCollateralRatio),
                         this.convertEthToAcd(this.ethBalance).mul(loanProduct.loanCollateralRatio),
-                        state.augmint.maxBorrowableAmount(0)
+                        state.augmint.maxBorrowableAmount(0),
+                        wantToTakeAmount,
+                        wantToTakeAmount.lt(loanProduct.minimumLoanInAcd) ? Acd(0) : wantToTakeAmount
                     )
                 );
-                loanAmountNow = wantToTakeAmount.lt(loanProduct.minimumLoanInAcd) ? Acd(0) : Acd(wantToTakeAmount);
+                //         console.debug(
+                //             `**** Want TO TAKE LOAN. canTakeAmount: ${canTakeAmount} wantToTakeAmount: ${wantToTakeAmount}
+                // maxBorrowableAmount: ${state.augmint.maxBorrowableAmount(0)} min loan amount: ${loanProduct.minimumLoanInAcd}`
+                //         );
             }
-
-            // console.debug(
-            //     `**** Willing TO TAKE LOAN. amount: ${loanAmountNow} wantToTakeAmount: ${wantToTakeAmount} maxBorrowableAmount: ${state.augmint.maxBorrowableAmount(
-            //         0
-            //     )}`
-            // );
         }
 
         /* Get new loan  */
-        if (loanAmountNow.gt(0)) {
+        if (canTakeAmount.gt(0)) {
             // console.debug(
-            //     `**** GOING TO TAKE LOAN. amount: ${loanAmountNow} maxBorrowableAmount: ${state.augmint.maxBorrowableAmount(
+            //     `**** GOING TO TAKE LOAN. amount: ${canTakeAmount} maxBorrowableAmount: ${state.augmint.maxBorrowableAmount(
             //         0
             //     )}`
             // );
             this.triedToBuyForRepayment = false;
 
             if (wantToTake) {
-                this.takeLoan(0, loanAmountNow);
+                this.takeLoan(0, canTakeAmount);
             }
         }
 
