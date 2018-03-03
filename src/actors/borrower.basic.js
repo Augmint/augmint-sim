@@ -49,7 +49,7 @@ class BorrowerBasic extends Actor {
                 currentTime >=
                     this.loans[0].repayBy -
                         (this.params.BUY_ACD_X_DAYS_BEFORE_REPAY + this.params.REPAY_X_DAYS_BEFORE) * ONE_DAY_IN_SECS &&
-                repaymentDue < collateralValueAcd; // TODO: move this last bit to loanManager? Unlikely that anyone would repay a loan if collateral value below repayment amount
+                repaymentDue.lt(collateralValueAcd); // TODO: move this last bit to loanManager? Unlikely that anyone would repay a loan if collateral value below repayment amount
         } else {
             /* no open loans , can we and do we want we take a new loan? */
             const augmintInterest = loanProduct.interestPt;

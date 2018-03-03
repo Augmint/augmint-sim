@@ -119,9 +119,17 @@ function repayLoan(actorId, loanId) {
         console.warn(
             `actor (id: ${actorId} tried to repay ${loan.repaymentDue} but actor's balance is ${
                 augmint.actors[actorId].balances.acd
-            } loanId: ${loanId}. Augmint rejected lock.`
+            } loanId: ${loanId}. Augmint rejected repay.`
         );
         return false;
+    }
+
+    const collateralValueInAcd = augmint.exchange.convertEthToAcd(loan.collateralInEth);
+    if (loan.repaymentDue.gt(collateralValueInAcd)) {
+        console.warn(
+            `actor (id: ${actorId} is repaying ${loan.repaymentDue} but collateral value is only ${collateralValueInAcd}
+        loanId: ${loanId}. Augmint allowed repay but it's an unlikely behaviour. Check actor's code.`
+        );
     }
 
     // burn loan amount (disbursed) acd and move interest to interestEarned
