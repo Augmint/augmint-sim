@@ -160,17 +160,17 @@ module.exports = {
             : allowedByLtdDifferencePt;
         const maxLoanWithMinLoanLimit = maxLoan.lt(this.loanProducts[productId].minimumLoanInAcd)
             ? Acd(0)
-
-        // console.debug(
-        //     `maxBorrowableAmount calcs: totalLock: ${this.balances.lockedAcdPool} totalLoan: ${
-        //         this.balances.openLoansAcd
-        //     }
-        //     loanToDepositRatio: ${this.loanToDepositRatio} ltdDifferenceLimit: ${
-        //         this.params.ltdDifferenceLimit
-        //     } minimumLoanAmount: ${this.loanProducts[productId].minimumLoanInAcd}
-        //     maxLoan: ${maxLoanWithMinLoanLimit} allowedByLtdDifferenceAmount: ${allowedByLtdDifferenceAmount} allowedByLtdDifferencePt: ${allowedByLtdDifferencePt}`
-        // );
             : maxLoan.round(bigNums.ACD_DP, 0);
+
+        //         console.debug(
+        //             `=== maxBorrowableAmount calcs:
+        //     totalLock: ${this.balances.lockedAcdPool} totalLoan: ${this.balances.openLoansAcd}
+        //     loanToDepositRatio: ${this.loanToDepositRatio} ltdDifferenceLimit: ${this.params.ltdDifferenceLimit}
+        //     minimumLoanAmount: ${this.loanProducts[productId].minimumLoanInAcd}
+        //     allowedByLtdDifferenceAmount: ${allowedByLtdDifferenceAmount}
+        //     allowedByLtdDifferencePt: ${allowedByLtdDifferencePt}
+        // ==> maxLoan: ${maxLoanWithMinLoanLimit}`
+        //         );
 
         return maxLoanWithMinLoanLimit;
     },
@@ -198,18 +198,18 @@ module.exports = {
 
         const maxLockWithMinLockLimit = maxLock.lt(this.params.minimumLockAmount)
             ? Acd(0)
-
-        // console.debug(
-        //     `maxLockableAmount calcs: totalLock: ${this.balances.lockedAcdPool} totalLoan: ${
-        //         this.balances.openLoansAcd
-        //     } earned interestPool: ${this.balances.interestEarnedPool}
-        //     loanToDepositRatio: ${this.loanToDepositRatio} ltdDifferenceLimit: ${
-        //         this.params.ltdDifferenceLimit
-        //     } minimumLockAmount: ${this.params.minimumLockAmount}
-        //     maxLock: ${maxLockWithMinLockLimit} allowedByLtdDifferencePt: ${allowedByLtdDifferencePt}
-        //     allowedByLtdDifferenceAmount: ${allowedByLtdDifferenceAmount} allowedByEarning: ${allowedByEarning}`
-        // );
             : maxLock.round(bigNums.ACD_DP, 0);
+
+        //         console.debug(
+        //             `=== maxLockableAmount calcs:
+        //     totalLock: ${this.balances.lockedAcdPool} totalLoan: ${this.balances.openLoansAcd}
+        //     loanToDepositRatio: ${this.loanToDepositRatio} ltdDifferenceLimit: ${this.params.ltdDifferenceLimit}
+        //     earned interestPool: ${this.balances.interestEarnedPool}
+        //     minimumLockAmount: ${this.params.minimumLockAmount}
+        //     allowedByLtdDifferencePt: ${allowedByLtdDifferencePt}
+        //     allowedByLtdDifferenceAmount: ${allowedByLtdDifferenceAmount} allowedByEarning: ${allowedByEarning}
+        // ===> maxLock: ${maxLockWithMinLockLimit}`
+        //         );
 
         return maxLockWithMinLockLimit;
     }
