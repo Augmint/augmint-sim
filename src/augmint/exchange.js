@@ -65,7 +65,7 @@ function buyACD(actorId, acdAmount) {
             // if it this the only buy order and it would be fully filled from the sellorder then we deal with rounding diff
             // (issue only in sim b/c we store Acd amount instead of eth amount for buy Acd order)
             const roundingDiff = ethAmount.sub(augmint.balances.exchangeEth);
-            if (roundingDiff.mul(10 ** bigNums.ETH_DP).gt(1)) {
+            if (roundingDiff.mul(10 ** bigNums.ETH_DP).gt(2)) {
                 throw new Error(
                     `buyAcd orderfill eth amount rounding difference is too high: ${roundingDiff.toFixed(
                         bigNums.ETH_DP
@@ -172,7 +172,7 @@ function sellACD(actorId, acdAmount) {
             // if it will fully fill the last buyorder then we deal with rounding diff
             // (issue only in sim b/c we store Acd amount instead of eth amount for buy Acd order)
             const roundingDiff = ethAmount.sub(augmint.balances.exchangeEth);
-            if (roundingDiff.mul(10 ** bigNums.ETH_DP).gt(1)) {
+            if (roundingDiff.mul(10 ** bigNums.ETH_DP).gt(2)) {
                 throw new Error(
                     `sellACD orderfill eth amount rounding difference is too high: ${roundingDiff.toFixed(
                         bigNums.ETH_DP
