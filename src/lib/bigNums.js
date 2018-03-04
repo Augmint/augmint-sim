@@ -21,8 +21,8 @@ const PT1 = new BigPt("1");
 
 module.exports = {
     BigAcd: n => new BigAcd(n).round(BigAcd.DP, BigAcd.RM), // to enforce decimalplaces
-    BigEth: n => BigEth(n).round(BigEth.DP, BigEth.RM), // to enforce decimalplaces,
-    BigPt: n => BigPt(n).round(BigPt.DP, BigPt.RM), // to enforce decimalplaces
+    BigEth: n => new BigEth(n).round(BigEth.DP, BigEth.RM), // to enforce decimalplaces,
+    BigPt: n => new BigPt(n).round(BigPt.DP, BigPt.RM), // to enforce decimalplaces
     get ACD_DP() {
         return BigAcd.DP;
     },
