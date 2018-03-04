@@ -2,6 +2,8 @@
 const bigNums = require("../lib/bigNums.js");
 const Acd = bigNums.BigAcd;
 const Pt = bigNums.BigPt;
+const ACD0 = bigNums.ACD0;
+const PT1 = bigNums.PT1;
 
 const AugmintError = require("../augmint/augmint.error.js");
 const Actor = require("./actor.js");
@@ -33,12 +35,12 @@ class BorrowerBasic extends Actor {
         const loanProduct = state.augmint.loanProducts[0];
         let willRepaySoon = false;
         let timeUntilRepayment = 0;
-        let repaymentDueWithCost = Acd(0);
-        let repaymentDue = Acd(0);
-        let collateralValueAcd = Acd(0);
+        let repaymentDueWithCost = ACD0;
+        let repaymentDue = ACD0;
+        let collateralValueAcd = ACD0;
         let wantToTake = false;
-        let wantToTakeAmount = Acd(0);
-        let canTakeAmount = Acd(0);
+        let wantToTakeAmount = ACD0;
+        let canTakeAmount = ACD0;
 
         if (this.loans.length !== 0) {
             /* we have a loan, is repayment due? */
@@ -59,15 +61,15 @@ class BorrowerBasic extends Actor {
             wantToTake = state.utils.byChanceInADay(this.params.CHANCE_TO_TAKE_LOAN * marketChance);
             wantToTakeAmount = wantToTake
                 ? Acd(this.params.WANTS_TO_BORROW_AMOUNT.mul(loanProduct.loanCollateralRatio))
-                : Acd(0);
+                : ACD0;
 
-            if (wantToTakeAmount.gt(0)) {
+            if (wantToTakeAmount.gt(ACD0)) {
                 canTakeAmount = Acd(
                     Math.min(
                         this.convertEthToAcd(this.ethBalance).mul(loanProduct.loanCollateralRatio),
                         state.augmint.maxBorrowableAmount(0),
                         wantToTakeAmount,
-                        wantToTakeAmount.lt(loanProduct.minimumLoanInAcd) ? Acd(0) : wantToTakeAmount
+                        wantToTakeAmount.lt(loanProduct.minimumLoanInAcd) ? ACD0 : wantToTakeAmount
                     )
                 );
                 //         console.debug(
@@ -78,7 +80,7 @@ class BorrowerBasic extends Actor {
         }
 
         /* Get new loan  */
-        if (canTakeAmount.gt(0)) {
+        if (canTakeAmount.gt(ACD0)) {
             // console.debug(
             //     `**** GOING TO TAKE LOAN. amount: ${canTakeAmount} maxBorrowableAmount: ${state.augmint.maxBorrowableAmount(
             //         0
@@ -92,7 +94,11 @@ class BorrowerBasic extends Actor {
         }
 
         /* Sell all ACD (CHANCE_TO_SELL_ALL_ACD) unless repayment is due soon */
-        if (this.acdBalance.gt(0) && !willRepaySoon && state.utils.byChanceInADay(this.params.CHANCE_TO_SELL_ALL_ACD)) {
+        if (
+            this.acdBalance.gt(ACD0) &&
+            !willRepaySoon &&
+            state.utils.byChanceInADay(this.params.CHANCE_TO_SELL_ALL_ACD)
+        ) {
             this.sellACD(this.acdBalance);
         }
 
@@ -105,7 +111,7 @@ class BorrowerBasic extends Actor {
             ) {
                 // buys ACD for repayment
                 const buyAmount = Acd(Math.max(0, repaymentDue.sub(this.acdBalance))).div(
-                    Pt(1).sub(state.augmint.params.exchangeFeePercentage)
+                    PT1.sub(state.augmint.params.exchangeFeePercentage)
                 );
                 this.buyACD(buyAmount);
                 this.triedToBuyForRepayment = true;
