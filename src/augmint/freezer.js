@@ -10,7 +10,7 @@ const augmint = require("./augmint.js");
 const clock = require("../lib/clock.js");
 
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
-const locks = augmint.locks;
+//const locks = augmint.locks;
 // just using a simple counter for id-ing locks:
 let counter = 0;
 
@@ -56,8 +56,8 @@ function lockACD(actorId, acdAmount) {
     counter++;
 
     // create lock
-    locks[actorId] = locks[actorId] || {};
-    locks[actorId][lockId] = {
+    augmint.locks[actorId] = augmint.locks[actorId] || {};
+    augmint.locks[actorId][lockId] = {
         id: lockId,
         lockedAmount: acdAmount,
         acdValue: interestInAcd.add(acdAmount),
@@ -68,14 +68,14 @@ function lockACD(actorId, acdAmount) {
 }
 
 function releaseACD(actorId, lockId) {
-    if (!locks[actorId] || !locks[actorId][lockId]) {
+    if (!augmint.locks[actorId] || !augmint.locks[actorId][lockId]) {
         console.warn(
             `Release lock failed, tried to release a non existent lock. actorId: ${actorId} lockId: ${lockId}`
         );
         return false;
     }
 
-    const lock = locks[actorId][lockId];
+    const lock = augmint.locks[actorId][lockId];
     const currentTime = clock.getTime();
     if (lock.lockedUntil > currentTime) {
         console.warn(
@@ -95,13 +95,13 @@ function releaseACD(actorId, lockId) {
     }
 
     // remove lock:
-    delete locks[actorId][lockId];
+    delete augmint.locks[actorId][lockId];
     return true;
 }
 
 // allows actors to query their locks:
 function getLocksForActor(actorId) {
-    return locks[actorId];
+    return augmint.locks[actorId];
 }
 
 module.exports = {

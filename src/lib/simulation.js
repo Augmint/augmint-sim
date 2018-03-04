@@ -33,6 +33,24 @@ function patchAugmintBalances(balances) {
 }
 
 function init(initParams) {
+    // console.log("before clear");
+    // augmint.debugState();
+    // showLog();
+
+    iteration = 0;
+    clock.setTime(0);
+
+    for (var it = actors.values(), val = null; (val = it.next().value); ) {
+        if (val.locks.length > 0) {
+            console.log(val.id + ":" + JSON.stringify(val.locks[0].id));
+            val.releaseACD(val.locks[0].id);
+        }
+    }
+
+    actors.clear();
+    // console.log("after clear");
+
+    augmint.init();
     augmint.exchange = exchange; // TODO: dirty hack. make this and/or augmint a class?
     setSimulationParams(initParams.simulationParams);
     patchAugmintBalances(initParams.augmintOptions.balances);
@@ -64,7 +82,6 @@ function getState() {
 }
 
 function incrementBy(_timeStep = params.timeStep) {
-
     rates.updateRates(getState());
 
     // actors make their moves:

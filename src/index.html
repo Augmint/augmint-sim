@@ -197,6 +197,7 @@
     <img class="logo" src="2_augmint_alternate-logo_reversed-360.jpg" alt="Augmint logo">
     <div class="buttons">
         <button class="btn pause-btn">Start</button>
+        <button class="btn restart-btn">Restart</button>
         <label2 for="rates-dropdown">Set ETH/USD:</label2>
         <select id="rates-dropdown" class="dropdown rates-dropdown">
         </select>
@@ -208,6 +209,7 @@
             <button class="btn clearLog-btn" onclick="javascript:document.getElementById('log-textarea').value = ''">clear log</button>
             <span>Dump to log:</span>
             <button class="btn dumpState-btn">state</button>
+            <button class="btn dumpIterationLog-btn">iteration log</button>
             <button class="btn dumpMovesLog-btn">actor moves log</button>
         </div>
         <div>
@@ -265,7 +267,7 @@
                 <div class="actor-inputs">
                   <h4 data-actor-param="name">###NAME###</h4>
                   <span data-actor-param="type" class="actor-type">###TYPE###</span><br/>
-                  <span class="hidden"><label class="technical-inputs actor-label">count: </label><input type="number" data-actor-param="count" value="###COUNT###"/><br/></span>
+                  <span class="hidden"><label class="technical-inputs actor-label">count: </label><input type="number" data-actor-param="count" value="999999"/><br/></span>
                   <h5>Starting balance</h5>
                     ###BALANCES###
                   <h5>params</h5>

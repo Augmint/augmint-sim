@@ -58,6 +58,82 @@ module.exports = {
     locks: {},
     exchange: null, // set by simulation.init()
 
+    clearObject(obj) {
+        for (var prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                delete obj[prop];
+            }
+        }
+    },
+    init() {
+        const self = this;
+
+        // console.log("this.error.alwaysLocker after clear:" + JSON.stringify(this.actors["alwaysLocker"]));
+        // console.error("actors check in inint:(this.actors): " + JSON.stringify(this.actors));
+        // console.error("actors check in inint:(this.actors): " + JSON.stringify(this.actors));
+
+        this.clearObject(this.actors);
+        this.actors = {};
+
+        this.balances = {
+            // acd:
+            acdFeesEarned: Acd(0),
+            lockedAcdPool: Acd(0),
+            openLoansAcd: Acd(0),
+            defaultedLoansAcd: Acd(0),
+            interestEarnedPool: Acd(0),
+            exchangeAcd: Acd(0),
+            // eth:
+            ethFeesEarned: Eth(0),
+            collateralHeld: Eth(0),
+            exchangeEth: Eth(0)
+        };
+        this.clearObject(this.params.loanProduct);
+        this.clearObject(this.params);
+        this.params = {
+            marketLoanInterestRate: Pt(0.18), // what do we compete with?  actor's demand for loans depends on it
+            marketLockInterestRate: Pt(0.04), // what do we compete with? actor's demand for locks depends on it
+            exchangeFeePercentage: Pt(0.1),
+            lockedAcdInterestPercentage: Pt(0.5),
+            lockTimeInDays: 365,
+            ethUsdTrendSampleDays: 3, // how many days to inspect for rates.ethToUsdTrend calculation)
+            minimumLockAmount: Acd(100), // without interest
+            ltdDifferenceLimit: Pt(0.2) /* allow lock or loan if Loan To Deposut ratio stay within 1 +/- this param  */,
+            allowedLtdDifferenceAmount: Acd(
+                5000
+            ) /*  if totalLoan and totalLock difference is less than this
+                then allow loan or lock even if ltdDifference limit would go off with it */,
+            loanRepaymentCost: Acd(5) // gas and other costs in ACD - used when deciding if a loan worth to repay
+        };
+
+        this.rates = {
+            ethToAcd: 1, // i.e. price per acd in eth
+            ethToUsd: 1,
+            ethToUsdTrend: 0
+        };
+
+        for (let i = this.orderBook.buy.length; i > 0; i--) {
+            self.orderBook.buy.pop();
+        }
+
+        for (let i = this.orderBook.sell.length; i > 0; i--) {
+            self.orderBook.sell.pop();
+        }
+
+        for (let i = this.loanProducts; i > 0; i--) {
+            self.loanProducts.pop();
+        }
+
+        this.clearObject(this.loanProducts[0]);
+        this.loanProducts.pop();
+
+        this.clearObject(this.loans);
+        this.loans = {};
+        this.clearObject(this.locks);
+        this.locks = {};
+        this.exchange = null;
+    },
+
     issueAcd(amount) {
         this.actors.reserve.balances.acd = this.actors.reserve.balances.acd.add(amount);
         return this.actors.reserve.balances.acd;
