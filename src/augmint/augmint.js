@@ -139,7 +139,7 @@ module.exports = {
         https://docs.google.com/spreadsheets/d/1MeWYPYZRIm1n9lzpvbq8kLfQg1hhvk5oJY6NrR401S0/edit#gid=270865454 */
     maxBorrowableAmount(productId) {
         const allowedByLtdDifferencePt = Pt(
-            this.balances.lockedAcdPool.mul(this.params.ltdDifferenceLimit.add(1)).sub(this.balances.openLoansAcd)
+            this.balances.lockedAcdPool.mul(this.params.ltdDifferenceLimit.add(PT1)).sub(this.balances.openLoansAcd)
         );
 
         const allowedByLtdDifferenceAmount = this.balances.openLoansAcd.gt(
@@ -171,7 +171,9 @@ module.exports = {
     get maxLockableAmount() {
         // TODO: interest cals implemented in freezer too. Make a common getter somewhere?
 
-        const interestPt = Pt(this.params.lockedAcdInterestPercentage.add(1) ** (this.params.lockTimeInDays / 365) - 1);
+        const interestPt = Pt(
+            this.params.lockedAcdInterestPercentage.add(PT1) ** (this.params.lockTimeInDays / 365) - 1
+        );
         const allowedByEarning = this.balances.interestEarnedPool.div(interestPt);
 
         const allowedByLtdDifferencePt = this.balances.openLoansAcd
