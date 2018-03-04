@@ -2,6 +2,8 @@
 const bigNums = require("../lib/bigNums.js");
 const Acd = bigNums.BigAcd;
 const Pt = bigNums.BigPt;
+const ACD0 = bigNums.ACD0;
+const PT0 = bigNums.PT0;
 
 const Actor = require("./actor.js");
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
@@ -21,10 +23,10 @@ class LockerBasic extends Actor {
     constructor(id, balances, state, _params = {}) {
         super(id, balances, state, Object.assign({}, defaultParams, _params));
         this.waitingForBuyOrder = false;
-        this.canLockAmount = Acd(0);
-        this.aimingToLockAmount = Acd(0);
-        this.lastAugmintInterest = Pt(0);
-        this.lastMarketInterest = Pt(0);
+        this.canLockAmount = ACD0;
+        this.aimingToLockAmount = ACD0;
+        this.lastAugmintInterest = PT0;
+        this.lastMarketInterest = PT0;
     }
 
     executeMoves(state) {
@@ -42,13 +44,13 @@ class LockerBasic extends Actor {
             const wantsToLock = state.utils.byChanceInADay(this.params.CHANCE_TO_LOCK * marketChance);
             this.aimingToLockAmount = wantsToLock
                 ? Acd(Math.min(acdAvailable, this.params.WANTS_TO_LOCK_AMOUNT))
-                : Acd(0);
+                : ACD0;
         }
 
         /* if want to lock and market/augmint conditions changed
             then (re)calculate if we want to take a loan and how much */
         if (
-            this.aimingToLockAmount.gt(0) &&
+            this.aimingToLockAmount.gt(ACD0) &&
             (!augmintInterest.eq(this.lastAugmintInterest) || !marketInterest.eq(this.lastMarketInterest))
         ) {
             // console.log(`** day: ${state.meta.currentDay} (it: ${state.meta.iteration}) ** recalc aimingToLockAmount`);
@@ -58,10 +60,10 @@ class LockerBasic extends Actor {
         }
 
         /* calc / recalc how much we can actually lock */
-        if (this.aimingToLockAmount.gt(0)) {
+        if (this.aimingToLockAmount.gt(ACD0)) {
             this.canLockAmount = Acd(Math.min(this.aimingToLockAmount, maxLockableAmount));
             this.canLockAmount = this.canLockAmount.lt(state.augmint.params.minimumLockAmount)
-                ? Acd(0)
+                ? ACD0
                 : this.canLockAmount;
 
             // console.debug(
@@ -74,7 +76,7 @@ class LockerBasic extends Actor {
             //     }`
             // );
         } else {
-            this.canLockAmount = Acd(0);
+            this.canLockAmount = ACD0;
         }
 
         // Buy ACD for lock we want
@@ -84,7 +86,7 @@ class LockerBasic extends Actor {
             //        (augmint or market params changed after the order was placed)
             const needToBuy = this.canLockAmount.sub(this.acdBalance).sub(this.ownAcdOrdersSum);
 
-            if (needToBuy.gt(0)) {
+            if (needToBuy.gt(ACD0)) {
                 // console.debug(
                 //     `** day: ${state.meta.currentDay} (it: ${
                 //         state.meta.iteration
@@ -99,7 +101,7 @@ class LockerBasic extends Actor {
         }
 
         /* Lock if we want and can */
-        if (this.canLockAmount.gt(0) && this.acdBalance.gte(this.canLockAmount)) {
+        if (this.canLockAmount.gt(ACD0) && this.acdBalance.gte(this.canLockAmount)) {
             // console.debug(
             //     `** day: ${state.meta.currentDay} (it: ${state.meta.iteration}) ** GOING to LOCK. canLockAmount: ${
             //         this.canLockAmount
@@ -107,8 +109,8 @@ class LockerBasic extends Actor {
             // );
 
             if (this.lockACD(this.canLockAmount)) {
-                this.aimingToLockAmount = Acd(0);
-                this.canLockAmount = Acd(0);
+                this.aimingToLockAmount = ACD0;
+                this.canLockAmount = ACD0;
                 this.waitingForBuyOrder = false;
                 this.wantToLock = false;
             } else {
@@ -146,7 +148,7 @@ class LockerBasic extends Actor {
         }
 
         /* sell ETH balance to USD */
-        if (this.ethBalance.gt(0)) {
+        if (this.ethBalance.gt(ACD0)) {
             this.sellEthForUsd(this.ethBalance);
         }
 
