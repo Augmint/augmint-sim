@@ -4,6 +4,7 @@
 
 const bigNums = require("../lib/bigNums.js");
 const Pt = bigNums.BigPt;
+const PT1 = bigNums.PT1;
 
 const AugmintError = require("../augmint/augmint.error.js");
 const augmint = require("./augmint.js");
@@ -34,7 +35,7 @@ function lockACD(actorId, acdAmount) {
     }
 
     const interestPt = Pt(
-        augmint.params.lockedAcdInterestPercentage.add(1) ** (augmint.params.lockTimeInDays / 365) - 1
+        augmint.params.lockedAcdInterestPercentage.add(PT1) ** (augmint.params.lockTimeInDays / 365) - 1
     );
     const interestInAcd = acdAmount.mul(interestPt).round(bigNums.ACD_DP, 0); // ROUND_DOWN
 

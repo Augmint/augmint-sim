@@ -9,6 +9,8 @@ const bigNums = require("../lib/bigNums.js");
 const Acd = bigNums.BigAcd;
 const Eth = bigNums.BigEth;
 const Pt = bigNums.BigPt;
+const ACD0 = bigNums.ACD0;
+const PT1 = bigNums.PT1;
 
 module.exports = {
     actors: {},
@@ -73,7 +75,7 @@ module.exports = {
         return this.actors ? this.actors.reserve.balances.acd : Acd(0);
     },
     get reserveEth() {
-        return this.actors && this.actors.reserve ? this.actors.reserve.balances.eth : Acd(0);
+        return this.actors && this.actors.reserve ? this.actors.reserve.balances.eth : ACD0;
     },
 
     get reserveAcdOnExchange() {
@@ -84,13 +86,13 @@ module.exports = {
         const orderBook = this.orderBook;
         const totalBuyAmount = orderBook.buy.reduce((sum, order) => {
             return sum.add(order.amount);
-        }, Acd(0));
+        }, ACD0);
         const totalSellAmount = orderBook.sell.reduce((sum, order) => {
             if (!order.amount.round(2, 0).eq(order.amount)) {
                 throw new Error(order.actorId + order.amount.toString());
             }
             return sum.add(order.amount);
-        }, Acd(0));
+        }, ACD0);
         if (
             !totalSellAmount.round(2, 0).eq(totalSellAmount) ||
             !totalBuyAmount.round(2, 0).eq(totalBuyAmount) ||
@@ -115,7 +117,7 @@ module.exports = {
         // it includes reserve balance but not acd in orders. to get only user's balances use usersAcd()
         return Object.keys(this.actors).reduce((sum, actorId) => {
             return sum.add(this.actors[actorId].balances.acd);
-        }, Acd(0));
+        }, ACD0);
     },
 
     get floatingAcd() {
@@ -153,14 +155,14 @@ module.exports = {
         const allowedByLtdDifferenceAmount = this.balances.openLoansAcd.gt(
             this.balances.lockedAcdPool.add(this.params.allowedLtdDifferenceAmount)
         )
-            ? Acd(0)
+            ? ACD0
             : this.balances.lockedAcdPool.add(this.params.allowedLtdDifferenceAmount).sub(this.balances.openLoansAcd);
 
         const maxLoan = allowedByLtdDifferenceAmount.gt(allowedByLtdDifferencePt)
             ? allowedByLtdDifferenceAmount
             : allowedByLtdDifferencePt;
         const maxLoanWithMinLoanLimit = maxLoan.lt(this.loanProducts[productId].minimumLoanInAcd)
-            ? Acd(0)
+            ? ACD0
             : maxLoan.round(bigNums.ACD_DP, 0);
 
         //         console.debug(
@@ -183,13 +185,13 @@ module.exports = {
         const allowedByEarning = this.balances.interestEarnedPool.div(interestPt);
 
         const allowedByLtdDifferencePt = this.balances.openLoansAcd
-            .div(Pt(1).sub(this.params.ltdDifferenceLimit))
+            .div(PT1.sub(this.params.ltdDifferenceLimit))
             .sub(this.balances.lockedAcdPool);
 
         const allowedByLtdDifferenceAmount = this.balances.openLoansAcd.gt(
             this.balances.lockedAcdPool.add(this.params.allowedLtdDifferenceAmount)
         )
-            ? Acd(0)
+            ? ACD0
             : this.balances.openLoansAcd.sub(this.balances.lockedAcdPool).add(this.params.allowedLtdDifferenceAmount);
 
         //const maxLock = Math.min(Math.max(allowedByLtdDifferencePt, allowedByLtdDifferenceAmount), allowedByEarning);
@@ -198,7 +200,7 @@ module.exports = {
         );
 
         const maxLockWithMinLockLimit = maxLock.lt(this.params.minimumLockAmount)
-            ? Acd(0)
+            ? ACD0
             : maxLock.round(bigNums.ACD_DP, 0);
 
         //         console.debug(

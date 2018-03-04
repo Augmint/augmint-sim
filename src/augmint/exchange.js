@@ -8,7 +8,7 @@ const logger = require("../lib/logger.js");
 const orderBook = augmint.orderBook;
 
 const bigNums = require("../lib/bigNums.js");
-const Acd = bigNums.BigAcd;
+const ACD0 = bigNums.ACD0;
 const Eth = bigNums.BigEth;
 
 function convertEthToUsd(ethAmount) {
@@ -305,16 +305,16 @@ function buyEthWithUsd(actorId, usdAmount) {
 
 function getActorSellAcdOrdersSum(actorId) {
     return orderBook.sell.reduce((sum, sellOrder) => {
-        const amount = sellOrder.actorId == actorId ? sellOrder.amount : Acd(0);
+        const amount = sellOrder.actorId == actorId ? sellOrder.amount : ACD0;
         return sum.add(amount);
-    }, Acd(0));
+    }, ACD0);
 }
 
 function getActorBuyAcdOrdersSum(actorId) {
     return orderBook.buy.reduce((sum, buyOrder) => {
-        const amount = buyOrder.actorId == actorId ? buyOrder.amount : Acd(0);
+        const amount = buyOrder.actorId == actorId ? buyOrder.amount : ACD0;
         return sum.add(amount);
-    }, Acd(0));
+    }, ACD0);
 }
 
 module.exports = {

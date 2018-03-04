@@ -1,7 +1,9 @@
 "use strict";
 const bigNums = require("../lib/bigNums.js");
 const Acd = bigNums.BigAcd;
-const Pt = bigNums.BigPt;
+const PT1 = bigNums.PT1;
+const ACD0 = bigNums.ACD0;
+const ETH0 = bigNums.ETH0;
 
 const Actor = require("./actor.js");
 const defaultParams = {};
@@ -15,22 +17,22 @@ class ReserveBasic extends Actor {
         // TODO: add some delay in intervention (ie intervene only after a couple of ticks)
         const acdDemand = this.getAcdDemand();
 
-        if (acdDemand.eq(0) && this.acdBalance.gt(0)) {
+        if (acdDemand.eq(ACD0) && this.acdBalance.gt(ETH0)) {
             this.burnAcd(this.acdBalance);
-        } else if (acdDemand.lt(0) && this.ethBalance.gt(0)) {
+        } else if (acdDemand.lt(ACD0) && this.ethBalance.gt(ETH0)) {
             const maxBuyableAcdFromReserveEth = this.convertEthToAcd(this.ethBalance)
-                .mul(Pt(1).sub(state.augmint.params.exchangeFeePercentage))
+                .mul(PT1.sub(state.augmint.params.exchangeFeePercentage))
                 .round(bigNums.ACD_DP, 0);
 
             const buyAmount = Acd(Math.min(maxBuyableAcdFromReserveEth, -acdDemand));
 
-            if (buyAmount.gt(0)) {
+            if (buyAmount.gt(ACD0)) {
                 this.buyACD(buyAmount);
             }
-        } else if (acdDemand.gt(0)) {
+        } else if (acdDemand.gt(ACD0)) {
             const newIssueNeeded = Acd(Math.max(acdDemand, 0));
 
-            if (newIssueNeeded.gt(0)) {
+            if (newIssueNeeded.gt(ACD0)) {
                 this.issueAcd(newIssueNeeded);
             }
 
