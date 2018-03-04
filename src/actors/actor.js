@@ -3,6 +3,8 @@
 "use strict";
 const bigNums = require("../lib/bigNums.js");
 const Acd = bigNums.BigAcd;
+const ACD0 = bigNums.ACD0;
+const ETH0 = bigNums.ETH0;
 const Eth = bigNums.BigEth;
 const Pt = bigNums.BigPt;
 
@@ -21,9 +23,9 @@ class Actor {
         this.id = id;
         augmint.actors[this.id] = {
             balances: {
-                eth: balances.eth || Eth(0),
-                acd: balances.acd || Acd(0),
-                usd: balances.usd || Acd(0)
+                eth: balances.eth || ETH0,
+                acd: balances.acd || ACD0,
+                usd: balances.usd || ACD0
             },
             state: state || {},
             type: this.constructor.name,
@@ -48,11 +50,11 @@ class Actor {
     // STATE:
     // NB: I'm storing all state in augmint/loan manager/etc for the sake of making pausing/replaying etc. easier
     get acdBalance() {
-        return augmint.actors[this.id].balances.acd || Acd(0);
+        return augmint.actors[this.id].balances.acd || ACD0;
     }
 
     get ethBalance() {
-        return augmint.actors[this.id].balances.eth || Eth(0);
+        return augmint.actors[this.id].balances.eth || ETH0;
     }
 
     set ethBalance(newBal) {

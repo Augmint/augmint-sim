@@ -9,6 +9,7 @@ const logger = require("../lib/logger.js");
 
 const bigNums = require("../lib/bigNums.js");
 const Eth = bigNums.BigEth;
+const PT1 = bigNums.PT1;
 const Pt = bigNums.BigPt;
 
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
@@ -64,7 +65,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
     }
 
     const collateralInEth = augmint.exchange.convertAcdToEth(loanAmountInAcd).div(loanProduct.loanCollateralRatio); // we should use ROUND_DOWN (0) here
-    const interestPt = Pt(loanProduct.interestPt.add(1) ** (loanProduct.repaymentPeriodInDays / 365) - 1);
+    const interestPt = Pt(loanProduct.interestPt.add(PT1) ** (loanProduct.repaymentPeriodInDays / 365) - 1);
     const premiumInAcd = loanAmountInAcd.mul(interestPt).round(bigNums.ACD_DP, 0); // ROUND_DOWN
     const repaymentDue = premiumInAcd.add(loanAmountInAcd);
     const repayBy = clock.getTime() + loanProduct.repaymentPeriodInDays * ONE_DAY_IN_SECS;
