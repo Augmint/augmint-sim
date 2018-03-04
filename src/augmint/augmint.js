@@ -88,18 +88,8 @@ module.exports = {
             return sum.add(order.amount);
         }, ACD0);
         const totalSellAmount = orderBook.sell.reduce((sum, order) => {
-            if (!order.amount.round(2, 0).eq(order.amount)) {
-                throw new Error(order.actorId + order.amount.toString());
-            }
             return sum.add(order.amount);
         }, ACD0);
-        if (
-            !totalSellAmount.round(2, 0).eq(totalSellAmount) ||
-            !totalBuyAmount.round(2, 0).eq(totalBuyAmount) ||
-            !this.reserveAcdOnExchange.round(2, 0).eq(this.reserveAcdOnExchange)
-        ) {
-            throw new Error(totalSellAmount.toString());
-        }
         return totalBuyAmount.sub(totalSellAmount).add(this.reserveAcdOnExchange);
     },
 
