@@ -74,7 +74,7 @@ module.exports = {
 
         this.clearObject(this.actors);
         this.actors = {};
-
+        this.clearObject(this.balances);
         this.balances = {
             // acd:
             acdFeesEarned: Acd(0),
