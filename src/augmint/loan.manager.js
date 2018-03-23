@@ -219,6 +219,20 @@ function getLoansForActor(actorId) {
     return loans[actorId];
 }
 
+function clearObject(obj) {
+    for (var prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            // console.log(JSON.stringify(obj, null, 3));
+            delete obj[prop];
+        }
+    }
+}
+
+function clearAllLoans() {
+    clearObject(loans);
+    console.log(JSON.stringify(loans));
+}
+
 module.exports = {
     createLoanProduct,
     updateLoanProduct,
@@ -227,5 +241,6 @@ module.exports = {
     repayLoan,
     collectDefaultedLoan,
     collectAllDefaultedLoans,
-    getLoansForActor
+    getLoansForActor,
+    clearAllLoans
 };

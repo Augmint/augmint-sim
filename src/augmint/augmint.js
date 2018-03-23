@@ -60,6 +60,13 @@ module.exports = {
     locks: {},
     exchange: null, // set by simulation.init()
 
+    clearActors(actor) {
+        for (var prop in actor) {
+            if (actor.hasOwnProperty(prop)) {
+                delete actor[prop];
+            }
+        }
+    },
     clearObject(obj) {
         for (var prop in obj) {
             if (obj.hasOwnProperty(prop)) {
@@ -70,11 +77,7 @@ module.exports = {
     init() {
         const self = this;
 
-        // console.log("this.error.alwaysLocker after clear:" + JSON.stringify(this.actors["alwaysLocker"]));
-        // console.error("actors check in inint:(this.actors): " + JSON.stringify(this.actors));
-        // console.error("actors check in inint:(this.actors): " + JSON.stringify(this.actors));
-
-        this.clearObject(this.actors);
+        this.clearActors(this.actors);
         this.actors = {};
         this.clearObject(this.balances);
         this.balances = {
@@ -148,25 +151,32 @@ module.exports = {
 
     // TODO: move these under balances.
     get reserveAcd() {
-        return this.actors ? this.actors.reserve.balances.acd : Acd(0);
+        return this.actors && this.actors.reserve ? this.actors.reserve.balances.acd : Acd(0);
     },
     get reserveEth() {
         return this.actors && this.actors.reserve ? this.actors.reserve.balances.eth : ACD0;
     },
 
     get reserveAcdOnExchange() {
-        return this.exchange.getActorSellAcdOrdersSum("reserve");
+        return this.exchange ? this.exchange.getActorSellAcdOrdersSum("reserve") : ACD0;
     },
 
     get netAcdDemand() {
         const orderBook = this.orderBook;
+
+        // if (orderBook.buy && orderBook.sell && (orderBook.buy.length > 0 || orderBook.sell.length > 0)) {
+        //     console.log(JSON.stringify(orderBook));
+        // }
+
         const totalBuyAmount = orderBook.buy.reduce((sum, order) => {
             return sum.add(order.amount);
         }, ACD0);
         const totalSellAmount = orderBook.sell.reduce((sum, order) => {
             return sum.add(order.amount);
         }, ACD0);
-        return totalBuyAmount.sub(totalSellAmount).add(this.reserveAcdOnExchange);
+        return totalBuyAmount && totalSellAmount
+            ? totalBuyAmount.sub(totalSellAmount).add(this.reserveAcdOnExchange)
+            : ACD0;
     },
 
     get totalAcd() {
@@ -231,16 +241,6 @@ module.exports = {
             ? ACD0
             : maxLoan.round(bigNums.ACD_DP, 0);
 
-        //         console.debug(
-        //             `=== maxBorrowableAmount calcs:
-        //     totalLock: ${this.balances.lockedAcdPool} totalLoan: ${this.balances.openLoansAcd}
-        //     loanToDepositRatio: ${this.loanToDepositRatio} ltdDifferenceLimit: ${this.params.ltdDifferenceLimit}
-        //     minimumLoanAmount: ${this.loanProducts[productId].minimumLoanInAcd}
-        //     allowedByLtdDifferenceAmount: ${allowedByLtdDifferenceAmount}
-        //     allowedByLtdDifferencePt: ${allowedByLtdDifferencePt}
-        // ==> maxLoan: ${maxLoanWithMinLoanLimit}`
-        //         );
-
         return maxLoanWithMinLoanLimit;
     },
 
@@ -270,17 +270,6 @@ module.exports = {
         const maxLockWithMinLockLimit = maxLock.lt(this.params.minimumLockAmount)
             ? ACD0
             : maxLock.round(bigNums.ACD_DP, 0);
-
-        //         console.debug(
-        //             `=== maxLockableAmount calcs:
-        //     totalLock: ${this.balances.lockedAcdPool} totalLoan: ${this.balances.openLoansAcd}
-        //     loanToDepositRatio: ${this.loanToDepositRatio} ltdDifferenceLimit: ${this.params.ltdDifferenceLimit}
-        //     earned interestPool: ${this.balances.interestEarnedPool}
-        //     minimumLockAmount: ${this.params.minimumLockAmount}
-        //     allowedByLtdDifferencePt: ${allowedByLtdDifferencePt}
-        //     allowedByLtdDifferenceAmount: ${allowedByLtdDifferenceAmount} allowedByEarning: ${allowedByEarning}
-        // ===> maxLock: ${maxLockWithMinLockLimit}`
-        //         );
 
         return maxLockWithMinLockLimit;
     }
