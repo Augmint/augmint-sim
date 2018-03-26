@@ -15,15 +15,10 @@ let random = new RandomSeed(params.randomSeed);
 const actors = new Set();
 
 function setSimulationParams(_params) {
-    // console.log("_params.randomSeed:" + _params.randomSeed);
-    // console.log("params.randomSeed:" + params.randomSeed);
-    // console.log(_params.randomSeed != params.randomSeed);
 
-    // if (_params.randomSeed != params.randomSeed) {
-    // console.error("new randomseed created");
     // new seed, to be tested...
     random = new RandomSeed(_params.randomSeed);
-    // }
+ 
     Object.assign(params, _params);
     params.stepsPerDay = 24 / (params.timeStep / 60 / 60);
 }
@@ -37,43 +32,10 @@ function patchAugmintBalances(balances) {
     Object.assign(augmint.balances, balances);
 }
 
-function showLog() {
-    // console.log(JSON.stringify(Array.from(actors), null, 3));
-    // console.log(JSON.stringify(Array.from(actors.keys()), null, 3));
-    // console.log(JSON.stringify(Array.from(actors.values()), null, 3));
-    // console.log("actors:");
-    // let actLog = "";
-    // for (var it = actors.values(), val = null; (val = it.next().value); ) {
-    //     actLog += JSON.stringify(val, null, 3).replace(/\\"/g, "\"");
-    // }
-    // console.log(actLog);
-}
-
-function clearActors() {
-    // // console.log("actors:");
-    // let actLog = "";
-    // for (var it = actors.values(), val = null; (val = it.next().value); ) {
-    //     actLog += JSON.stringify(val, null, 3).replace(/\\"/g, "\"");
-    // }
-    // // console.log(actLog);
-}
-
 function init(initParams) {
-    // console.log("before init");
-    // augmint.debugState();
-    // showLog();
-    // this.getState(true);
     iteration = 0;
     clock.setTime(0);
 
-    // for (var it = actors.values(), val = null; (val = it.next().value); ) {
-    //     if (val.locks.length > 0) {
-    //         // console.log(val.id + ":" + JSON.stringify(val.locks[0].id));
-    //         console.log(val.id + ":" + JSON.stringify(val));
-    //         val.releaseACD(val.locks[0].id);
-    //     }
-    // }
-    clearActors();
     actors.clear();
     loanManager.clearAllLoans();
 
@@ -81,13 +43,8 @@ function init(initParams) {
     augmint.exchange = exchange; // TODO: dirty hack. make this and/or augmint a class?
     setSimulationParams(initParams.simulationParams);
     patchAugmintBalances(initParams.augmintOptions.balances);
-    // console.error("initparams:");
-    // console.error(JSON.stringify(initParams.augmintOptions.params, null, 3));
     patchAugmintParams(initParams.augmintOptions.params);
-    console.log("after init");
     this.getState(true);
-    // augmint.debugState();
-    // showLog();
 }
 
 function byChanceInADay(dailyChance) {
@@ -99,23 +56,6 @@ function byChance(chance) {
 }
 
 function getState(showLog) {
-    const a = {
-        meta: {
-            currentTime: clock.getTime(),
-            currentDay: clock.getDay(),
-            timeStep: params.timeStep,
-            stepsPerDay: params.stepsPerDay,
-            iteration: iteration
-        },
-        augmint: augmint,
-        exchange: exchange,
-        utils: { byChanceInADay: byChanceInADay, byChance: byChance }, // TODO: do it nicer. maybe make simulation a class
-        params: params
-    };
-    if (showLog) {
-        // console.error("getState()");
-        // console.log(JSON.stringify(a, null, 3));
-    }
     return {
         meta: {
             currentTime: clock.getTime(),
@@ -157,7 +97,6 @@ function addActors(newActors) {
 }
 
 function addActorsFromGui(newActors) {
-    console.log("actors from gui");
     newActors.forEach(actor => {
         const count = actor.count;
         for (let i = 0; i < count; i++) {
@@ -165,17 +104,14 @@ function addActorsFromGui(newActors) {
             actors.add(new ActorDirectory[actor.constructor.name](name, actor.balances, actor.state, actor.parameters));
         }
     });
-    showLog();
 }
 
 function setState(state) {
     clock.setTime(state.meta.currentTime || 0);
-
     actors.clear();
     addActors(state.augmint.actors);
 
     patchAugmintBalances(state.augmint.balances);
-
     patchAugmintParams(state.augmint.params);
 }
 

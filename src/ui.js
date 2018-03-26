@@ -318,7 +318,6 @@ function renderActorParamsGui() {
 }
 
 function restart() {
-    console.error("restart happened");
     hideParamChangeAlert();
     const actorInputs = Array.from(document.querySelectorAll(".actor-inputs input"));
     actorInputs.forEach(input => {

@@ -230,7 +230,6 @@ function clearObject(obj) {
 
 function clearAllLoans() {
     clearObject(loans);
-    console.log(JSON.stringify(loans));
 }
 
 module.exports = {
