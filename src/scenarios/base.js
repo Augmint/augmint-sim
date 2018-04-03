@@ -15,7 +15,10 @@ const augmintOptions = {
         lockTimeInDays: 30,
         ethUsdTrendSampleDays: 5, // how many days to inspect for rates.ethToUsdTrend calculation)
         minimumLockAmount: Acd(100), // without interest
-        ltdDifferenceLimit: Pt(0.2) /* allow lock or loan if Loan To Deposut ratio stay within 1 +- this param  */,
+
+        ltdLockDifferenceLimit: Pt(0.2) /* allow lock if Loan To Deposut ratio stay within 1 +/- this param  */,
+        ltdLoanDifferenceLimit: Pt(0.2) /* allow loan if Loan To Deposut ratio stay within 1 +/- this param  */,
+
         allowedLtdDifferenceAmount: Acd(
             5000
         ) /* in token - if totalLoan and totalLock difference is less than that

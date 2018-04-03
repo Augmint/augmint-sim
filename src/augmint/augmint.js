@@ -37,7 +37,8 @@ module.exports = {
         lockTimeInDays: 365,
         ethUsdTrendSampleDays: 3, // how many days to inspect for rates.ethToUsdTrend calculation)
         minimumLockAmount: Acd(100), // without interest
-        ltdDifferenceLimit: Pt(0.2) /* allow lock or loan if Loan To Deposut ratio stay within 1 +/- this param  */,
+        ltdLockDifferenceLimit: Pt(0.2) /* allow lock if Loan To Deposut ratio stay within 1 +/- this param  */,
+        ltdLoanDifferenceLimit: Pt(0.2) /* allow loan if Loan To Deposut ratio stay within 1 +/- this param  */,
         allowedLtdDifferenceAmount: Acd(
             5000
         ) /*  if totalLoan and totalLock difference is less than this
@@ -139,7 +140,7 @@ module.exports = {
         https://docs.google.com/spreadsheets/d/1MeWYPYZRIm1n9lzpvbq8kLfQg1hhvk5oJY6NrR401S0/edit#gid=270865454 */
     maxBorrowableAmount(productId) {
         const allowedByLtdDifferencePt = Pt(
-            this.balances.lockedAcdPool.mul(this.params.ltdDifferenceLimit.add(PT1)).sub(this.balances.openLoansAcd)
+            this.balances.lockedAcdPool.mul(this.params.ltdLoanDifferenceLimit.add(PT1)).sub(this.balances.openLoansAcd)
         );
 
         const allowedByLtdDifferenceAmount = this.balances.openLoansAcd.gt(
@@ -177,7 +178,7 @@ module.exports = {
         const allowedByEarning = this.balances.interestEarnedPool.div(interestPt);
 
         const allowedByLtdDifferencePt = this.balances.openLoansAcd
-            .div(PT1.sub(this.params.ltdDifferenceLimit))
+            .div(PT1.sub(this.params.ltdLockDifferenceLimit))
             .sub(this.balances.lockedAcdPool);
 
         const allowedByLtdDifferenceAmount = this.balances.openLoansAcd.gt(
