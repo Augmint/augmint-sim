@@ -75,7 +75,7 @@ const graphs = [
         },
         datasets: [
             {
-                func: augmint => augmint.params.ltdDifferenceLimit.add(1),
+                func: augmint => augmint.params.ltdLoanDifferenceLimit.add(1),
                 options: {
                     label: "loan limit",
                     borderDash: DASHED_LINE,
@@ -84,7 +84,7 @@ const graphs = [
                 }
             },
             {
-                func: augmint => augmint.params.ltdDifferenceLimit.mul(-1).add(1),
+                func: augmint => augmint.params.ltdLockDifferenceLimit.mul(-1).add(1),
                 options: {
                     label: "lock limit",
                     borderDash: DASHED_LINE,
