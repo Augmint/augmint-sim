@@ -75,8 +75,6 @@ module.exports = {
         }
     },
     init() {
-        const self = this;
-
         this.clearActors(this.actors);
         this.actors = {};
         this.clearObject(this.balances);
@@ -117,18 +115,10 @@ module.exports = {
             ethToUsdTrend: 0
         };
 
-        for (let i = this.orderBook.buy.length; i > 0; i--) {
-            self.orderBook.buy.pop();
-        }
-
-        for (let i = this.orderBook.sell.length; i > 0; i--) {
-            self.orderBook.sell.pop();
-        }
-
-        for (let i = this.loanProducts; i > 0; i--) {
-            self.loanProducts.pop();
-        }
-
+        this.orderBook.buy.length = 0;
+        this.orderBook.sell.length = 0;
+        this.loanProducts.length = 0;
+ 
         this.clearObject(this.loanProducts[0]);
         this.loanProducts.pop();
 

@@ -16,7 +16,6 @@ const clockElem = document.querySelector(".clock");
 const pauseBtn = document.querySelector(".pause-btn");
 const restartBtn = document.querySelector(".restart-btn");
 const dumpStateBtn = document.querySelector(".dumpState-btn");
-const dumpIterationLogBtn = document.querySelector(".dumpIterationLog-btn");
 const dumpMovesLogBtn = document.querySelector(".dumpMovesLog-btn");
 const toggleLogBtn = document.querySelector(".toggleLog-btn");
 const logWrapper = document.querySelector(".log-wrapper");
@@ -358,9 +357,6 @@ function init() {
     dumpStateBtn.addEventListener("click", () => {
         simulation.patchAugmintParams(getParamsFromUI());
         logger.print(simulation.getState());
-    });
-    dumpIterationLogBtn.addEventListener("click", () => {
-        logger.printIterationLog();
     });
     dumpMovesLogBtn.addEventListener("click", () => {
         let startPos = logTextArea.textLength;
