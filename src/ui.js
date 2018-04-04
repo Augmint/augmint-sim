@@ -14,6 +14,9 @@ const ActorDirectory = require("./actors/actor.directory.js");
 // DOM elements
 const clockElem = document.querySelector(".clock");
 const pauseBtn = document.querySelector(".pause-btn");
+const storeBtn = document.querySelector(".store-btn");
+const saveJSONBtn = document.querySelector(".save-json-btn");
+
 const restartBtn = document.querySelector(".restart-btn");
 const dumpStateBtn = document.querySelector(".dumpState-btn");
 const dumpMovesLogBtn = document.querySelector(".dumpMovesLog-btn");
@@ -254,6 +257,77 @@ function collapse() {
     }
 }
 
+function download(filename, text) {
+    var element = document.createElement("a");
+    element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(text));
+    element.setAttribute("download", filename);
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
+
+function getMainParamsAsJSON() {
+    const marketLockInterestRate = document.querySelector("[data-key='marketLockInterestRate']").value;
+    const lockedAcdInterestPercentage = document.querySelector("[data-key='lockedAcdInterestPercentage']").value;
+    const marketLoanInterestRate = document.querySelector("[data-key='marketLoanInterestRate']").value;
+    const ltdLoanDifferenceLimit = document.querySelector("[data-key='ltdLoanDifferenceLimit']").value;
+    const ltdLockDifferenceLimit = document.querySelector("[data-key='ltdLockDifferenceLimit']").value;
+    const allowedLtdDifferenceAmount = document.querySelector("[data-key='allowedLtdDifferenceAmount']").value;
+    const repaymentPeriodInDays = document.getElementById("repaymentPeriodInDays").value;
+    const loanInterestPt = document.getElementById("loanInterestPt").value;
+    const loanCollateralRatio = document.getElementById("loanCollateralRatio").value;
+
+    var jsonObj = `{
+                "marketLockInterestRate": ${marketLockInterestRate},
+                "lockedAcdInterestPercentage": ${lockedAcdInterestPercentage},
+                "marketLoanInterestRate": ${marketLoanInterestRate},
+                "ltdLoanDifferenceLimit": ${ltdLoanDifferenceLimit},
+                "ltdLockDifferenceLimit": ${ltdLockDifferenceLimit},
+                "allowedLtdDifferenceAmount": ${allowedLtdDifferenceAmount},
+                "repaymentPeriodInDays": ${repaymentPeriodInDays},
+                "loanInterestPt": ${loanInterestPt},
+                "loanCollateralRatio": ${loanCollateralRatio}
+              }`;
+
+    return jsonObj;
+}
+
+function saveAsJSON() {
+    var columnsResult = getActorsFromGui();
+    const params = getMainParamsAsJSON();
+
+    var jsonData = "{\"augmintOptions\": ";
+    jsonData += "{\"params\":";
+    jsonData += params;
+    jsonData += ",";
+    jsonData += "\"actors\": {";
+    columnsResult.forEach(function(actor,index) {
+        jsonData+="\""+actor.id+"\": ";
+        actor.type = actor.constructor.name;
+        delete actor.id;
+        jsonData+=JSON.stringify(actor)+",";
+    });
+    jsonData = jsonData.substring(0, jsonData.length - 1);
+    jsonData += "}}}";
+    download("params.json", JSON.stringify(JSON.parse(jsonData), null, 4) );
+}
+
+function collapseStore() {
+    const panel = document.getElementById("store-panel");
+    const style = panel.className;
+    const hidden = style.indexOf("hidden") !== -1;
+
+    if (hidden) {
+        panel.className = "";
+    } else {
+        panel.className = "hidden";
+    }
+}
+
 function getActorParamsBox(name, actor) {
     let template = document.getElementById("actor-params-item").innerHTML;
     template = template.replace("###NAME###", name);
@@ -353,6 +427,8 @@ function init() {
 
     restartBtn.disabled = true;
     restartBtn.addEventListener("click", restart);
+    storeBtn.addEventListener("click", collapseStore);
+    saveJSONBtn.addEventListener("click", saveAsJSON);
 
     pauseBtn.addEventListener("click", togglePause);
     ratesDropDown.addEventListener("change", () => ratesDropDownOnChange(ratesDropDown.value));
