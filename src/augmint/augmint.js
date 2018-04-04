@@ -61,6 +61,75 @@ module.exports = {
     locks: {},
     exchange: null, // set by simulation.init()
 
+    clearActors(actor) {
+        for (var prop in actor) {
+            if (actor.hasOwnProperty(prop)) {
+                delete actor[prop];
+            }
+        }
+    },
+    clearObject(obj) {
+        for (var prop in obj) {
+            if (obj.hasOwnProperty(prop)) {
+                delete obj[prop];
+            }
+        }
+    },
+    init() {
+        this.clearActors(this.actors);
+        this.actors = {};
+        this.clearObject(this.balances);
+        this.balances = {
+            // acd:
+            acdFeesEarned: Acd(0),
+            lockedAcdPool: Acd(0),
+            openLoansAcd: Acd(0),
+            defaultedLoansAcd: Acd(0),
+            interestEarnedPool: Acd(0),
+            exchangeAcd: Acd(0),
+            // eth:
+            ethFeesEarned: Eth(0),
+            collateralHeld: Eth(0),
+            exchangeEth: Eth(0)
+        };
+        this.clearObject(this.params.loanProduct);
+        this.clearObject(this.params);
+        this.params = {
+            marketLoanInterestRate: Pt(0.18), // what do we compete with?  actor's demand for loans depends on it
+            marketLockInterestRate: Pt(0.04), // what do we compete with? actor's demand for locks depends on it
+            exchangeFeePercentage: Pt(0.1),
+            lockedAcdInterestPercentage: Pt(0.5),
+            lockTimeInDays: 365,
+            ethUsdTrendSampleDays: 3, // how many days to inspect for rates.ethToUsdTrend calculation)
+            minimumLockAmount: Acd(100), // without interest
+            ltdDifferenceLimit: Pt(0.2) /* allow lock or loan if Loan To Deposut ratio stay within 1 +/- this param  */,
+            allowedLtdDifferenceAmount: Acd(
+                5000
+            ) /*  if totalLoan and totalLock difference is less than this
+                then allow loan or lock even if ltdDifference limit would go off with it */,
+            loanRepaymentCost: Acd(5) // gas and other costs in ACD - used when deciding if a loan worth to repay
+        };
+
+        this.rates = {
+            ethToAcd: 1, // i.e. price per acd in eth
+            ethToUsd: 1,
+            ethToUsdTrend: 0
+        };
+
+        this.orderBook.buy.length = 0;
+        this.orderBook.sell.length = 0;
+        this.loanProducts.length = 0;
+ 
+        this.clearObject(this.loanProducts[0]);
+        this.loanProducts.pop();
+
+        this.clearObject(this.loans);
+        this.loans = {};
+        this.clearObject(this.locks);
+        this.locks = {};
+        this.exchange = null;
+    },
+
     issueAcd(amount) {
         this.actors.reserve.balances.acd = this.actors.reserve.balances.acd.add(amount);
         return this.actors.reserve.balances.acd;
@@ -73,25 +142,32 @@ module.exports = {
 
     // TODO: move these under balances.
     get reserveAcd() {
-        return this.actors ? this.actors.reserve.balances.acd : Acd(0);
+        return this.actors && this.actors.reserve ? this.actors.reserve.balances.acd : Acd(0);
     },
     get reserveEth() {
         return this.actors && this.actors.reserve ? this.actors.reserve.balances.eth : ACD0;
     },
 
     get reserveAcdOnExchange() {
-        return this.exchange.getActorSellAcdOrdersSum("reserve");
+        return this.exchange ? this.exchange.getActorSellAcdOrdersSum("reserve") : ACD0;
     },
 
     get netAcdDemand() {
         const orderBook = this.orderBook;
+
+        // if (orderBook.buy && orderBook.sell && (orderBook.buy.length > 0 || orderBook.sell.length > 0)) {
+        //     console.log(JSON.stringify(orderBook));
+        // }
+
         const totalBuyAmount = orderBook.buy.reduce((sum, order) => {
             return sum.add(order.amount);
         }, ACD0);
         const totalSellAmount = orderBook.sell.reduce((sum, order) => {
             return sum.add(order.amount);
         }, ACD0);
-        return totalBuyAmount.sub(totalSellAmount).add(this.reserveAcdOnExchange);
+        return totalBuyAmount && totalSellAmount
+            ? totalBuyAmount.sub(totalSellAmount).add(this.reserveAcdOnExchange)
+            : ACD0;
     },
 
     get totalAcd() {
@@ -156,16 +232,6 @@ module.exports = {
             ? ACD0
             : maxLoan.round(bigNums.ACD_DP, 0);
 
-        //         console.debug(
-        //             `=== maxBorrowableAmount calcs:
-        //     totalLock: ${this.balances.lockedAcdPool} totalLoan: ${this.balances.openLoansAcd}
-        //     loanToDepositRatio: ${this.loanToDepositRatio} ltdDifferenceLimit: ${this.params.ltdDifferenceLimit}
-        //     minimumLoanAmount: ${this.loanProducts[productId].minimumLoanInAcd}
-        //     allowedByLtdDifferenceAmount: ${allowedByLtdDifferenceAmount}
-        //     allowedByLtdDifferencePt: ${allowedByLtdDifferencePt}
-        // ==> maxLoan: ${maxLoanWithMinLoanLimit}`
-        //         );
-
         return maxLoanWithMinLoanLimit;
     },
 
@@ -195,17 +261,6 @@ module.exports = {
         const maxLockWithMinLockLimit = maxLock.lt(this.params.minimumLockAmount)
             ? ACD0
             : maxLock.round(bigNums.ACD_DP, 0);
-
-        //         console.debug(
-        //             `=== maxLockableAmount calcs:
-        //     totalLock: ${this.balances.lockedAcdPool} totalLoan: ${this.balances.openLoansAcd}
-        //     loanToDepositRatio: ${this.loanToDepositRatio} ltdDifferenceLimit: ${this.params.ltdDifferenceLimit}
-        //     earned interestPool: ${this.balances.interestEarnedPool}
-        //     minimumLockAmount: ${this.params.minimumLockAmount}
-        //     allowedByLtdDifferencePt: ${allowedByLtdDifferencePt}
-        //     allowedByLtdDifferenceAmount: ${allowedByLtdDifferenceAmount} allowedByEarning: ${allowedByEarning}
-        // ===> maxLock: ${maxLockWithMinLockLimit}`
-        //         );
 
         return maxLockWithMinLockLimit;
     }

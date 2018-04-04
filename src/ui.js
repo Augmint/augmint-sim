@@ -1,5 +1,4 @@
 "use strict";
-
 const bigNums = require("./lib/bigNums.js");
 const Acd = bigNums.BigAcd;
 const Pt = bigNums.BigPt;
@@ -15,6 +14,7 @@ const ActorDirectory = require("./actors/actor.directory.js");
 // DOM elements
 const clockElem = document.querySelector(".clock");
 const pauseBtn = document.querySelector(".pause-btn");
+const restartBtn = document.querySelector(".restart-btn");
 const dumpStateBtn = document.querySelector(".dumpState-btn");
 const dumpMovesLogBtn = document.querySelector(".dumpMovesLog-btn");
 const toggleLogBtn = document.querySelector(".toggleLog-btn");
@@ -153,6 +153,10 @@ function showParamChangeAlert() {
     document.querySelector(".actor-alert").className = "actor-alert";
 }
 
+function hideParamChangeAlert() {
+    document.querySelector(".actor-alert").className = "actor-alert hidden";
+}
+
 function togglePause() {
     paused = !paused;
 
@@ -164,6 +168,7 @@ function togglePause() {
     if (paused) {
         // pausing sim:
         let runTime = Date.now() - benchmarkStart;
+        restartBtn.disabled = false;
         pauseBtn.innerHTML = "Continue";
         updateUIFromParams();
         inputs.forEach(input => {
@@ -182,8 +187,9 @@ function togglePause() {
         );
     } else {
         started = true;
+        restartBtn.disabled = true;
 
-        // restarting sim:
+        // Continuing the sim:
         benchmarkStart = Date.now();
         benchmarkItCt = 0;
         pauseBtn.innerHTML = "Pause";
@@ -254,7 +260,7 @@ function getActorParamsBox(name, actor) {
     template = template.replace("###TYPE###", actor.type);
     if (actor.count !== undefined) {
         template = template.replace("<span class=\"hidden\">", "<span>");
-        template = template.replace("###COUNT###", actor.count);
+        template = template.replace("999999", actor.count);
     }
 
     let balancesContent = "";
@@ -312,6 +318,31 @@ function renderActorParamsGui() {
     panel.innerHTML = content;
 }
 
+function restart() {
+    hideParamChangeAlert();
+    const actorInputs = Array.from(document.querySelectorAll(".actor-inputs input"));
+    actorInputs.forEach(input => {
+        input.disabled = false;
+    });
+    lastRender = -1;
+    clockElem.innerHTML = "0";
+    started = false;
+    graphs.clear(graphsWrapper);
+    graphs.init(graphsWrapper);
+
+    restartBtn.disabled = true;
+    logger.init(simulation.getState, logTextArea);
+    simulation.init({
+        simulationParams: {
+            randomSeed: "change this for different repeatable results. or do not pass for a random seed",
+            timeStep: 60 * 60 * 4 // 4 hours
+        },
+        // TODO: move all balances and params to UI
+        augmintOptions: scenario.augmintOptions
+    });
+    simulation.patchAugmintParams(getParamsFromUI());
+}
+
 function init() {
     renderActorParamsGui();
 
@@ -320,14 +351,15 @@ function init() {
 
     populateRatesDropDown();
 
+    restartBtn.disabled = true;
+    restartBtn.addEventListener("click", restart);
+
     pauseBtn.addEventListener("click", togglePause);
     ratesDropDown.addEventListener("change", () => ratesDropDownOnChange(ratesDropDown.value));
-
     dumpStateBtn.addEventListener("click", () => {
         simulation.patchAugmintParams(getParamsFromUI());
         logger.print(simulation.getState());
     });
-
     dumpMovesLogBtn.addEventListener("click", () => {
         let startPos = logTextArea.textLength;
         logger.printMovesLog();

@@ -13,14 +13,14 @@ const PT1 = bigNums.PT1;
 const Pt = bigNums.BigPt;
 
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
-const loanProducts = augmint.loanProducts;
+//const loanProducts = augmint.loanProducts;
 const loans = augmint.loans;
 // just gonna use a counter for id-ing loans:
 let counter = 0;
 
 function createLoanProduct(prod) {
-    loanProducts.push({
-        id: prod.id ? prod.id : loanProducts.length,
+    augmint.loanProducts.push({
+        id: prod.id ? prod.id : augmint.loanProducts.length,
         minimumLoanInAcd: prod.minimumLoanInAcd,
         loanCollateralRatio: prod.loanCollateralRatio,
         interestPt: prod.interestPt,
@@ -31,13 +31,13 @@ function createLoanProduct(prod) {
 
 function updateLoanProduct(prod) {
     // TODO: it works with only one loan product but we are fine with that for now
-    prod.id = loanProducts.length;
-    loanProducts.pop();
+    prod.id = augmint.loanProducts.length;
+    augmint.loanProducts.pop();
     createLoanProduct(prod);
 }
 
 function getLoanProducts() {
-    return loanProducts;
+    return augmint.loanProducts;
 }
 
 function takeLoan(actorId, loanProductId, loanAmountInAcd) {
@@ -49,7 +49,7 @@ function takeLoan(actorId, loanProductId, loanAmountInAcd) {
         return false;
     }
 
-    const loanProduct = loanProducts[loanProductId];
+    const loanProduct = augmint.loanProducts[loanProductId];
 
     if (!loanProduct) {
         throw new AugmintError("takeLoan() error: Invalid loanProduct Id:" + loanProductId);
@@ -219,6 +219,19 @@ function getLoansForActor(actorId) {
     return loans[actorId];
 }
 
+function clearObject(obj) {
+    for (var prop in obj) {
+        if (obj.hasOwnProperty(prop)) {
+            // console.log(JSON.stringify(obj, null, 3));
+            delete obj[prop];
+        }
+    }
+}
+
+function clearAllLoans() {
+    clearObject(loans);
+}
+
 module.exports = {
     createLoanProduct,
     updateLoanProduct,
@@ -227,5 +240,6 @@ module.exports = {
     repayLoan,
     collectDefaultedLoan,
     collectAllDefaultedLoans,
-    getLoansForActor
+    getLoansForActor,
+    clearAllLoans
 };
