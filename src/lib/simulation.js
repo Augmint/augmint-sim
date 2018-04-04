@@ -15,10 +15,10 @@ let random = new RandomSeed(params.randomSeed);
 const actors = new Set();
 
 function setSimulationParams(_params) {
-    if (_params.randomSeed != params.randomSeed) {
-        // new seed, to be tested...
-        random = new RandomSeed(_params.randomSeed);
-    }
+
+    // new seed, to be tested...
+    random = new RandomSeed(_params.randomSeed);
+ 
     Object.assign(params, _params);
     params.stepsPerDay = 24 / (params.timeStep / 60 / 60);
 }
@@ -33,10 +33,18 @@ function patchAugmintBalances(balances) {
 }
 
 function init(initParams) {
+    iteration = 0;
+    clock.setTime(0);
+
+    actors.clear();
+    loanManager.clearAllLoans();
+
+    augmint.init();
     augmint.exchange = exchange; // TODO: dirty hack. make this and/or augmint a class?
     setSimulationParams(initParams.simulationParams);
     patchAugmintBalances(initParams.augmintOptions.balances);
     patchAugmintParams(initParams.augmintOptions.params);
+    this.getState(true);
 }
 
 function byChanceInADay(dailyChance) {
@@ -47,7 +55,7 @@ function byChance(chance) {
     return random.random() < chance;
 }
 
-function getState() {
+function getState(showLog) {
     return {
         meta: {
             currentTime: clock.getTime(),
@@ -64,7 +72,6 @@ function getState() {
 }
 
 function incrementBy(_timeStep = params.timeStep) {
-
     rates.updateRates(getState());
 
     // actors make their moves:
@@ -101,12 +108,10 @@ function addActorsFromGui(newActors) {
 
 function setState(state) {
     clock.setTime(state.meta.currentTime || 0);
-
     actors.clear();
     addActors(state.augmint.actors);
 
     patchAugmintBalances(state.augmint.balances);
-
     patchAugmintParams(state.augmint.params);
 }
 
