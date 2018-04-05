@@ -16,6 +16,8 @@ const clockElem = document.querySelector(".clock");
 const pauseBtn = document.querySelector(".pause-btn");
 const storeBtn = document.querySelector(".store-btn");
 const saveJSONBtn = document.querySelector(".save-json-btn");
+const loadJSONBtn = document.querySelector(".load-json-btn");
+const fileInput = document.getElementById("file-input");
 
 const restartBtn = document.querySelector(".restart-btn");
 const dumpStateBtn = document.querySelector(".dumpState-btn");
@@ -277,9 +279,13 @@ function getMainParamsAsJSON() {
     const ltdLoanDifferenceLimit = document.querySelector("[data-key='ltdLoanDifferenceLimit']").value;
     const ltdLockDifferenceLimit = document.querySelector("[data-key='ltdLockDifferenceLimit']").value;
     const allowedLtdDifferenceAmount = document.querySelector("[data-key='allowedLtdDifferenceAmount']").value;
+    const lockTimeInDays = document.querySelector("[data-key='lockTimeInDays']").value;
     const repaymentPeriodInDays = document.getElementById("repaymentPeriodInDays").value;
     const loanInterestPt = document.getElementById("loanInterestPt").value;
     const loanCollateralRatio = document.getElementById("loanCollateralRatio").value;
+    const defaultFeePercentage = document.getElementById("defaultFeePercentage").value;
+    const minimumLoanInAcd = document.getElementById("minimumLoanInAcd").value;
+    const ethUsdTrendSampleDays = document.getElementById("ethUsdTrendSampleDays").value;
 
     var jsonObj = `{
                 "marketLockInterestRate": ${marketLockInterestRate},
@@ -288,16 +294,57 @@ function getMainParamsAsJSON() {
                 "ltdLoanDifferenceLimit": ${ltdLoanDifferenceLimit},
                 "ltdLockDifferenceLimit": ${ltdLockDifferenceLimit},
                 "allowedLtdDifferenceAmount": ${allowedLtdDifferenceAmount},
+                "lockTimeInDays": ${lockTimeInDays},
                 "repaymentPeriodInDays": ${repaymentPeriodInDays},
                 "loanInterestPt": ${loanInterestPt},
-                "loanCollateralRatio": ${loanCollateralRatio}
+                "loanCollateralRatio": ${loanCollateralRatio},
+                "defaultFeePercentage": ${defaultFeePercentage},
+                "minimumLoanInAcd": ${minimumLoanInAcd},
+                "ethUsdTrendSampleDays": ${ethUsdTrendSampleDays}
               }`;
 
     return jsonObj;
 }
 
+function renderMainParams(jsonObj) {
+    document.querySelector("[data-key='marketLockInterestRate']").value=jsonObj.marketLockInterestRate;
+    document.querySelector("[data-key='lockedAcdInterestPercentage']").value=jsonObj.lockedAcdInterestPercentage;
+    document.querySelector("[data-key='marketLoanInterestRate']").value=jsonObj.marketLoanInterestRate;
+    document.querySelector("[data-key='ltdLoanDifferenceLimit']").value=jsonObj.ltdLoanDifferenceLimit;
+    document.querySelector("[data-key='ltdLockDifferenceLimit']").value=jsonObj.ltdLockDifferenceLimit;
+    document.querySelector("[data-key='allowedLtdDifferenceAmount']").value=jsonObj.allowedLtdDifferenceAmount;
+    document.querySelector("[data-key='lockTimeInDays']").value=jsonObj.lockTimeInDays;
+    document.getElementById("repaymentPeriodInDays").value=jsonObj.repaymentPeriodInDays;
+    document.getElementById("loanInterestPt").value=jsonObj.loanInterestPt;
+    document.getElementById("loanCollateralRatio").value=jsonObj.loanCollateralRatio;
+    document.getElementById("defaultFeePercentage").value=jsonObj.defaultFeePercentage;
+    document.getElementById("minimumLoanInAcd").value=jsonObj.minimumLoanInAcd;
+    document.getElementById("ethUsdTrendSampleDays").value=jsonObj.ethUsdTrendSampleDays;
+}
+
+
+function showFileBrowser() {
+    const panel = document.getElementById("file-input-panel");
+    const style = panel.className;
+    const hidden = style.indexOf("hidden") !== -1;
+
+    if (hidden) {
+        panel.className = "";
+    } else {
+        panel.className = "hidden";
+    }
+}
+
+function isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+}
+
 function saveAsJSON() {
-    var columnsResult = getActorsFromGui();
+    var actorsFromGui = getActorsFromGui();
     const params = getMainParamsAsJSON();
 
     var jsonData = "{\"augmintOptions\": ";
@@ -305,11 +352,16 @@ function saveAsJSON() {
     jsonData += params;
     jsonData += ",";
     jsonData += "\"actors\": {";
-    columnsResult.forEach(function(actor,index) {
+    actorsFromGui.forEach(function(actor,index) {
+        let tempActor = new Object;
+        tempActor.type = actor.constructor.name;
+        tempActor.count = actor.count;
+        console.log(actor.constructor.name);
+        console.log(actor.parameters);
+        if (!isEmpty(actor.parameters)) tempActor.params = actor.parameters;
+        tempActor.balances = actor.balances;
         jsonData+="\""+actor.id+"\": ";
-        actor.type = actor.constructor.name;
-        delete actor.id;
-        jsonData+=JSON.stringify(actor)+",";
+        jsonData+=JSON.stringify(tempActor)+",";
     });
     jsonData = jsonData.substring(0, jsonData.length - 1);
     jsonData += "}}}";
@@ -329,53 +381,46 @@ function collapseStore() {
 }
 
 function getActorParamsBox(name, actor) {
-    let template = document.getElementById("actor-params-item").innerHTML;
-    template = template.replace("###NAME###", name);
-    template = template.replace("###TYPE###", actor.type);
-    if (actor.count !== undefined) {
-        template = template.replace("<span class=\"hidden\">", "<span>");
-        template = template.replace("999999", actor.count);
-    }
-
+    // let template = document.getElementById("actor-params-item").innerHTML;
     let balancesContent = "";
     for (var bal in actor.balances) {
         if (actor.balances.hasOwnProperty(bal)) {
             balancesContent +=
-                "<label class=\"technical-inputs actor-label\">" +
-                bal +
-                ": </label><input data-actor-balancename=\"" +
-                bal +
-                "\" data-actor-param=\"balance\" type=\"number\" value=\"" +
-                actor.balances[bal] +
-                "\"/><br/>";
+                `<label class="technical-inputs actor-label">${bal}</label>
+                <input data-actor-balancename="${bal}" data-actor-param="balance" type="number" value="${actor.balances[bal]}"/><br/>`;
         }
     }
-    template = template.replace("###BALANCES###", balancesContent);
 
-    if (actor.params === undefined) {
-        template = template.replace("<h5>params</h5>", "");
-        template = template.replace("###PARAMS###", "");
-    } else {
-        let paramsContent = "";
-        for (var p in actor.params) {
-            if (actor.params.hasOwnProperty(p)) {
-                paramsContent +=
-                    "<label class=\"technical-inputs actor-label small-label\">" +
-                    p +
-                    ": </label><input data-actor-paramname=\"" +
-                    p +
-                    "\" data-actor-param=\"param\" type=\"number\" value=\"" +
-                    actor.params[p] +
-                    "\"/><br/>";
-            }
+    let paramsContent = "";
+    for (var p in actor.params) {
+        if (actor.params.hasOwnProperty(p)) {
+            paramsContent +=
+                `<label class="technical-inputs actor-label small-label">${p}</label>
+                 <input data-actor-paramname="${p}" data-actor-param="param" type="number" value="${actor.params[p]}" />
+                 <br/>`;
         }
-        template = template.replace("###PARAMS###", paramsContent);
     }
 
+    const template =
+    `<div id="actor-params-item">
+        <div class="flex-item actor-item">
+          <div class="actor-inputs">
+            <h4 data-actor-param="name">${name}</h4>
+            <span data-actor-param="type" class="actor-type">${actor.type}</span><br/>
+            <span class="${actor.count ? "" : "hidden"}"><label class="technical-inputs actor-label">count: </label><input type="number" data-actor-param="count" value="${actor.count ? actor.count : 0}"/><br/></span>
+            <h5>Starting balance</h5>
+              ${balancesContent}
+              ${actor.params ?  "<h5>params</h5>" : ""}
+              ${paramsContent}
+          </div>
+        </div>
+      </div>`;
+ 
     return template;
 }
 
-function renderActorParamsGui() {
+function renderActorParamsGui(actors) {
+
     const panel = document.getElementById("actor-params-container");
     const collapsePanel = document.querySelector(".collapse-bar");
 
@@ -383,9 +428,9 @@ function renderActorParamsGui() {
 
     let content = "";
 
-    for (var name in scenario.actors) {
-        if (scenario.actors.hasOwnProperty(name)) {
-            content += getActorParamsBox(name, scenario.actors[name]);
+    for (var name in actors) {
+        if (actors.hasOwnProperty(name)) {
+            content += getActorParamsBox(name, actors[name]);
         }
     }
 
@@ -417,8 +462,34 @@ function restart() {
     simulation.patchAugmintParams(getParamsFromUI());
 }
 
+
+function parseLoadedJSON(contents) {
+    const jsonObj = JSON.parse(contents);
+    renderActorParamsGui(jsonObj.augmintOptions.actors);
+    renderMainParams(jsonObj.augmintOptions.params);
+}
+
+function loadFile(e) {
+    var file = e.target.files[0];
+    if (!file) {
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var contents = e.target.result;
+        parseLoadedJSON(contents);
+    };
+    reader.readAsText(file);
+}
+
 function init() {
-    renderActorParamsGui();
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+        fileInput.addEventListener("change", loadFile, false);
+    } else {
+        errorMsg.innerHTML = "<p>File api not supported by your browser</p>";
+    }
+
+    renderActorParamsGui(scenario.actors);
 
     graphs.init(graphsWrapper);
     logger.init(simulation.getState, logTextArea);
@@ -429,6 +500,7 @@ function init() {
     restartBtn.addEventListener("click", restart);
     storeBtn.addEventListener("click", collapseStore);
     saveJSONBtn.addEventListener("click", saveAsJSON);
+    loadJSONBtn.addEventListener("click", showFileBrowser);
 
     pauseBtn.addEventListener("click", togglePause);
     ratesDropDown.addEventListener("change", () => ratesDropDownOnChange(ratesDropDown.value));
