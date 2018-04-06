@@ -17,7 +17,9 @@ const pauseBtn = document.querySelector(".pause-btn");
 const storeBtn = document.querySelector(".store-btn");
 const saveJSONBtn = document.querySelector(".save-json-btn");
 const loadJSONBtn = document.querySelector(".load-json-btn");
-const fileInput = document.getElementById("file-input");
+const saveLSBtn = document.querySelector(".save-ls-btn");
+const loadLSBtn = document.querySelector(".load-ls-btn");
+const jsonFileInput = document.getElementById("json-file-input");
 
 const restartBtn = document.querySelector(".restart-btn");
 const dumpStateBtn = document.querySelector(".dumpState-btn");
@@ -30,6 +32,7 @@ const inputs = Array.from(document.querySelectorAll(".sim-inputs input"));
 
 const graphsWrapper = document.querySelector(".graphs-wrapper");
 const errorMsg = document.querySelector(".error-msg");
+const msg = document.querySelector(".msg");
 
 let lastRender = -1;
 let paused = true;
@@ -145,7 +148,6 @@ function getActorsFromGui() {
         const actor = new ActorDirectory[actorType](actorName, balances, null, params);
         actor.balances = balances;
         actor.parameters = params;
-        // console.log(balances);
         if (count !== null) {
             actor.count = parseInt(count);
         }
@@ -273,34 +275,34 @@ function download(filename, text) {
 }
 
 function getMainParamsAsJSON() {
-    const marketLockInterestRate = document.querySelector("[data-key='marketLockInterestRate']").value;
-    const lockedAcdInterestPercentage = document.querySelector("[data-key='lockedAcdInterestPercentage']").value;
-    const marketLoanInterestRate = document.querySelector("[data-key='marketLoanInterestRate']").value;
-    const ltdLoanDifferenceLimit = document.querySelector("[data-key='ltdLoanDifferenceLimit']").value;
-    const ltdLockDifferenceLimit = document.querySelector("[data-key='ltdLockDifferenceLimit']").value;
+    const marketLockInterestRate = Pt(document.querySelector("[data-key='marketLockInterestRate']").value).toFixed(2);
+    const lockedAcdInterestPercentage = Pt(document.querySelector("[data-key='lockedAcdInterestPercentage']").value).toFixed(2);
+    const marketLoanInterestRate = Pt(document.querySelector("[data-key='marketLoanInterestRate']").value).toFixed(2);
+    const ltdLoanDifferenceLimit = Pt(document.querySelector("[data-key='ltdLoanDifferenceLimit']").value).toFixed(2);
+    const ltdLockDifferenceLimit = Pt(document.querySelector("[data-key='ltdLockDifferenceLimit']").value).toFixed(2);
     const allowedLtdDifferenceAmount = document.querySelector("[data-key='allowedLtdDifferenceAmount']").value;
     const lockTimeInDays = document.querySelector("[data-key='lockTimeInDays']").value;
     const repaymentPeriodInDays = document.getElementById("repaymentPeriodInDays").value;
-    const loanInterestPt = document.getElementById("loanInterestPt").value;
-    const loanCollateralRatio = document.getElementById("loanCollateralRatio").value;
+    const loanInterestPt = Pt(document.getElementById("loanInterestPt").value).toFixed(2);
+    const loanCollateralRatio = Pt(document.getElementById("loanCollateralRatio").value).toFixed(2);
     const defaultFeePercentage = document.getElementById("defaultFeePercentage").value;
     const minimumLoanInAcd = document.getElementById("minimumLoanInAcd").value;
     const ethUsdTrendSampleDays = document.getElementById("ethUsdTrendSampleDays").value;
 
     var jsonObj = `{
-                "marketLockInterestRate": ${marketLockInterestRate},
-                "lockedAcdInterestPercentage": ${lockedAcdInterestPercentage},
-                "marketLoanInterestRate": ${marketLoanInterestRate},
-                "ltdLoanDifferenceLimit": ${ltdLoanDifferenceLimit},
-                "ltdLockDifferenceLimit": ${ltdLockDifferenceLimit},
-                "allowedLtdDifferenceAmount": ${allowedLtdDifferenceAmount},
-                "lockTimeInDays": ${lockTimeInDays},
-                "repaymentPeriodInDays": ${repaymentPeriodInDays},
-                "loanInterestPt": ${loanInterestPt},
-                "loanCollateralRatio": ${loanCollateralRatio},
-                "defaultFeePercentage": ${defaultFeePercentage},
-                "minimumLoanInAcd": ${minimumLoanInAcd},
-                "ethUsdTrendSampleDays": ${ethUsdTrendSampleDays}
+                "marketLockInterestRate": "${marketLockInterestRate}",
+                "lockedAcdInterestPercentage": "${lockedAcdInterestPercentage}",
+                "marketLoanInterestRate": "${marketLoanInterestRate}",
+                "ltdLoanDifferenceLimit": "${ltdLoanDifferenceLimit}",
+                "ltdLockDifferenceLimit": "${ltdLockDifferenceLimit}",
+                "allowedLtdDifferenceAmount": "${allowedLtdDifferenceAmount}",
+                "lockTimeInDays": "${lockTimeInDays}",
+                "repaymentPeriodInDays": "${repaymentPeriodInDays}",
+                "loanInterestPt": "${loanInterestPt}",
+                "loanCollateralRatio": "${loanCollateralRatio}",
+                "defaultFeePercentage": "${defaultFeePercentage}",
+                "minimumLoanInAcd": "${minimumLoanInAcd}",
+                "ethUsdTrendSampleDays": "${ethUsdTrendSampleDays}"
               }`;
 
     return jsonObj;
@@ -323,8 +325,8 @@ function renderMainParams(jsonObj) {
 }
 
 
-function showFileBrowser() {
-    const panel = document.getElementById("file-input-panel");
+function showJSONFileBrowser() {
+    const panel = document.getElementById("json-file-input-panel");
     const style = panel.className;
     const hidden = style.indexOf("hidden") !== -1;
 
@@ -335,6 +337,8 @@ function showFileBrowser() {
     }
 }
 
+
+
 function isEmpty(obj) {
     for(var key in obj) {
         if(obj.hasOwnProperty(key))
@@ -343,7 +347,7 @@ function isEmpty(obj) {
     return true;
 }
 
-function saveAsJSON() {
+function getParamsAsJSON() {
     var actorsFromGui = getActorsFromGui();
     const params = getMainParamsAsJSON();
 
@@ -356,8 +360,6 @@ function saveAsJSON() {
         let tempActor = new Object;
         tempActor.type = actor.constructor.name;
         tempActor.count = actor.count;
-        console.log(actor.constructor.name);
-        console.log(actor.parameters);
         if (!isEmpty(actor.parameters)) tempActor.params = actor.parameters;
         tempActor.balances = actor.balances;
         jsonData+="\""+actor.id+"\": ";
@@ -365,7 +367,20 @@ function saveAsJSON() {
     });
     jsonData = jsonData.substring(0, jsonData.length - 1);
     jsonData += "}}}";
-    download("params.json", JSON.stringify(JSON.parse(jsonData), null, 4) );
+    return JSON.stringify(JSON.parse(jsonData), null, 4);
+}
+
+function saveToLocalStorage() {
+    localStorage.setItem("parameters",getParamsAsJSON());
+    msg.innerHTML = "Successfully saved to local storage.";
+    msg.className = "msg";
+    setTimeout(function(){
+        msg.className = "msg msg-hidden";
+    }, 2*1000);
+}
+
+function saveAsJSON() {
+    download("params.json", getParamsAsJSON());
 }
 
 function collapseStore() {
@@ -415,7 +430,7 @@ function getActorParamsBox(name, actor) {
           </div>
         </div>
       </div>`;
- 
+
     return template;
 }
 
@@ -482,9 +497,15 @@ function loadFile(e) {
     reader.readAsText(file);
 }
 
+function loadFromLoalStorage() {
+    const jsonObj = JSON.parse(localStorage.getItem("parameters"));
+    renderActorParamsGui(jsonObj.augmintOptions.actors);
+    renderMainParams(jsonObj.augmintOptions.params);
+}
+
 function init() {
     if (window.File && window.FileReader && window.FileList && window.Blob) {
-        fileInput.addEventListener("change", loadFile, false);
+        jsonFileInput.addEventListener("change", loadFile, false);
     } else {
         errorMsg.innerHTML = "<p>File api not supported by your browser</p>";
     }
@@ -500,7 +521,9 @@ function init() {
     restartBtn.addEventListener("click", restart);
     storeBtn.addEventListener("click", collapseStore);
     saveJSONBtn.addEventListener("click", saveAsJSON);
-    loadJSONBtn.addEventListener("click", showFileBrowser);
+    loadJSONBtn.addEventListener("click", showJSONFileBrowser);
+    saveLSBtn.addEventListener("click", saveToLocalStorage);
+    loadLSBtn.addEventListener("click", loadFromLoalStorage);
 
     pauseBtn.addEventListener("click", togglePause);
     ratesDropDown.addEventListener("change", () => ratesDropDownOnChange(ratesDropDown.value));
