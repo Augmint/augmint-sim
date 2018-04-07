@@ -247,8 +247,9 @@ function populateRatesDropDown() {
 }
 
 function collapse(e) {
-    const panel = e.target.parentElement;
     const subPanel = e.target;
+    const panel = subPanel.parentElement;
+
     const style = panel.className;
     const closed = style.indexOf("closed") !== -1;
 
@@ -439,11 +440,11 @@ function getActorParamsBox(name, actor) {
 function renderActorParamsGui(actors) {
 
     const panel = document.getElementById("actor-params-container");
-    const actorsPanel = document.getElementById("actors-panel");
-    const sysParamsPanel = document.getElementById("sys-params-panel");
+    const collapseBars = document.querySelectorAll(".collapse-bar");
 
-    actorsPanel.addEventListener("click", collapse, true);
-    sysParamsPanel.addEventListener("click", collapse, true);
+    for (let i = 0; i < collapseBars.length; ++i) {
+        collapseBars[i].addEventListener("click", collapse, true);
+    }
 
     let content = "";
 
