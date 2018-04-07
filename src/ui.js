@@ -246,18 +246,20 @@ function populateRatesDropDown() {
     });
 }
 
-function collapse() {
-    const style = document.querySelector(".collapse-panel").className;
+function collapse(e) {
+    const panel = e.target.parentElement;
+    const subPanel = e.target;
+    const style = panel.className;
     const closed = style.indexOf("closed") !== -1;
 
     if (closed) {
-        document.querySelector(".collapse-panel").className = "collapse-panel";
-        document.querySelector(".collapse-button").innerHTML = "&minus;";
-        document.querySelector(".collapse-content").className = "collapse-content";
+        panel.className = "collapse-panel";
+        subPanel.innerHTML = subPanel.innerHTML.replace("+","−");
+        panel.querySelector(".collapse-content").className = "collapse-content";
     } else {
-        document.querySelector(".collapse-panel").className = "collapse-panel closed";
-        document.querySelector(".collapse-button").innerHTML = "+";
-        document.querySelector(".collapse-content").className = "collapse-content hidden";
+        panel.className = "collapse-panel closed";
+        subPanel.innerHTML = subPanel.innerHTML.replace("−","+");
+        panel.querySelector(".collapse-content").className = "collapse-content hidden";
     }
 }
 
@@ -437,9 +439,11 @@ function getActorParamsBox(name, actor) {
 function renderActorParamsGui(actors) {
 
     const panel = document.getElementById("actor-params-container");
-    const collapsePanel = document.querySelector(".collapse-bar");
+    const actorsPanel = document.getElementById("actors-panel");
+    const sysParamsPanel = document.getElementById("sys-params-panel");
 
-    collapsePanel.addEventListener("click", collapse);
+    actorsPanel.addEventListener("click", collapse, true);
+    sysParamsPanel.addEventListener("click", collapse, true);
 
     let content = "";
 
