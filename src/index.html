@@ -11,6 +11,7 @@
     }
 
     .buttons {
+        display:flex;
         margin-top: 10px;
     }
 
@@ -19,20 +20,42 @@
     }
 
     .btn {
-        margin-bottom: 10px;
-        padding: 6px 10px;
-        font-size: 1em;
+      margin-left: 10px;
+      margin-bottom: 10px;
+      font-size: 0.9em;
+      height: 34px;
+      border-radius: 5px;
+      border-style: solid;
+      border-color: #9c9999;
+      border-width: 1px;
     }
 
     .logo {
+      margin-right: 15px;
+      float: left;
+      width: 140px;
+    }
+
+
+    .github-link {
+      margin-left: 10px;
+      margin-bottom: 10px;
+      font-size: 0.9em;
+      margin-right: 15px;
+      width: 35px;
+    }
+
+    .github-logo {
         margin-right: 15px;
         float: left;
-        width: 140px;
+        width: 35px;
     }
+
 
     .flex-container {
         display: flex;
         flex-wrap: wrap;
+        margin-left: 5px;
     }
 
     .flex-item {
@@ -43,16 +66,38 @@
         border-radius: 10px;
     }
 
-
     label {
-        float: left;
-        width: 290px;
         margin-left: 10px;
+        margin-top: 4px;
     }
 
-    input[type=number]{
+    .label {
+        margin-right: -94px;
+        margin-left: 12px;
+        margin-top: -18px;
+        font-size: 0.9em;
+    }
+
+    .rates-dropdown {
+        height: 35px;
+        border-radius: 10px;
+        min-width: 139px;
+    }
+
+    input[type=number] {
+        margin-right: 15px;
         width: 75px;
         text-align: right;
+        float: right;
+        height: 15px;
+        border-radius: 5px;
+        border-style: solid;
+        border-width: 1px;
+        border-color: #aaa;
+    }
+
+    input[type=file] {
+        margin-left: 164px;
     }
 
     input:disabled{
@@ -73,6 +118,26 @@
     .error-msg p {
         color: rgb(230, 88, 88);
         margin: 0 0 15px 0;
+    }
+
+    .msg {
+        position: fixed;
+        top: 3px;
+        background-color: #bae9ba;
+        color: black;
+        width: 20%;
+        margin-left: 40%;
+        text-align: center;
+        padding: 2px;
+        opacity: 1;
+    }
+
+    .msg-hidden {
+        opacity:0;
+        -webkit-transition: opacity 2s ease-in-out;
+        -moz-transition: opacity 2s ease-in-out;
+        -ms-transition: opacity 2s ease-in-out;
+        -o-transition: opacity 2s ease-in-out;
     }
 
     /* actor css */
@@ -109,6 +174,7 @@
       background-color: #eeeeee;
       margin-bottom: 15px;
       padding-bottom: 10px;
+      min-height: 400px;
     }
 
     .actor-inputs > h4{
@@ -133,6 +199,15 @@
 
     .small-label {
       font-size: 10px;
+    }
+
+
+    .sim-inputs, .loanproduct-inputs {
+      line-height: 25px;
+    }
+
+    .actor-inputs {
+      line-height: 20px;
     }
 
     .actor-type{
@@ -176,7 +251,7 @@
         display:none;
     }
 
-    .collapse-button {
+    .collapse-bar::first-letter {
         margin-left: 10px;
         border-width: 1px;
         border-style: solid;
@@ -194,15 +269,32 @@
 </head>
 <body>
     <div class="error-msg"></div>
+    <div class="msg msg-hidden"></div>
     <img class="logo" src="2_augmint_alternate-logo_reversed-360.jpg" alt="Augmint logo">
     <div class="buttons">
         <button class="btn pause-btn">Start</button>
         <button class="btn restart-btn">Restart</button>
-        <label2 for="rates-dropdown">Set ETH/USD:</label2>
+        <label class="label" for="rates-dropdown">Set ETH/USD:</label>
         <select id="rates-dropdown" class="dropdown rates-dropdown">
         </select>
         <button class="btn toggleLog-btn">Show log</button>
-        <a href="https://github.com/DecentLabs/augmint-sim/blob/master/src/scenarios/base.js" target="_blank">Simulation parameters</a>
+        <button class="btn store-btn ">Save/load params</button>
+        <div class="github-link" >
+          <a href="https://github.com/Augmint/augmint-sim" target="_blank">
+            <img class="github-logo" src="GitHub-Mark-64px.png" alt="Simulation parameters">
+          </a>
+        </div>
+    </div>
+    <div class="hidden" id="store-panel">
+      <div>
+          <button class="btn load-json-btn">Load JSON</button>
+          <button class="btn save-json-btn">Save JSON</button>
+          <button class="btn load-ls-btn">Load from local storage</button>
+          <button class="btn save-ls-btn">Save to local storage</button>
+      </div>
+        <div id="json-file-input-panel" class="hidden">
+          <input type="file" id="json-file-input" >
+        </div>
     </div>
     <div class="log-wrapper" style="display: none;">
         <div>
@@ -216,7 +308,14 @@
         </div>
     </div>
     <br/>
-    <div class="flex-container">
+    <div id="sys-params-panel" class="collapse-panel closed">
+      <div class="collapse-bar">
+        +
+        Monetary and system params
+      </div>
+    <div class="collapse-content hidden">
+      <h4>Monetary and system params</h4>
+      <div class="flex-container">
         <div class="flex-item">
             <h4>Monetary params:</h4>
             <!-- <label>Exchange Fees (%): <input type="number" value="0" data-key="exchangeFeePercentage"/></label> -->
@@ -249,11 +348,12 @@
             <label class="technical-inputs">ethUsdTrendSampleDays: </label><input type="number" id="ethUsdTrendSampleDays"/><br/>
             <br/>
         </div>
+      </div>
     </div>
-    <div class="collapse-panel closed">
-      <div class="collapse-bar">
-        <span class="collapse-button">+</span>
-        <h4>Initial params</h4>
+    </div>
+    <div id="actors-panel" class="collapse-panel closed">
+      <div class="collapse-bar">+
+        Initial params
       </div>
       <div class="collapse-content hidden">
         <div class="actor-alert hidden">

@@ -14,6 +14,13 @@ const ActorDirectory = require("./actors/actor.directory.js");
 // DOM elements
 const clockElem = document.querySelector(".clock");
 const pauseBtn = document.querySelector(".pause-btn");
+const storeBtn = document.querySelector(".store-btn");
+const saveJSONBtn = document.querySelector(".save-json-btn");
+const loadJSONBtn = document.querySelector(".load-json-btn");
+const saveLSBtn = document.querySelector(".save-ls-btn");
+const loadLSBtn = document.querySelector(".load-ls-btn");
+const jsonFileInput = document.getElementById("json-file-input");
+
 const restartBtn = document.querySelector(".restart-btn");
 const dumpStateBtn = document.querySelector(".dumpState-btn");
 const dumpMovesLogBtn = document.querySelector(".dumpMovesLog-btn");
@@ -25,6 +32,7 @@ const inputs = Array.from(document.querySelectorAll(".sim-inputs input"));
 
 const graphsWrapper = document.querySelector(".graphs-wrapper");
 const errorMsg = document.querySelector(".error-msg");
+const msg = document.querySelector(".msg");
 
 let lastRender = -1;
 let paused = true;
@@ -140,7 +148,6 @@ function getActorsFromGui() {
         const actor = new ActorDirectory[actorType](actorName, balances, null, params);
         actor.balances = balances;
         actor.parameters = params;
-        // console.log(balances);
         if (count !== null) {
             actor.count = parseInt(count);
         }
@@ -239,79 +246,211 @@ function populateRatesDropDown() {
     });
 }
 
-function collapse() {
-    const style = document.querySelector(".collapse-panel").className;
+function collapse(e) {
+    const subPanel = e.target;
+    const panel = subPanel.parentElement;
+
+    const style = panel.className;
     const closed = style.indexOf("closed") !== -1;
 
     if (closed) {
-        document.querySelector(".collapse-panel").className = "collapse-panel";
-        document.querySelector(".collapse-button").innerHTML = "&minus;";
-        document.querySelector(".collapse-content").className = "collapse-content";
+        panel.className = "collapse-panel";
+        subPanel.innerHTML = subPanel.innerHTML.replace("+","−");
+        panel.querySelector(".collapse-content").className = "collapse-content";
     } else {
-        document.querySelector(".collapse-panel").className = "collapse-panel closed";
-        document.querySelector(".collapse-button").innerHTML = "+";
-        document.querySelector(".collapse-content").className = "collapse-content hidden";
+        panel.className = "collapse-panel closed";
+        subPanel.innerHTML = subPanel.innerHTML.replace("−","+");
+        panel.querySelector(".collapse-content").className = "collapse-content hidden";
+    }
+}
+
+function download(filename, text) {
+    var element = document.createElement("a");
+    element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(text));
+    element.setAttribute("download", filename);
+
+    element.style.display = "none";
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
+}
+
+function getMainParamsAsJSON() {
+    const marketLockInterestRate = Pt(document.querySelector("[data-key='marketLockInterestRate']").value).toFixed(2);
+    const lockedAcdInterestPercentage = Pt(document.querySelector("[data-key='lockedAcdInterestPercentage']").value).toFixed(2);
+    const marketLoanInterestRate = Pt(document.querySelector("[data-key='marketLoanInterestRate']").value).toFixed(2);
+    const ltdLoanDifferenceLimit = Pt(document.querySelector("[data-key='ltdLoanDifferenceLimit']").value).toFixed(2);
+    const ltdLockDifferenceLimit = Pt(document.querySelector("[data-key='ltdLockDifferenceLimit']").value).toFixed(2);
+    const allowedLtdDifferenceAmount = document.querySelector("[data-key='allowedLtdDifferenceAmount']").value;
+    const lockTimeInDays = document.querySelector("[data-key='lockTimeInDays']").value;
+    const repaymentPeriodInDays = document.getElementById("repaymentPeriodInDays").value;
+    const loanInterestPt = Pt(document.getElementById("loanInterestPt").value).toFixed(2);
+    const loanCollateralRatio = Pt(document.getElementById("loanCollateralRatio").value).toFixed(2);
+    const defaultFeePercentage = document.getElementById("defaultFeePercentage").value;
+    const minimumLoanInAcd = document.getElementById("minimumLoanInAcd").value;
+    const ethUsdTrendSampleDays = document.getElementById("ethUsdTrendSampleDays").value;
+
+    var jsonObj = `{
+                "marketLockInterestRate": "${marketLockInterestRate}",
+                "lockedAcdInterestPercentage": "${lockedAcdInterestPercentage}",
+                "marketLoanInterestRate": "${marketLoanInterestRate}",
+                "ltdLoanDifferenceLimit": "${ltdLoanDifferenceLimit}",
+                "ltdLockDifferenceLimit": "${ltdLockDifferenceLimit}",
+                "allowedLtdDifferenceAmount": "${allowedLtdDifferenceAmount}",
+                "lockTimeInDays": "${lockTimeInDays}",
+                "repaymentPeriodInDays": "${repaymentPeriodInDays}",
+                "loanInterestPt": "${loanInterestPt}",
+                "loanCollateralRatio": "${loanCollateralRatio}",
+                "defaultFeePercentage": "${defaultFeePercentage}",
+                "minimumLoanInAcd": "${minimumLoanInAcd}",
+                "ethUsdTrendSampleDays": "${ethUsdTrendSampleDays}"
+              }`;
+
+    return jsonObj;
+}
+
+function renderMainParams(jsonObj) {
+    document.querySelector("[data-key='marketLockInterestRate']").value=jsonObj.marketLockInterestRate;
+    document.querySelector("[data-key='lockedAcdInterestPercentage']").value=jsonObj.lockedAcdInterestPercentage;
+    document.querySelector("[data-key='marketLoanInterestRate']").value=jsonObj.marketLoanInterestRate;
+    document.querySelector("[data-key='ltdLoanDifferenceLimit']").value=jsonObj.ltdLoanDifferenceLimit;
+    document.querySelector("[data-key='ltdLockDifferenceLimit']").value=jsonObj.ltdLockDifferenceLimit;
+    document.querySelector("[data-key='allowedLtdDifferenceAmount']").value=jsonObj.allowedLtdDifferenceAmount;
+    document.querySelector("[data-key='lockTimeInDays']").value=jsonObj.lockTimeInDays;
+    document.getElementById("repaymentPeriodInDays").value=jsonObj.repaymentPeriodInDays;
+    document.getElementById("loanInterestPt").value=jsonObj.loanInterestPt;
+    document.getElementById("loanCollateralRatio").value=jsonObj.loanCollateralRatio;
+    document.getElementById("defaultFeePercentage").value=jsonObj.defaultFeePercentage;
+    document.getElementById("minimumLoanInAcd").value=jsonObj.minimumLoanInAcd;
+    document.getElementById("ethUsdTrendSampleDays").value=jsonObj.ethUsdTrendSampleDays;
+}
+
+
+function showJSONFileBrowser() {
+    const panel = document.getElementById("json-file-input-panel");
+    const style = panel.className;
+    const hidden = style.indexOf("hidden") !== -1;
+
+    if (hidden) {
+        panel.className = "";
+    } else {
+        panel.className = "hidden";
+    }
+}
+
+
+
+function isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+}
+
+function getParamsAsJSON() {
+    var actorsFromGui = getActorsFromGui();
+    const params = getMainParamsAsJSON();
+
+    var jsonData = "{\"augmintOptions\": ";
+    jsonData += "{\"params\":";
+    jsonData += params;
+    jsonData += ",";
+    jsonData += "\"actors\": {";
+    actorsFromGui.forEach(function(actor,index) {
+        let tempActor = new Object;
+        tempActor.type = actor.constructor.name;
+        tempActor.count = actor.count;
+        if (!isEmpty(actor.parameters)) tempActor.params = actor.parameters;
+        tempActor.balances = actor.balances;
+        jsonData+="\""+actor.id+"\": ";
+        jsonData+=JSON.stringify(tempActor)+",";
+    });
+    jsonData = jsonData.substring(0, jsonData.length - 1);
+    jsonData += "}}}";
+    return JSON.stringify(JSON.parse(jsonData), null, 4);
+}
+
+function saveToLocalStorage() {
+    localStorage.setItem("parameters",getParamsAsJSON());
+    msg.innerHTML = "Successfully saved to local storage.";
+    msg.className = "msg";
+    setTimeout(function(){
+        msg.className = "msg msg-hidden";
+    }, 2*1000);
+}
+
+function saveAsJSON() {
+    download("params.json", getParamsAsJSON());
+}
+
+function collapseStore() {
+    const panel = document.getElementById("store-panel");
+    const style = panel.className;
+    const hidden = style.indexOf("hidden") !== -1;
+
+    if (hidden) {
+        panel.className = "";
+    } else {
+        panel.className = "hidden";
     }
 }
 
 function getActorParamsBox(name, actor) {
-    let template = document.getElementById("actor-params-item").innerHTML;
-    template = template.replace("###NAME###", name);
-    template = template.replace("###TYPE###", actor.type);
-    if (actor.count !== undefined) {
-        template = template.replace("<span class=\"hidden\">", "<span>");
-        template = template.replace("999999", actor.count);
-    }
-
+    // let template = document.getElementById("actor-params-item").innerHTML;
     let balancesContent = "";
     for (var bal in actor.balances) {
         if (actor.balances.hasOwnProperty(bal)) {
             balancesContent +=
-                "<label class=\"technical-inputs actor-label\">" +
-                bal +
-                ": </label><input data-actor-balancename=\"" +
-                bal +
-                "\" data-actor-param=\"balance\" type=\"number\" value=\"" +
-                actor.balances[bal] +
-                "\"/><br/>";
+                `<label class="technical-inputs actor-label">${bal}</label>
+                <input data-actor-balancename="${bal}" data-actor-param="balance" type="number" value="${actor.balances[bal]}"/><br/>`;
         }
     }
-    template = template.replace("###BALANCES###", balancesContent);
 
-    if (actor.params === undefined) {
-        template = template.replace("<h5>params</h5>", "");
-        template = template.replace("###PARAMS###", "");
-    } else {
-        let paramsContent = "";
-        for (var p in actor.params) {
-            if (actor.params.hasOwnProperty(p)) {
-                paramsContent +=
-                    "<label class=\"technical-inputs actor-label small-label\">" +
-                    p +
-                    ": </label><input data-actor-paramname=\"" +
-                    p +
-                    "\" data-actor-param=\"param\" type=\"number\" value=\"" +
-                    actor.params[p] +
-                    "\"/><br/>";
-            }
+    let paramsContent = "";
+    for (var p in actor.params) {
+        if (actor.params.hasOwnProperty(p)) {
+            paramsContent +=
+                `<label class="technical-inputs actor-label small-label">${p}</label>
+                 <input data-actor-paramname="${p}" data-actor-param="param" type="number" value="${actor.params[p]}" />
+                 <br/>`;
         }
-        template = template.replace("###PARAMS###", paramsContent);
     }
+
+    const template =
+    `<div id="actor-params-item">
+        <div class="flex-item actor-item">
+          <div class="actor-inputs">
+            <h4 data-actor-param="name">${name}</h4>
+            <span data-actor-param="type" class="actor-type">${actor.type}</span><br/>
+            <span class="${actor.count ? "" : "hidden"}"><label class="technical-inputs actor-label">count: </label><input type="number" data-actor-param="count" value="${actor.count ? actor.count : 0}"/><br/></span>
+            <h5>Starting balance</h5>
+              ${balancesContent}
+              ${actor.params ?  "<h5>params</h5>" : ""}
+              ${paramsContent}
+          </div>
+        </div>
+      </div>`;
 
     return template;
 }
 
-function renderActorParamsGui() {
-    const panel = document.getElementById("actor-params-container");
-    const collapsePanel = document.querySelector(".collapse-bar");
+function renderActorParamsGui(actors) {
 
-    collapsePanel.addEventListener("click", collapse);
+    const panel = document.getElementById("actor-params-container");
+    const collapseBars = document.querySelectorAll(".collapse-bar");
+
+    for (let i = 0; i < collapseBars.length; ++i) {
+        collapseBars[i].addEventListener("click", collapse, true);
+    }
 
     let content = "";
 
-    for (var name in scenario.actors) {
-        if (scenario.actors.hasOwnProperty(name)) {
-            content += getActorParamsBox(name, scenario.actors[name]);
+    for (var name in actors) {
+        if (actors.hasOwnProperty(name)) {
+            content += getActorParamsBox(name, actors[name]);
         }
     }
 
@@ -343,8 +482,40 @@ function restart() {
     simulation.patchAugmintParams(getParamsFromUI());
 }
 
+
+function parseLoadedJSON(contents) {
+    const jsonObj = JSON.parse(contents);
+    renderActorParamsGui(jsonObj.augmintOptions.actors);
+    renderMainParams(jsonObj.augmintOptions.params);
+}
+
+function loadFile(e) {
+    var file = e.target.files[0];
+    if (!file) {
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var contents = e.target.result;
+        parseLoadedJSON(contents);
+    };
+    reader.readAsText(file);
+}
+
+function loadFromLocalStorage() {
+    const jsonObj = JSON.parse(localStorage.getItem("parameters"));
+    renderActorParamsGui(jsonObj.augmintOptions.actors);
+    renderMainParams(jsonObj.augmintOptions.params);
+}
+
 function init() {
-    renderActorParamsGui();
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+        jsonFileInput.addEventListener("change", loadFile, false);
+    } else {
+        errorMsg.innerHTML = "<p>File api not supported by your browser</p>";
+    }
+
+    renderActorParamsGui(scenario.actors);
 
     graphs.init(graphsWrapper);
     logger.init(simulation.getState, logTextArea);
@@ -353,6 +524,11 @@ function init() {
 
     restartBtn.disabled = true;
     restartBtn.addEventListener("click", restart);
+    storeBtn.addEventListener("click", collapseStore);
+    saveJSONBtn.addEventListener("click", saveAsJSON);
+    loadJSONBtn.addEventListener("click", showJSONFileBrowser);
+    saveLSBtn.addEventListener("click", saveToLocalStorage);
+    loadLSBtn.addEventListener("click", loadFromLocalStorage);
 
     pauseBtn.addEventListener("click", togglePause);
     ratesDropDown.addEventListener("change", () => ratesDropDownOnChange(ratesDropDown.value));
