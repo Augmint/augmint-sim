@@ -246,18 +246,21 @@ function populateRatesDropDown() {
     });
 }
 
-function collapse() {
-    const style = document.querySelector(".collapse-panel").className;
+function collapse(e) {
+    const subPanel = e.target;
+    const panel = subPanel.parentElement;
+
+    const style = panel.className;
     const closed = style.indexOf("closed") !== -1;
 
     if (closed) {
-        document.querySelector(".collapse-panel").className = "collapse-panel";
-        document.querySelector(".collapse-button").innerHTML = "&minus;";
-        document.querySelector(".collapse-content").className = "collapse-content";
+        panel.className = "collapse-panel";
+        subPanel.innerHTML = subPanel.innerHTML.replace("+","−");
+        panel.querySelector(".collapse-content").className = "collapse-content";
     } else {
-        document.querySelector(".collapse-panel").className = "collapse-panel closed";
-        document.querySelector(".collapse-button").innerHTML = "+";
-        document.querySelector(".collapse-content").className = "collapse-content hidden";
+        panel.className = "collapse-panel closed";
+        subPanel.innerHTML = subPanel.innerHTML.replace("−","+");
+        panel.querySelector(".collapse-content").className = "collapse-content hidden";
     }
 }
 
@@ -437,9 +440,11 @@ function getActorParamsBox(name, actor) {
 function renderActorParamsGui(actors) {
 
     const panel = document.getElementById("actor-params-container");
-    const collapsePanel = document.querySelector(".collapse-bar");
+    const collapseBars = document.querySelectorAll(".collapse-bar");
 
-    collapsePanel.addEventListener("click", collapse);
+    for (let i = 0; i < collapseBars.length; ++i) {
+        collapseBars[i].addEventListener("click", collapse, true);
+    }
 
     let content = "";
 
@@ -497,7 +502,7 @@ function loadFile(e) {
     reader.readAsText(file);
 }
 
-function loadFromLoalStorage() {
+function loadFromLocalStorage() {
     const jsonObj = JSON.parse(localStorage.getItem("parameters"));
     renderActorParamsGui(jsonObj.augmintOptions.actors);
     renderMainParams(jsonObj.augmintOptions.params);
@@ -523,7 +528,7 @@ function init() {
     saveJSONBtn.addEventListener("click", saveAsJSON);
     loadJSONBtn.addEventListener("click", showJSONFileBrowser);
     saveLSBtn.addEventListener("click", saveToLocalStorage);
-    loadLSBtn.addEventListener("click", loadFromLoalStorage);
+    loadLSBtn.addEventListener("click", loadFromLocalStorage);
 
     pauseBtn.addEventListener("click", togglePause);
     ratesDropDown.addEventListener("change", () => ratesDropDownOnChange(ratesDropDown.value));
