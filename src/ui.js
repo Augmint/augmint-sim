@@ -502,7 +502,7 @@ function loadFile(e) {
     reader.readAsText(file);
 }
 
-function loadFromLoalStorage() {
+function loadFromLocalStorage() {
     const jsonObj = JSON.parse(localStorage.getItem("parameters"));
     renderActorParamsGui(jsonObj.augmintOptions.actors);
     renderMainParams(jsonObj.augmintOptions.params);
@@ -528,7 +528,7 @@ function init() {
     saveJSONBtn.addEventListener("click", saveAsJSON);
     loadJSONBtn.addEventListener("click", showJSONFileBrowser);
     saveLSBtn.addEventListener("click", saveToLocalStorage);
-    loadLSBtn.addEventListener("click", loadFromLoalStorage);
+    loadLSBtn.addEventListener("click", loadFromLocalStorage);
 
     pauseBtn.addEventListener("click", togglePause);
     ratesDropDown.addEventListener("change", () => ratesDropDownOnChange(ratesDropDown.value));
