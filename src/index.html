@@ -96,6 +96,10 @@
         border-color: #aaa;
     }
 
+    input[type=file] {
+        margin-left: 164px;
+    }
+
     input:disabled{
         background-color: #b3b3b3;
         color: black;
@@ -268,7 +272,6 @@
     <div class="msg msg-hidden"></div>
     <img class="logo" src="2_augmint_alternate-logo_reversed-360.jpg" alt="Augmint logo">
     <div class="buttons">
-        <button class="btn store-btn ">Store</button>
         <button class="btn pause-btn">Start</button>
         <button class="btn restart-btn">Restart</button>
         <label class="label" for="rates-dropdown">Set ETH/USD:</label>
@@ -277,38 +280,21 @@
         <button class="btn toggleLog-btn">Show log</button>
         <button class="btn store-btn ">Save/load params</button>
         <div class="github-link" >
-          <a href="https://github.com/Augmint" target="_blank">
+          <a href="https://github.com/Augmint/augmint-sim" target="_blank">
             <img class="github-logo" src="GitHub-Mark-64px.png" alt="Simulation parameters">
           </a>
         </div>
     </div>
     <div class="hidden" id="store-panel">
-      <div class="buttons">
+      <div>
           <button class="btn load-json-btn">Load JSON</button>
           <button class="btn save-json-btn">Save JSON</button>
           <button class="btn load-ls-btn">Load from local storage</button>
           <button class="btn save-ls-btn">Save to local storage</button>
-          <div id="json-file-input-panel" class="hidden">
-            <input class="btn" type="file" id="json-file-input" >
-          </div>
-          <div id="ls-file-input-panel" class="hidden">
-            <input class="btn" type="file" id="ls-file-input" >
-          </div>
       </div>
-    </div>
-    <div class="hidden" id="store-panel">
-      <div class="buttons">
-          <button class="btn load-json-btn">Load JSON</button>
-          <button class="btn save-json-btn">Save JSON</button>
-          <button class="btn load-ls-btn">Load from local storage</button>
-          <button class="btn save-ls-btn">Save to local storage</button>
-          <div id="json-file-input-panel" class="hidden">
-            <input class="btn" type="file" id="json-file-input" >
-          </div>
-          <div id="ls-file-input-panel" class="hidden">
-            <input class="btn" type="file" id="ls-file-input" >
-          </div>
-      </div>
+        <div id="json-file-input-panel" class="hidden">
+          <input type="file" id="json-file-input" >
+        </div>
     </div>
     <div class="log-wrapper" style="display: none;">
         <div>
