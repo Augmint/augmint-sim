@@ -22,6 +22,7 @@
         margin-bottom: 10px;
         padding: 6px 10px;
         font-size: 1em;
+        height: 34px;
     }
 
     .logo {
@@ -73,6 +74,26 @@
     .error-msg p {
         color: rgb(230, 88, 88);
         margin: 0 0 15px 0;
+    }
+
+    .msg {
+        position: fixed;
+        top: 3px;
+        background-color: #bae9ba;
+        color: black;
+        width: 20%;
+        margin-left: 40%;
+        text-align: center;
+        padding: 2px;
+        opacity: 1;
+    }
+
+    .msg-hidden {
+        opacity:0;
+        -webkit-transition: opacity 2s ease-in-out;
+        -moz-transition: opacity 2s ease-in-out;
+        -ms-transition: opacity 2s ease-in-out;
+        -o-transition: opacity 2s ease-in-out;
     }
 
     /* actor css */
@@ -194,8 +215,10 @@
 </head>
 <body>
     <div class="error-msg"></div>
+    <div class="msg msg-hidden"></div>
     <img class="logo" src="2_augmint_alternate-logo_reversed-360.jpg" alt="Augmint logo">
     <div class="buttons">
+        <button class="btn store-btn ">Store</button>
         <button class="btn pause-btn">Start</button>
         <button class="btn restart-btn">Restart</button>
         <label2 for="rates-dropdown">Set ETH/USD:</label2>
@@ -203,6 +226,20 @@
         </select>
         <button class="btn toggleLog-btn">Show log</button>
         <a href="https://github.com/DecentLabs/augmint-sim/blob/master/src/scenarios/base.js" target="_blank">Simulation parameters</a>
+    </div>
+    <div class="hidden" id="store-panel">
+      <div class="buttons">
+          <button class="btn load-json-btn">Load JSON</button>
+          <button class="btn save-json-btn">Save JSON</button>
+          <button class="btn load-ls-btn">Load from local storage</button>
+          <button class="btn save-ls-btn">Save to local storage</button>
+          <div id="json-file-input-panel" class="hidden">
+            <input class="btn" type="file" id="json-file-input" >
+          </div>
+          <div id="ls-file-input-panel" class="hidden">
+            <input class="btn" type="file" id="ls-file-input" >
+          </div>
+      </div>
     </div>
     <div class="log-wrapper" style="display: none;">
         <div>
