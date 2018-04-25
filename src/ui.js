@@ -4,6 +4,7 @@ const Acd = bigNums.BigAcd;
 const Pt = bigNums.BigPt;
 
 const simulation = require("./lib/simulation.js");
+
 const logger = require("./lib/logger.js");
 const rates = require("./augmint/rates.js");
 const graphs = require("./lib/graphs.js");
@@ -509,6 +510,8 @@ function loadFromLocalStorage() {
 }
 
 function init() {
+
+    
     if (window.File && window.FileReader && window.FileList && window.Blob) {
         jsonFileInput.addEventListener("change", loadFile, false);
     } else {
