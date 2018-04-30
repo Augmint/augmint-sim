@@ -79,12 +79,24 @@ function _Big_() {
         return this.number<number;
     };
 
+    P.lte = function(number) {
+        return this.number<=number;
+    };
+
     P.eq = function(number) {
         return this.number==number;
     };
 
     P.toString = function () {
-        return this.number+"";
+        return this.number.toString();
+    };
+
+    P.valueOf = function () {
+        return  Number(parseFloat(this.number));
+    };
+
+    P.toJSON = function () {
+        return this.number.toString();
     };
 
     Big = _Big_();
