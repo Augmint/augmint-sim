@@ -1,5 +1,4 @@
 "use strict";
-// const Big = require("big.js");
 const Big = require("../lib/fixedDecimal.js");
 const BigAcd = Big(); // ACD values
 const BigEth = Big(); // ETH values

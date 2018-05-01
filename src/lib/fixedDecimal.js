@@ -42,28 +42,28 @@ function _Big_() {
     P.add = function(number) {
         let Big = this.constructor;
         let returnValue = new Big(this);
-        returnValue.number =  Number(parseFloat(this.number)+number);
+        returnValue.number =  Number(parseFloat(this.number)+number).toFixed(Big.DP);
         return returnValue;
     };
 
     P.sub = function(number) {
         let Big = this.constructor;
         let returnValue = new Big(this);
-        returnValue.number = Number(parseFloat(this.number)-number);
+        returnValue.number = Number(parseFloat(this.number)-number).toFixed(Big.DP);
         return returnValue;
     };
 
     P.mul = function(number) {
         let Big = this.constructor;
         let returnValue = new Big(this);
-        returnValue.number = Number(parseFloat(this.number)*number);
+        returnValue.number = Number(parseFloat(this.number)*number).toFixed(Big.DP);
         return returnValue;
     };
 
     P.div = function(number) {
         let Big = this.constructor;
         let returnValue = new Big(this);
-        returnValue.number = Number(parseFloat(this.number)/number);
+        returnValue.number = Number(parseFloat(this.number)/number).toFixed(Big.DP);
         return returnValue;
     };
 

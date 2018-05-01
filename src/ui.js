@@ -511,7 +511,7 @@ function loadFromLocalStorage() {
 
 function init() {
 
-    
+
     if (window.File && window.FileReader && window.FileList && window.Blob) {
         jsonFileInput.addEventListener("change", loadFile, false);
     } else {
