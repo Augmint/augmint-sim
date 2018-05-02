@@ -9,7 +9,7 @@ const orderBook = augmint.orderBook;
 
 const bigNums = require("../lib/bigNums.js");
 const ACD0 = bigNums.ACD0;
-const Eth = bigNums.BigEth;
+const Eth = bigNums.FixedEth;
 
 function convertEthToUsd(ethAmount) {
     return augmint.rates.ethToUsd.mul(ethAmount).round(bigNums.ACD_DP, 1); // ROUND_HALF_UP

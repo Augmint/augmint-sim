@@ -1,9 +1,10 @@
 "use strict";
 const bigNums = require("./lib/bigNums.js");
-const Acd = bigNums.BigAcd;
-const Pt = bigNums.BigPt;
+const Acd = bigNums.FixedAcd;
+const Pt = bigNums.FixedPt;
 
 const simulation = require("./lib/simulation.js");
+
 const logger = require("./lib/logger.js");
 const rates = require("./augmint/rates.js");
 const graphs = require("./lib/graphs.js");
@@ -509,6 +510,8 @@ function loadFromLocalStorage() {
 }
 
 function init() {
+
+
     if (window.File && window.FileReader && window.FileList && window.Blob) {
         jsonFileInput.addEventListener("change", loadFile, false);
     } else {
