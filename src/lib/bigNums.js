@@ -1,36 +1,36 @@
 "use strict";
-const Big = require("../lib/fixedDecimal.js");
-const BigAcd = Big(); // ACD values
-const BigEth = Big(); // ETH values
-const BigPt = Big(); // percent values (0.12 = 12%)
+const FixedDecimal = require("../lib/fixedDecimal.js");
+const FixedAcd = FixedDecimal(); // ACD values
+const FixedEth = FixedDecimal(); // ETH values
+const FixedPt = FixedDecimal(); // percent values (0.12 = 12%)
 
-BigAcd.DP = 2;
-BigAcd.RM = 1;
+FixedAcd.DP = 2;
+FixedAcd.RM = 1;
 
-BigEth.DP = 8;
-BigEth.RM = 1;
+FixedEth.DP = 8;
+FixedEth.RM = 1;
 
-BigPt.DP = 6;
-BigPt.RM = 1;
+FixedPt.DP = 6;
+FixedPt.RM = 1;
 
 // Big value constants, for performance - see: https://jsperf.com/big
-const ACD0 = new BigAcd("0");
-const ETH0 = new BigEth("0");
-const PT0 = new BigPt("0");
-const PT1 = new BigPt("1");
+const ACD0 = new FixedAcd("0");
+const ETH0 = new FixedEth("0");
+const PT0 = new FixedPt("0");
+const PT1 = new FixedPt("1");
 
 module.exports = {
-    BigAcd: n => new BigAcd(n).round(BigAcd.DP, BigAcd.RM), // to enforce decimalplaces
-    BigEth: n => new BigEth(n).round(BigEth.DP, BigEth.RM), // to enforce decimalplaces,
-    BigPt: n => new BigPt(n).round(BigPt.DP, BigPt.RM), // to enforce decimalplaces
+    FixedAcd: n => new FixedAcd(n).round(FixedAcd.DP, FixedAcd.RM), // to enforce decimalplaces
+    FixedEth: n => new FixedEth(n).round(FixedEth.DP, FixedEth.RM), // to enforce decimalplaces,
+    FixedPt: n => new FixedPt(n).round(FixedPt.DP, FixedPt.RM), // to enforce decimalplaces
     get ACD_DP() {
-        return BigAcd.DP;
+        return FixedAcd.DP;
     },
     get ETH_DP() {
-        return BigEth.DP;
+        return FixedEth.DP;
     },
     get PT_DP() {
-        return BigPt.DP;
+        return FixedPt.DP;
     },
     get ACD0() {
         return ACD0;

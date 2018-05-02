@@ -3,7 +3,7 @@
 "use strict";
 
 const bigNums = require("../lib/bigNums.js");
-const Pt = bigNums.BigPt;
+const Pt = bigNums.FixedPt;
 const PT1 = bigNums.PT1;
 
 const AugmintError = require("../augmint/augmint.error.js");

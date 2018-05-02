@@ -1,9 +1,9 @@
 "use strict";
 
 const bigNums = require("../lib/bigNums.js");
-const Acd = bigNums.BigAcd;
-const Eth = bigNums.BigEth;
-const Pt = bigNums.BigPt;
+const Acd = bigNums.FixedAcd;
+const Eth = bigNums.FixedEth;
+const Pt = bigNums.FixedPt;
 
 const augmintOptions = {
     balances: { interestEarnedPool: Acd(5000) /* genesis, loan from stakeholders */ },

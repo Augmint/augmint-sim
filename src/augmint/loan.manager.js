@@ -8,9 +8,9 @@ const clock = require("../lib/clock.js");
 const logger = require("../lib/logger.js");
 
 const bigNums = require("../lib/bigNums.js");
-const Eth = bigNums.BigEth;
+const Eth = bigNums.FixedEth;
 const PT1 = bigNums.PT1;
-const Pt = bigNums.BigPt;
+const Pt = bigNums.FixedPt;
 
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 //const loanProducts = augmint.loanProducts;

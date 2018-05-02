@@ -1,6 +1,6 @@
 "use strict";
 const bigNums = require("../lib/bigNums.js");
-const Acd = bigNums.BigAcd;
+const Acd = bigNums.FixedAcd;
 const PT1 = bigNums.PT1;
 const ACD0 = bigNums.ACD0;
 const ETH0 = bigNums.ETH0;

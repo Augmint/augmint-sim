@@ -6,9 +6,9 @@
 // TODO: would prefer proper setters/getters, but this is cool for now...
 
 const bigNums = require("../lib/bigNums.js");
-const Acd = bigNums.BigAcd;
-const Eth = bigNums.BigEth;
-const Pt = bigNums.BigPt;
+const Acd = bigNums.FixedAcd;
+const Eth = bigNums.FixedEth;
+const Pt = bigNums.FixedPt;
 const ACD0 = bigNums.ACD0;
 const PT1 = bigNums.PT1;
 
@@ -119,7 +119,7 @@ module.exports = {
         this.orderBook.buy.length = 0;
         this.orderBook.sell.length = 0;
         this.loanProducts.length = 0;
- 
+
         this.clearObject(this.loanProducts[0]);
         this.loanProducts.pop();
 
