@@ -32,38 +32,48 @@ function _Big_() {
         return Big;
     }
 
+    function roundTo(n, digits) {
+        if (digits === undefined) {
+            digits = 0;
+        }
+
+        var multiplicator = Math.pow(10, digits);
+        n = parseFloat((n * multiplicator).toFixed(11));
+        return Math.round(n) / multiplicator;
+    }
+
     P.round = function(dp,rm) {
         let Big = this.constructor;
         let returnValue = new Big(this);
-        returnValue.number = Number(parseFloat(this.number).toFixed(dp));
+        returnValue.number = roundTo(this.number,dp);
         return returnValue;
     };
 
     P.add = function(number) {
         let Big = this.constructor;
         let returnValue = new Big(this);
-        returnValue.number =  Number((this.number+number).toFixed(Big.DP));
+        returnValue.number =  this.number+number;
         return returnValue;
     };
 
     P.sub = function(number) {
         let Big = this.constructor;
         let returnValue = new Big(this);
-        returnValue.number = Number((this.number-number).toFixed(Big.DP));
+        returnValue.number = this.number-number;
         return returnValue;
     };
 
     P.mul = function(number) {
         let Big = this.constructor;
         let returnValue = new Big(this);
-        returnValue.number = Number((this.number*number).toFixed(Big.DP));
+        returnValue.number = this.number*number;
         return returnValue;
     };
 
     P.div = function(number) {
         let Big = this.constructor;
         let returnValue = new Big(this);
-        returnValue.number = Number((this.number/number).toFixed(Big.DP));
+        returnValue.number = roundTo(this.number/number,Big.DP);
         return returnValue;
     };
 
