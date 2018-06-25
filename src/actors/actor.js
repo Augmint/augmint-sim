@@ -1,12 +1,7 @@
 // a class which encapulates an actor's behaviour, and an interface with which to interact with augmint etc.
 
 "use strict";
-const bigNums = require("../lib/bigNums.js");
-const Acd = bigNums.FixedAcd;
-const ACD0 = bigNums.ACD0;
-const ETH0 = bigNums.ETH0;
-const Eth = bigNums.FixedEth;
-const Pt = bigNums.FixedPt;
+const { ACD0, ETH0, Acd, Eth, Pt } = require("../lib/augmintNums.js");
 
 const augmint = require("../augmint/augmint.js");
 const loanManager = require("../augmint/loan.manager.js");

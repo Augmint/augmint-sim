@@ -1,9 +1,5 @@
 "use strict";
-const bigNums = require("../lib/bigNums.js");
-const Acd = bigNums.FixedAcd;
-const Pt = bigNums.FixedPt;
-const ACD0 = bigNums.ACD0;
-const PT1 = bigNums.PT1;
+const { ACD0, PT1, Acd, Pt } = require("../lib/augmintNums.js");
 
 const AugmintError = require("../augmint/augmint.error.js");
 const Actor = require("./actor.js");
@@ -110,9 +106,11 @@ class BorrowerBasic extends Actor {
                 timeUntilRepayment >= state.meta.timeStep
             ) {
                 // buys ACD for repayment
-                const buyAmount = Acd(Math.max(0, repaymentDue.sub(this.acdBalance))).div(
-                    PT1.sub(state.augmint.params.exchangeFeePercentage)
-                );
+                const repaymentAmountMissing = repaymentDue.sub(this.acdBalance);
+                const buyAmount = repaymentAmountMissing
+                    .div(PT1.sub(state.augmint.params.exchangeFeePercentage))
+                    .add(0.1); // adding 0.1 to deal with multiple matchorders resulting in higher total exchange fee b/c of rounding
+
                 this.buyACD(buyAmount);
                 this.triedToBuyForRepayment = true;
             }

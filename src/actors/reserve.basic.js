@@ -1,9 +1,6 @@
 "use strict";
-const bigNums = require("../lib/bigNums.js");
-const Acd = bigNums.FixedAcd;
-const PT1 = bigNums.PT1;
-const ACD0 = bigNums.ACD0;
-const ETH0 = bigNums.ETH0;
+const { ACD0, PT1, ETH0, Acd } = require("../lib/augmintNums.js");
+const { ACD_DP, ROUND_DOWN } = require("../lib/fixedDecimal");
 
 const Actor = require("./actor.js");
 const defaultParams = {};
@@ -22,7 +19,7 @@ class ReserveBasic extends Actor {
         } else if (acdDemand.lt(ACD0) && this.ethBalance.gt(ETH0)) {
             const maxBuyableAcdFromReserveEth = this.convertEthToAcd(this.ethBalance)
                 .mul(PT1.sub(state.augmint.params.exchangeFeePercentage))
-                .round(bigNums.ACD_DP, 0);
+                .round(ACD_DP, ROUND_DOWN);
 
             const buyAmount = Acd(Math.min(maxBuyableAcdFromReserveEth, -acdDemand));
 

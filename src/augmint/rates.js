@@ -1,7 +1,6 @@
 "use strict";
 
-const bigNums = require("../lib/bigNums.js");
-const Acd = bigNums.FixedAcd;
+const { Acd } = require("../lib/augmintNums.js");
 
 const rates = require("./rates.json");
 const clock = require("../lib/clock");
