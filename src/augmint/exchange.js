@@ -7,12 +7,11 @@ const augmint = require("./augmint.js");
 const logger = require("../lib/logger.js");
 const orderBook = augmint.orderBook;
 
-const bigNums = require("../lib/bigNums.js");
-const ACD0 = bigNums.ACD0;
-const Eth = bigNums.FixedEth;
+const { ACD0, ACD_DP, ETH_DP, Eth } = require("../lib/augmintNums.js");
+const { ROUND_DOWN, ROUND_HALF_UP } = require("../lib/fixedDecimal.js");
 
 function convertEthToUsd(ethAmount) {
-    return augmint.rates.ethToUsd.mul(ethAmount).round(bigNums.ACD_DP, 1); // ROUND_HALF_UP
+    return augmint.rates.ethToUsd.mul(ethAmount).round(ACD_DP, ROUND_HALF_UP);
 }
 
 function convertUsdToEth(usdAmount) {
@@ -24,7 +23,7 @@ function convertAcdToEth(acdAmount) {
 }
 
 function convertEthToAcd(ethAmount) {
-    return augmint.rates.ethToAcd.mul(ethAmount).round(bigNums.ACD_DP, 1); // ROUND_HALF_UP
+    return augmint.rates.ethToAcd.mul(ethAmount).round(ACD_DP, ROUND_HALF_UP);
 }
 
 function convertUsdToAcd(usdAmount) {
@@ -65,17 +64,15 @@ function buyACD(actorId, acdAmount) {
             // if it this the only buy order and it would be fully filled from the sellorder then we deal with rounding diff
             // (issue only in sim b/c we store Acd amount instead of eth amount for buy Acd order)
             const roundingDiff = ethAmount.sub(augmint.balances.exchangeEth);
-            if (roundingDiff.mul(10 ** bigNums.ETH_DP).gt(2)) {
+            if (roundingDiff.mul(10 ** ETH_DP).gt(2)) {
                 throw new Error(
-                    `buyAcd orderfill eth amount rounding difference is too high: ${roundingDiff.toFixed(
-                        bigNums.ETH_DP
-                    )}`
+                    `buyAcd orderfill eth amount rounding difference is too high: ${roundingDiff.toFixed(ETH_DP)}`
                 );
             }
             ethAmount = augmint.balances.exchangeEth;
         }
 
-        const feesInAcd = sellAmount.mul(augmint.params.exchangeFeePercentage).round(bigNums.ACD_DP, 0); // ROUND_DOWN
+        const feesInAcd = sellAmount.mul(augmint.params.exchangeFeePercentage).round(ACD_DP, ROUND_DOWN);
 
         // reduce remaining buy order:
         acdAmount = acdAmount.sub(sellAmount);
@@ -172,17 +169,15 @@ function sellACD(actorId, acdAmount) {
             // if it will fully fill the last buyorder then we deal with rounding diff
             // (issue only in sim b/c we store Acd amount instead of eth amount for buy Acd order)
             const roundingDiff = ethAmount.sub(augmint.balances.exchangeEth);
-            if (roundingDiff.mul(10 ** bigNums.ETH_DP).gt(2)) {
+            if (roundingDiff.mul(10 ** ETH_DP).gt(2)) {
                 throw new Error(
-                    `sellACD orderfill eth amount rounding difference is too high: ${roundingDiff.toFixed(
-                        bigNums.ETH_DP
-                    )}`
+                    `sellACD orderfill eth amount rounding difference is too high: ${roundingDiff.toFixed(ETH_DP)}`
                 );
             }
             ethAmount = augmint.balances.exchangeEth;
         }
 
-        const feesInEth = ethAmount.mul(augmint.params.exchangeFeePercentage).round(bigNums.ETH_DP, 1); // ROUND_DOWN
+        const feesInEth = ethAmount.mul(augmint.params.exchangeFeePercentage).round(ETH_DP, ROUND_DOWN);
 
         // reduce remaining sell order:
         acdAmount = acdAmount.sub(buyAmount);

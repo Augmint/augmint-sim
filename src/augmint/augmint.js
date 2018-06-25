@@ -5,12 +5,7 @@
 // TODO: add transferFeePt param (and transferAcdWithFee functions)
 // TODO: would prefer proper setters/getters, but this is cool for now...
 
-const bigNums = require("../lib/bigNums.js");
-const Acd = bigNums.FixedAcd;
-const Eth = bigNums.FixedEth;
-const Pt = bigNums.FixedPt;
-const ACD0 = bigNums.ACD0;
-const PT1 = bigNums.PT1;
+const { ACD0, PT1, ACD_DP, Pt, Eth, Acd } = require("../lib/augmintNums.js");
 
 module.exports = {
     actors: {},
@@ -230,7 +225,7 @@ module.exports = {
             : allowedByLtdDifferencePt;
         const maxLoanWithMinLoanLimit = maxLoan.lt(this.loanProducts[productId].minimumLoanInAcd)
             ? ACD0
-            : maxLoan.round(bigNums.ACD_DP, 0);
+            : maxLoan.round(ACD_DP, 0);
 
         return maxLoanWithMinLoanLimit;
     },
@@ -258,9 +253,7 @@ module.exports = {
             Math.min(Math.max(allowedByLtdDifferencePt, allowedByLtdDifferenceAmount), allowedByEarning)
         );
 
-        const maxLockWithMinLockLimit = maxLock.lt(this.params.minimumLockAmount)
-            ? ACD0
-            : maxLock.round(bigNums.ACD_DP, 0);
+        const maxLockWithMinLockLimit = maxLock.lt(this.params.minimumLockAmount) ? ACD0 : maxLock.round(ACD_DP, 0);
 
         return maxLockWithMinLockLimit;
     }

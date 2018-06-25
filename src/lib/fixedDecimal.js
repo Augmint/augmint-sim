@@ -1,116 +1,108 @@
-"use strict"
-;(function (GLOBAL) {
+"use strict";
 
-let Big,
-DP = 20,
-RM = 1,
-P = {},
-UNDEFINED = void 0;
+const ROUND_HALF_UP = 1;
+const ROUND_DOWN = 0;
+const ROUND_UP = 3;
+const DEFAULT_ROUNDING_MODE = ROUND_HALF_UP;
 
-function _Big_() {
-
-        function parse(x, n) {
-            x.number = Number(parseFloat(n));
-        }
-
-        function Big(n) {
-            var x = this;
-
-            if (!(x instanceof Big)) return n === UNDEFINED ? _Big_() : new Big(n);
-
-            if (n instanceof Big) {
-                x.number = n.number;
-            } else {
-                parse(x, n);
-            }
-
-            x.constructor = Big;
-        }
-        Big.prototype = P;
-        Big.DP = DP;
-        Big.RM = RM;
-        return Big;
+class FixedDecimal {
+    constructor(n, dp, rm) {
+        this.dp = dp;
+        this.number = this.roundTo(n, dp, rm === undefined ? DEFAULT_ROUNDING_MODE : rm);
     }
 
-    function roundTo(n, digits) {
-        if (digits === undefined) {
-            digits = 0;
+    roundTo(n, dp, rm) {
+        if (dp === undefined) {
+            dp = 0;
         }
 
-        var multiplicator = Math.pow(10, digits);
-        n = parseFloat((n * multiplicator).toFixed(11));
-        return Math.round(n) / multiplicator;
+        if (rm === undefined) {
+            rm = DEFAULT_ROUNDING_MODE;
+        }
+
+        const multiplicator = Math.pow(10, dp);
+
+        switch (rm) {
+        case ROUND_HALF_UP:
+            return Math.round(n * multiplicator) / multiplicator;
+
+        case ROUND_DOWN:
+            return Math.floor(n * multiplicator) / multiplicator;
+
+        case ROUND_UP:
+            return Math.ceil(n * multiplicator) / multiplicator;
+
+        default:
+            throw new Error("Rounding mode is not supported : " + rm);
+        }
     }
 
-    P.round = function(dp,rm) {
-        let Big = this.constructor;
-        let returnValue = new Big(this);
-        returnValue.number = roundTo(this.number,dp);
-        return returnValue;
-    };
+    round(dp, rm) {
+        return new FixedDecimal(this.number, dp, rm);
+    }
 
-    P.add = function(number) {
-        let Big = this.constructor;
-        let returnValue = new Big(this);
-        returnValue.number =  this.number+number;
-        return returnValue;
-    };
+    add(number) {
+        return new FixedDecimal(this.number + number, this.dp);
+    }
 
-    P.sub = function(number) {
-        let Big = this.constructor;
-        let returnValue = new Big(this);
-        returnValue.number = this.number-number;
-        return returnValue;
-    };
+    sub(number) {
+        return new FixedDecimal(this.number - number, this.dp);
+    }
 
-    P.mul = function(number) {
-        let Big = this.constructor;
-        let returnValue = new Big(this);
-        returnValue.number = this.number*number;
-        return returnValue;
-    };
+    mul(number) {
+        return new FixedDecimal(this.number * number, this.dp);
+    }
 
-    P.div = function(number) {
-        let Big = this.constructor;
-        let returnValue = new Big(this);
-        returnValue.number = roundTo(this.number/number,Big.DP);
-        return returnValue;
-    };
+    div(number, dp, rm) {
+        return new FixedDecimal(
+            this.number / number,
+            dp === undefined ? this.dp : dp,
+            rm === undefined ? DEFAULT_ROUNDING_MODE : rm
+        );
+    }
 
-    P.gt = function(number) {
-        return this.number>number;
-    };
+    gt(number) {
+        return this.number > number;
+    }
 
-    P.gte = function(number) {
-        return this.number>=number;
-    };
+    gte(number) {
+        return this.number >= number;
+    }
 
-    P.lt = function(number) {
-        return this.number<number;
-    };
+    lt(number) {
+        return this.number < number;
+    }
 
-    P.lte = function(number) {
-        return this.number<=number;
-    };
+    lte(number) {
+        return this.number <= number;
+    }
 
-    P.eq = function(number) {
-        return this.number==number;
-    };
+    eq(number) {
+        return this.number == number;
+    }
 
-    P.toString = function () {
+    toString() {
         return this.number.toString();
-    };
+    }
 
-    P.valueOf = function () {
-        return  Number(this.number);
-    };
+    valueOf() {
+        return this.number;
+    }
 
-    P.toJSON = function () {
+    toJSON() {
         return this.number.toString();
-    };
+    }
+}
 
-    Big = _Big_();
-    Big["default"] = Big.Big = Big;
-    module.exports = Big;
-
-})(this);
+module.exports = {
+    get ROUND_HALF_UP() {
+        return ROUND_HALF_UP;
+    },
+    get ROUND_DOWN() {
+        return ROUND_DOWN;
+    },
+    get ROUND_UP() {
+        return ROUND_DOWN;
+    },
+    FixedDecimal
+};

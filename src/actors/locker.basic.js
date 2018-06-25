@@ -1,9 +1,5 @@
 "use strict";
-const bigNums = require("../lib/bigNums.js");
-const Acd = bigNums.FixedAcd;
-const Pt = bigNums.FixedPt;
-const ACD0 = bigNums.ACD0;
-const PT0 = bigNums.PT0;
+const { ACD0, PT0, Acd, Pt } = require("../lib/augmintNums.js");
 
 const Actor = require("./actor.js");
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
