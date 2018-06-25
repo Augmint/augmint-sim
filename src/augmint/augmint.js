@@ -32,7 +32,7 @@ module.exports = {
     params: {
         marketLoanInterestRate: Pt(0.18), // what do we compete with?  actor's demand for loans depends on it
         marketLockInterestRate: Pt(0.04), // what do we compete with? actor's demand for locks depends on it
-        exchangeFeePercentage: Pt(0.1),
+        exchangeFeePercentage: Pt(0.003),
         lockedAcdInterestPercentage: Pt(0.5),
         lockTimeInDays: 365,
         ethUsdTrendSampleDays: 3, // how many days to inspect for rates.ethToUsdTrend calculation)
