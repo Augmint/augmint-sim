@@ -11,6 +11,7 @@ const augmintOptions = {
         lockedAcdInterestPercentage: Pt(0.08),
         lockTimeInDays: 30,
         ethUsdTrendSampleDays: 5, // how many days to inspect for rates.ethToUsdTrend calculation)
+        graphRefreshDays: 5, // refresh graph in every x days
         minimumLockAmount: Acd(100), // without interest
 
         ltdLockDifferenceLimit: Pt(0.2) /* allow lock if Loan To Deposut ratio stay within 1 +/- this param  */,
