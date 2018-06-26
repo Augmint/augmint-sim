@@ -75,6 +75,7 @@ function getParamsFromUI() {
     };
     //technical params
     params["ethUsdTrendSampleDays"] = parseInt(document.getElementById("ethUsdTrendSampleDays").value);
+    params["graphRefreshDays"] = parseInt(document.getElementById("graphRefreshDays").value);
 
     return params;
 }
@@ -107,6 +108,7 @@ function updateUIFromParams() {
     ).toFixed(2);
     // technical params
     document.getElementById("ethUsdTrendSampleDays").value = augmint.params.ethUsdTrendSampleDays;
+    document.getElementById("graphRefreshDays").value = augmint.params.graphRefreshDays;
 }
 
 function getActorsFromGui() {
@@ -186,6 +188,8 @@ function togglePause() {
         loadproductInputs.forEach(input => {
             input.disabled = false;
         });
+
+        graphs.refreshGraph();
 
         console.debug(
             "Benchmark: iterations/sec: ",
@@ -327,6 +331,7 @@ function renderMainParams(jsonObj) {
     document.getElementById("defaultFeePercentage").value = jsonObj.defaultFeePercentage;
     document.getElementById("minimumLoanInAcd").value = jsonObj.minimumLoanInAcd;
     document.getElementById("ethUsdTrendSampleDays").value = jsonObj.ethUsdTrendSampleDays;
+    document.getElementById("graphRefreshDays").value = jsonObj.graphRefreshDays;
 }
 
 function showJSONFileBrowser() {
@@ -565,11 +570,14 @@ function render() {
     const state = simulation.getState();
     const daysPassed = state.meta.currentDay;
 
-    // only re-render once per day:
+    // only update graphData once per day:
     if (daysPassed > lastRender) {
         lastRender = daysPassed;
         clockElem.innerHTML = daysPassed;
-        graphs.update(state.meta.currentTime, state.augmint);
+        graphs.updateData(state.meta.currentTime, state.augmint);
+        if (state.meta.currentDay % state.augmint.params.graphRefreshDays === 0) {
+            graphs.refreshGraph();
+        }
     }
 }
 
