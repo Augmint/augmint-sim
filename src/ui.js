@@ -284,21 +284,21 @@ function download(filename, text) {
 }
 
 function getMainParamsAsJSON() {
-    const marketLockInterestRate = Pt(document.querySelector("[data-key='marketLockInterestRate']").value).toFixed(2);
-    const lockedAcdInterestPercentage = Pt(
-        document.querySelector("[data-key='lockedAcdInterestPercentage']").value
-    ).toFixed(2);
-    const marketLoanInterestRate = Pt(document.querySelector("[data-key='marketLoanInterestRate']").value).toFixed(2);
-    const ltdLoanDifferenceLimit = Pt(document.querySelector("[data-key='ltdLoanDifferenceLimit']").value).toFixed(2);
-    const ltdLockDifferenceLimit = Pt(document.querySelector("[data-key='ltdLockDifferenceLimit']").value).toFixed(2);
+    const marketLockInterestRate = document.querySelector("[data-key='marketLockInterestRate']").value;
+    const lockedAcdInterestPercentage = document.querySelector("[data-key='lockedAcdInterestPercentage']").value;
+    const marketLoanInterestRate = document.querySelector("[data-key='marketLoanInterestRate']").value;
+    const ltdLoanDifferenceLimit = document.querySelector("[data-key='ltdLoanDifferenceLimit']").value;
+    const ltdLockDifferenceLimit = document.querySelector("[data-key='ltdLockDifferenceLimit']").value;
     const allowedLtdDifferenceAmount = document.querySelector("[data-key='allowedLtdDifferenceAmount']").value;
     const lockTimeInDays = document.querySelector("[data-key='lockTimeInDays']").value;
     const repaymentPeriodInDays = document.getElementById("repaymentPeriodInDays").value;
-    const loanInterestPt = Pt(document.getElementById("loanInterestPt").value).toFixed(2);
-    const loanCollateralRatio = Pt(document.getElementById("loanCollateralRatio").value).toFixed(2);
+    const loanInterestPt = document.getElementById("loanInterestPt").value;
+    const loanCollateralRatio = document.getElementById("loanCollateralRatio").value;
     const defaultFeePercentage = document.getElementById("defaultFeePercentage").value;
     const minimumLoanInAcd = document.getElementById("minimumLoanInAcd").value;
     const ethUsdTrendSampleDays = document.getElementById("ethUsdTrendSampleDays").value;
+    const graphRefreshDays = document.getElementById("graphRefreshDays").value;
+    const logMoves = document.getElementById("logMoves").checked ? 1 : 0;
 
     var jsonObj = `{
                 "marketLockInterestRate": "${marketLockInterestRate}",
@@ -313,7 +313,9 @@ function getMainParamsAsJSON() {
                 "loanCollateralRatio": "${loanCollateralRatio}",
                 "defaultFeePercentage": "${defaultFeePercentage}",
                 "minimumLoanInAcd": "${minimumLoanInAcd}",
-                "ethUsdTrendSampleDays": "${ethUsdTrendSampleDays}"
+                "ethUsdTrendSampleDays": "${ethUsdTrendSampleDays}",
+                "graphRefreshDays": "${graphRefreshDays}",
+                "logMoves": "${logMoves}"
               }`;
 
     return jsonObj;
@@ -334,6 +336,7 @@ function renderMainParams(jsonObj) {
     document.getElementById("minimumLoanInAcd").value = jsonObj.minimumLoanInAcd;
     document.getElementById("ethUsdTrendSampleDays").value = jsonObj.ethUsdTrendSampleDays;
     document.getElementById("graphRefreshDays").value = jsonObj.graphRefreshDays;
+    document.getElementById("logMoves").checked = jsonObj.logMoves === "1" ? true : false;
 }
 
 function showJSONFileBrowser() {
