@@ -22,6 +22,7 @@ const loadLSBtn = document.querySelector(".load-ls-btn");
 const jsonFileInput = document.getElementById("json-file-input");
 
 const restartBtn = document.querySelector(".restart-btn");
+const clearLogBtn = document.querySelector(".clearLog-btn");
 const dumpStateBtn = document.querySelector(".dumpState-btn");
 const dumpMovesLogBtn = document.querySelector(".dumpMovesLog-btn");
 const toggleLogBtn = document.querySelector(".toggleLog-btn");
@@ -76,6 +77,7 @@ function getParamsFromUI() {
     //technical params
     params["ethUsdTrendSampleDays"] = parseInt(document.getElementById("ethUsdTrendSampleDays").value);
     params["graphRefreshDays"] = parseInt(document.getElementById("graphRefreshDays").value);
+    params["logMoves"] = document.getElementById("logMoves").checked;
 
     return params;
 }
@@ -475,6 +477,7 @@ function restart() {
     graphs.init(graphsWrapper);
 
     restartBtn.disabled = true;
+    logger.clear();
     logger.init(simulation.getState, logTextArea);
     simulation.init({
         simulationParams: {
@@ -536,13 +539,13 @@ function init() {
 
     pauseBtn.addEventListener("click", togglePause);
     ratesDropDown.addEventListener("change", () => ratesDropDownOnChange(ratesDropDown.value));
+    clearLogBtn.addEventListener("click", () => logger.clear());
     dumpStateBtn.addEventListener("click", () => {
         simulation.patchAugmintParams(getParamsFromUI());
         logger.print(simulation.getState());
     });
     dumpMovesLogBtn.addEventListener("click", () => {
-        let startPos = logTextArea.textLength;
-        logger.printMovesLog();
+        let startPos = 0;
         logTextArea.focus();
         let endPos = logTextArea.textLength;
         startPos += logTextArea.value.substring(startPos, endPos).indexOf("\n") + 1;
@@ -550,7 +553,7 @@ function init() {
         logTextArea.selectionStart = startPos;
         logTextArea.selectionEnd = endPos;
         document.execCommand("copy");
-        alert("Moves log CSV copied to clipboard");
+        alert("log copied to clipboard");
     });
 
     toggleLogBtn.addEventListener("click", toggleLog);
