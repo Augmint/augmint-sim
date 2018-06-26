@@ -96,6 +96,18 @@
         border-color: #aaa;
     }
 
+    input[type=checkbox] {
+        margin-right: 5px;
+        width: 10px;
+        text-align: right;
+        float: left;
+        height: 15px;
+        border-radius: 5px;
+        border-style: solid;
+        border-width: 1px;
+        border-color: #aaa;
+    }
+
     input[type=file] {
         margin-left: 164px;
     }
@@ -298,13 +310,13 @@
     </div>
     <div class="log-wrapper" style="display: none;">
         <div>
-            <button class="btn clearLog-btn" onclick="javascript:document.getElementById('log-textarea').value = ''">clear log</button>
+            <button class="btn clearLog-btn" id="clearLog-btn">clear log</button>
             <span>Dump to log:</span>
             <button class="btn dumpState-btn">state</button>
-            <button class="btn dumpMovesLog-btn">actor moves log</button>
+            <button class="btn dumpMovesLog-btn">copy log</button>
         </div>
         <div>
-            <textarea id="log-textarea" class="textarea log-textarea" readonly cols="165" wrap="off" placeholder="nothing in the log yet. Click start." rows="20"></textarea>
+            <textarea id="log-textarea" class="textarea log-textarea" readonly cols="165" wrap="off" placeholder="nothing in the log yet. Click start - make sure logging is enabled in System params/technical params." rows="20"></textarea>
         </div>
     </div>
     <br/>
@@ -347,6 +359,7 @@
             <h4>Technical params:</h4>
             <label class="technical-inputs">ethUsdTrendSampleDays: </label><input type="number" id="ethUsdTrendSampleDays"/><br/>
             <label class="technical-inputs">Graph Refresh days: </label><input type="number" id="graphRefreshDays"/><br/>
+            <label class="technical-inputs">Log moves</label><input type="checkbox" id="logMoves"/><br/>
             <br/>
         </div>
       </div>

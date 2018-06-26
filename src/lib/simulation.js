@@ -15,10 +15,9 @@ let random = new RandomSeed(params.randomSeed);
 const actors = new Set();
 
 function setSimulationParams(_params) {
-
     // new seed, to be tested...
     random = new RandomSeed(_params.randomSeed);
- 
+
     Object.assign(params, _params);
     params.stepsPerDay = 24 / (params.timeStep / 60 / 60);
 }
@@ -44,7 +43,7 @@ function init(initParams) {
     setSimulationParams(initParams.simulationParams);
     patchAugmintBalances(initParams.augmintOptions.balances);
     patchAugmintParams(initParams.augmintOptions.params);
-    this.getState(true);
+    this.getState();
 }
 
 function byChanceInADay(dailyChance) {
@@ -55,7 +54,7 @@ function byChance(chance) {
     return random.random() < chance;
 }
 
-function getState(showLog) {
+function getState() {
     return {
         meta: {
             currentTime: clock.getTime(),

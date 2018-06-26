@@ -357,7 +357,6 @@ function clear(wrapper) {
     datasetBuffer = [];
 
     graphs.forEach(graph => {
-        // TODO:it doesn't properly clean up - consecutive runs after restart are getting slower
         graph.chart.destroy();
     });
     wrapper.innerHTML = "";
