@@ -72,7 +72,7 @@ const actors = {
         params: {
             WANTS_TO_LOCK_AMOUNT: Acd(5000), // how much they want to lock
             WANTS_TO_LOCK_AMOUNT_GROWTH_PA: Pt(2), // increase in demand % pa.
-            CHANCE_TO_LOCK: Pt(0.05), // relock by chance % of days when no lock and  lock interest rates compelling
+            CHANCE_TO_LOCK: Pt(0.3), // relock by chance % of days when no lock and  lock interest rates compelling
             INTEREST_SENSITIVITY: Pt(
                 1
             ) /* how sensitive is the locker for marketLockInterestRate ?
