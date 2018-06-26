@@ -40,10 +40,14 @@ const DASHED_LINE = [5, 5];
 
 const ONE_DAY_IN_SECS = 24 * 60 * 60;
 
+let xDataBuffer = [];
+let datasetBuffer = [];
+
 // prettier-ignore
 const graphs = [
     {
         title: "ETH/USD",
+        disableShift: true,
         options: { scales: { yAxes: [ {ticks: { suggestedMax: 2 } } ] } },
         datasets: [{
             func: augmint => { return augmint.rates.ethToUsd; },
@@ -60,6 +64,7 @@ const graphs = [
     // },
     {
         title: "Open ACD Demand '000s",
+        disableShift: true,
         options: { scales: { yAxes: [ {ticks: { min: undefined } } ] } },
         datasets: [{
             func: augmint => { return Math.round(augmint.netAcdDemand / 1000);}
@@ -67,6 +72,7 @@ const graphs = [
     },
     {
         title: "Loan to Lock Ratio",
+        disableShift: true,
         options: {
             title: { display: false },
             scales: { yAxes: [ {ticks: { suggestedMin: 0.5, suggestedMax: 1.5 } } ] },
@@ -347,6 +353,12 @@ const graphs = [
 ];
 
 function clear(wrapper) {
+    xDataBuffer = [];
+    datasetBuffer = [];
+
+    graphs.forEach(graph => {
+        graph.chart.destroy();
+    });
     wrapper.innerHTML = "";
 }
 
@@ -413,38 +425,50 @@ function init(wrapper) {
     });
 }
 
-function update(timeInSecs, augmint) {
-    graphs.forEach(graph => {
-        // update data for graphs:
-        graph.xData.push(Math.floor(timeInSecs / ONE_DAY_IN_SECS));
-        graph.datasets.forEach(dataset => {
-            dataset.yData.push(parseFloat(dataset.func(augmint)));
-            if (
-                dataset.yData.length > 365 &&
-                graph.title !== "ETH/USD" &&
-                graph.title !== "Open ACD Demand '000s" &&
-                graph.title !== "Loan to Lock Ratio"
-            ) {
-                dataset.yData.shift();
+function updateData(timeInSecs, augmint) {
+    xDataBuffer.push(Math.floor(timeInSecs / ONE_DAY_IN_SECS));
+    graphs.forEach((graph, graphIndex) => {
+        // buffer data for graphs:
+        graph.datasets.forEach((dataset, datasetIndex) => {
+            if (!Array.isArray(datasetBuffer[graphIndex])) {
+                datasetBuffer[graphIndex] = [];
             }
+            if (!Array.isArray(datasetBuffer[graphIndex][datasetIndex])) {
+                datasetBuffer[graphIndex][datasetIndex] = [];
+            }
+
+            datasetBuffer[graphIndex][datasetIndex].push(parseFloat(dataset.func(augmint)));
+        });
+    });
+}
+
+function refreshGraph() {
+    // update data from buffer and redraw every graph:
+    if (xDataBuffer.length > 0) {
+        graphs.forEach((graph, graphIndex) => {
+            // update X data
+            Array.prototype.push.apply(graph.xData, xDataBuffer);
+            if (!graph.disableShift && graph.xData.length > 365) {
+                graph.xData.splice(0, graph.xData.length - 365);
+            }
+
+            graph.datasets.forEach((dataset, datasetIndex) => {
+                Array.prototype.push.apply(dataset.yData, datasetBuffer[graphIndex][datasetIndex]);
+                if (!graph.disableShift && dataset.yData.length > 365) {
+                    dataset.yData.splice(0, dataset.yData.length - 365);
+                }
+            });
+            graph.chart.update();
         });
 
-        if (
-            graph.xData.length > 365 &&
-            graph.title !== "ETH/USD" &&
-            graph.title !== "Open ACD Demand '000s" &&
-            graph.title !== "Loan to Lock Ratio"
-        ) {
-            graph.xData.shift();
-        }
-
-        // redraw:
-        graph.chart.update();
-    });
+        xDataBuffer = []; // clear X buffer
+        datasetBuffer = []; // clear Y buffer
+    }
 }
 
 module.exports = {
     init,
     clear,
-    update
+    updateData,
+    refreshGraph
 };

@@ -1,8 +1,6 @@
 language: node_js
 cache:
   yarn: true
-  directories:
-    - "node_modules"
 before_install:
     - export BRANCH="${TRAVIS_PULL_REQUEST_BRANCH:-$TRAVIS_BRANCH}"
     - yarn global add greenkeeper-lockfile@1
@@ -25,8 +23,12 @@ after_script:
 after_success:
   - wget https://raw.githubusercontent.com/k3rn31p4nic/travis-ci-discord-webhook/master/send.sh
   - chmod +x send.sh
-  - ./send.sh success https://discordapp.com/api/webhooks/418374581749809171/cJ8pkKO40Uoud2BU-rI_EqAvssHT2r60_6CTl00ds96_jfv1B_c_iukZjhWbg9qzcbhe
+  - ./send.sh success $DISCORD_WEBHOOK_URL
 after_failure:
   - wget https://raw.githubusercontent.com/k3rn31p4nic/travis-ci-discord-webhook/master/send.sh
   - chmod +x send.sh
-  - ./send.sh failure https://discordapp.com/api/webhooks/418374581749809171/cJ8pkKO40Uoud2BU-rI_EqAvssHT2r60_6CTl00ds96_jfv1B_c_iukZjhWbg9qzcbhe
+  - ./send.sh failure $DISCORD_WEBHOOK_URL
+env:
+  global:
+    # DISCORD_WEBHOOK_URL
+    secure: kv2O9l8rHG7WBdViqG6BMx09g7qKxasxy2HaTS+NIvOSVp2Pmgg3C2VuqUwOUbEzEA+RQcidCpua8KZsFKdJgCe2sYV5ZeHd7h3FZ0BJKkLRCsMEcnDJ54KnKAaaUYXWxM/FfNjHR1ZZcBCHvLKwtZDAuQmq9cT4I07wQs2qSfoQYF9n4E0rbZxx/+zVIfLjnc4Z4irEaiNu1Ci4gnVXzSEvsNS+T+uswifgyeRGtNmhb861nFZ3CqLwfl663xe6VdJFKpinghABqX+ssrg1Iz5sWWP+q4qwP5BYvLZY0kvKROueYus0SKBdLh1f2NGVmKmXcCjG0lVjsga9RsePv0iyfPmXhrhM6//u1bXSjynZNhSH+i3ebWe79ToM5BRcdfYtwbOs2D5fzlFzi74HtZuac2i1b0+RiEVzexCF517LqvawGpCY4xaghmzVzJzgdTKI/KIhv3SYWOVzPZzcAczZ+vOzBolffK7hbDqVn3NGp8enz5ss0Ux7r7aCD+vxMvLR7RhdkFR7H9uJiggXzdtPIo5u/1BvmdEs6yOQEL3VWUln4y8rP8oP8f1tmne1YlZ5heNsaEo3GCJLsGYRYFauFcF4KvPRXDaSAAhnLE5ywnZv31GjEyyyU7/D/jMkdF6aDJYkWYT6zLhbLG85g7zwQ3zpgnRVfczl0L16mgI=

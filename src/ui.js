@@ -1,9 +1,9 @@
 "use strict";
-const bigNums = require("./lib/bigNums.js");
-const Acd = bigNums.BigAcd;
-const Pt = bigNums.BigPt;
+
+const { Acd, Pt } = require("./lib/augmintNums.js");
 
 const simulation = require("./lib/simulation.js");
+
 const logger = require("./lib/logger.js");
 const rates = require("./augmint/rates.js");
 const graphs = require("./lib/graphs.js");
@@ -22,6 +22,7 @@ const loadLSBtn = document.querySelector(".load-ls-btn");
 const jsonFileInput = document.getElementById("json-file-input");
 
 const restartBtn = document.querySelector(".restart-btn");
+const clearLogBtn = document.querySelector(".clearLog-btn");
 const dumpStateBtn = document.querySelector(".dumpState-btn");
 const dumpMovesLogBtn = document.querySelector(".dumpMovesLog-btn");
 const toggleLogBtn = document.querySelector(".toggleLog-btn");
@@ -75,6 +76,8 @@ function getParamsFromUI() {
     };
     //technical params
     params["ethUsdTrendSampleDays"] = parseInt(document.getElementById("ethUsdTrendSampleDays").value);
+    params["graphRefreshDays"] = parseInt(document.getElementById("graphRefreshDays").value);
+    params["logMoves"] = document.getElementById("logMoves").checked;
 
     return params;
 }
@@ -107,6 +110,7 @@ function updateUIFromParams() {
     ).toFixed(2);
     // technical params
     document.getElementById("ethUsdTrendSampleDays").value = augmint.params.ethUsdTrendSampleDays;
+    document.getElementById("graphRefreshDays").value = augmint.params.graphRefreshDays;
 }
 
 function getActorsFromGui() {
@@ -187,6 +191,8 @@ function togglePause() {
             input.disabled = false;
         });
 
+        graphs.refreshGraph();
+
         console.debug(
             "Benchmark: iterations/sec: ",
             benchmarkItCt / (runTime / 1000),
@@ -255,11 +261,11 @@ function collapse(e) {
 
     if (closed) {
         panel.className = "collapse-panel";
-        subPanel.innerHTML = subPanel.innerHTML.replace("+","−");
+        subPanel.innerHTML = subPanel.innerHTML.replace("+", "−");
         panel.querySelector(".collapse-content").className = "collapse-content";
     } else {
         panel.className = "collapse-panel closed";
-        subPanel.innerHTML = subPanel.innerHTML.replace("−","+");
+        subPanel.innerHTML = subPanel.innerHTML.replace("−", "+");
         panel.querySelector(".collapse-content").className = "collapse-content hidden";
     }
 }
@@ -278,19 +284,21 @@ function download(filename, text) {
 }
 
 function getMainParamsAsJSON() {
-    const marketLockInterestRate = Pt(document.querySelector("[data-key='marketLockInterestRate']").value).toFixed(2);
-    const lockedAcdInterestPercentage = Pt(document.querySelector("[data-key='lockedAcdInterestPercentage']").value).toFixed(2);
-    const marketLoanInterestRate = Pt(document.querySelector("[data-key='marketLoanInterestRate']").value).toFixed(2);
-    const ltdLoanDifferenceLimit = Pt(document.querySelector("[data-key='ltdLoanDifferenceLimit']").value).toFixed(2);
-    const ltdLockDifferenceLimit = Pt(document.querySelector("[data-key='ltdLockDifferenceLimit']").value).toFixed(2);
+    const marketLockInterestRate = document.querySelector("[data-key='marketLockInterestRate']").value;
+    const lockedAcdInterestPercentage = document.querySelector("[data-key='lockedAcdInterestPercentage']").value;
+    const marketLoanInterestRate = document.querySelector("[data-key='marketLoanInterestRate']").value;
+    const ltdLoanDifferenceLimit = document.querySelector("[data-key='ltdLoanDifferenceLimit']").value;
+    const ltdLockDifferenceLimit = document.querySelector("[data-key='ltdLockDifferenceLimit']").value;
     const allowedLtdDifferenceAmount = document.querySelector("[data-key='allowedLtdDifferenceAmount']").value;
     const lockTimeInDays = document.querySelector("[data-key='lockTimeInDays']").value;
     const repaymentPeriodInDays = document.getElementById("repaymentPeriodInDays").value;
-    const loanInterestPt = Pt(document.getElementById("loanInterestPt").value).toFixed(2);
-    const loanCollateralRatio = Pt(document.getElementById("loanCollateralRatio").value).toFixed(2);
+    const loanInterestPt = document.getElementById("loanInterestPt").value;
+    const loanCollateralRatio = document.getElementById("loanCollateralRatio").value;
     const defaultFeePercentage = document.getElementById("defaultFeePercentage").value;
     const minimumLoanInAcd = document.getElementById("minimumLoanInAcd").value;
     const ethUsdTrendSampleDays = document.getElementById("ethUsdTrendSampleDays").value;
+    const graphRefreshDays = document.getElementById("graphRefreshDays").value;
+    const logMoves = document.getElementById("logMoves").checked ? 1 : 0;
 
     var jsonObj = `{
                 "marketLockInterestRate": "${marketLockInterestRate}",
@@ -305,28 +313,31 @@ function getMainParamsAsJSON() {
                 "loanCollateralRatio": "${loanCollateralRatio}",
                 "defaultFeePercentage": "${defaultFeePercentage}",
                 "minimumLoanInAcd": "${minimumLoanInAcd}",
-                "ethUsdTrendSampleDays": "${ethUsdTrendSampleDays}"
+                "ethUsdTrendSampleDays": "${ethUsdTrendSampleDays}",
+                "graphRefreshDays": "${graphRefreshDays}",
+                "logMoves": "${logMoves}"
               }`;
 
     return jsonObj;
 }
 
 function renderMainParams(jsonObj) {
-    document.querySelector("[data-key='marketLockInterestRate']").value=jsonObj.marketLockInterestRate;
-    document.querySelector("[data-key='lockedAcdInterestPercentage']").value=jsonObj.lockedAcdInterestPercentage;
-    document.querySelector("[data-key='marketLoanInterestRate']").value=jsonObj.marketLoanInterestRate;
-    document.querySelector("[data-key='ltdLoanDifferenceLimit']").value=jsonObj.ltdLoanDifferenceLimit;
-    document.querySelector("[data-key='ltdLockDifferenceLimit']").value=jsonObj.ltdLockDifferenceLimit;
-    document.querySelector("[data-key='allowedLtdDifferenceAmount']").value=jsonObj.allowedLtdDifferenceAmount;
-    document.querySelector("[data-key='lockTimeInDays']").value=jsonObj.lockTimeInDays;
-    document.getElementById("repaymentPeriodInDays").value=jsonObj.repaymentPeriodInDays;
-    document.getElementById("loanInterestPt").value=jsonObj.loanInterestPt;
-    document.getElementById("loanCollateralRatio").value=jsonObj.loanCollateralRatio;
-    document.getElementById("defaultFeePercentage").value=jsonObj.defaultFeePercentage;
-    document.getElementById("minimumLoanInAcd").value=jsonObj.minimumLoanInAcd;
-    document.getElementById("ethUsdTrendSampleDays").value=jsonObj.ethUsdTrendSampleDays;
+    document.querySelector("[data-key='marketLockInterestRate']").value = jsonObj.marketLockInterestRate;
+    document.querySelector("[data-key='lockedAcdInterestPercentage']").value = jsonObj.lockedAcdInterestPercentage;
+    document.querySelector("[data-key='marketLoanInterestRate']").value = jsonObj.marketLoanInterestRate;
+    document.querySelector("[data-key='ltdLoanDifferenceLimit']").value = jsonObj.ltdLoanDifferenceLimit;
+    document.querySelector("[data-key='ltdLockDifferenceLimit']").value = jsonObj.ltdLockDifferenceLimit;
+    document.querySelector("[data-key='allowedLtdDifferenceAmount']").value = jsonObj.allowedLtdDifferenceAmount;
+    document.querySelector("[data-key='lockTimeInDays']").value = jsonObj.lockTimeInDays;
+    document.getElementById("repaymentPeriodInDays").value = jsonObj.repaymentPeriodInDays;
+    document.getElementById("loanInterestPt").value = jsonObj.loanInterestPt;
+    document.getElementById("loanCollateralRatio").value = jsonObj.loanCollateralRatio;
+    document.getElementById("defaultFeePercentage").value = jsonObj.defaultFeePercentage;
+    document.getElementById("minimumLoanInAcd").value = jsonObj.minimumLoanInAcd;
+    document.getElementById("ethUsdTrendSampleDays").value = jsonObj.ethUsdTrendSampleDays;
+    document.getElementById("graphRefreshDays").value = jsonObj.graphRefreshDays;
+    document.getElementById("logMoves").checked = jsonObj.logMoves === "1" ? true : false;
 }
-
 
 function showJSONFileBrowser() {
     const panel = document.getElementById("json-file-input-panel");
@@ -340,12 +351,9 @@ function showJSONFileBrowser() {
     }
 }
 
-
-
 function isEmpty(obj) {
-    for(var key in obj) {
-        if(obj.hasOwnProperty(key))
-            return false;
+    for (var key in obj) {
+        if (obj.hasOwnProperty(key)) return false;
     }
     return true;
 }
@@ -359,14 +367,14 @@ function getParamsAsJSON() {
     jsonData += params;
     jsonData += ",";
     jsonData += "\"actors\": {";
-    actorsFromGui.forEach(function(actor,index) {
-        let tempActor = new Object;
+    actorsFromGui.forEach(function(actor, index) {
+        let tempActor = new Object();
         tempActor.type = actor.constructor.name;
         tempActor.count = actor.count;
         if (!isEmpty(actor.parameters)) tempActor.params = actor.parameters;
         tempActor.balances = actor.balances;
-        jsonData+="\""+actor.id+"\": ";
-        jsonData+=JSON.stringify(tempActor)+",";
+        jsonData += "\"" + actor.id + "\": ";
+        jsonData += JSON.stringify(tempActor) + ",";
     });
     jsonData = jsonData.substring(0, jsonData.length - 1);
     jsonData += "}}}";
@@ -374,12 +382,12 @@ function getParamsAsJSON() {
 }
 
 function saveToLocalStorage() {
-    localStorage.setItem("parameters",getParamsAsJSON());
+    localStorage.setItem("parameters", getParamsAsJSON());
     msg.innerHTML = "Successfully saved to local storage.";
     msg.className = "msg";
-    setTimeout(function(){
+    setTimeout(function() {
         msg.className = "msg msg-hidden";
-    }, 2*1000);
+    }, 2 * 1000);
 }
 
 function saveAsJSON() {
@@ -403,32 +411,35 @@ function getActorParamsBox(name, actor) {
     let balancesContent = "";
     for (var bal in actor.balances) {
         if (actor.balances.hasOwnProperty(bal)) {
-            balancesContent +=
-                `<label class="technical-inputs actor-label">${bal}</label>
-                <input data-actor-balancename="${bal}" data-actor-param="balance" type="number" value="${actor.balances[bal]}"/><br/>`;
+            balancesContent += `<label class="technical-inputs actor-label">${bal}</label>
+                <input data-actor-balancename="${bal}" data-actor-param="balance" type="number" value="${
+    actor.balances[bal]
+}"/><br/>`;
         }
     }
 
     let paramsContent = "";
     for (var p in actor.params) {
         if (actor.params.hasOwnProperty(p)) {
-            paramsContent +=
-                `<label class="technical-inputs actor-label small-label">${p}</label>
+            paramsContent += `<label class="technical-inputs actor-label small-label">${p}</label>
                  <input data-actor-paramname="${p}" data-actor-param="param" type="number" value="${actor.params[p]}" />
                  <br/>`;
         }
     }
 
-    const template =
-    `<div id="actor-params-item">
+    const template = `<div id="actor-params-item">
         <div class="flex-item actor-item">
           <div class="actor-inputs">
             <h4 data-actor-param="name">${name}</h4>
             <span data-actor-param="type" class="actor-type">${actor.type}</span><br/>
-            <span class="${actor.count ? "" : "hidden"}"><label class="technical-inputs actor-label">count: </label><input type="number" data-actor-param="count" value="${actor.count ? actor.count : 0}"/><br/></span>
+            <span class="${
+    actor.count ? "" : "hidden"
+}"><label class="technical-inputs actor-label">count: </label><input type="number" data-actor-param="count" value="${
+    actor.count ? actor.count : 0
+}"/><br/></span>
             <h5>Starting balance</h5>
               ${balancesContent}
-              ${actor.params ?  "<h5>params</h5>" : ""}
+              ${actor.params ? "<h5>params</h5>" : ""}
               ${paramsContent}
           </div>
         </div>
@@ -438,7 +449,6 @@ function getActorParamsBox(name, actor) {
 }
 
 function renderActorParamsGui(actors) {
-
     const panel = document.getElementById("actor-params-container");
     const collapseBars = document.querySelectorAll(".collapse-bar");
 
@@ -470,6 +480,7 @@ function restart() {
     graphs.init(graphsWrapper);
 
     restartBtn.disabled = true;
+    logger.clear();
     logger.init(simulation.getState, logTextArea);
     simulation.init({
         simulationParams: {
@@ -481,7 +492,6 @@ function restart() {
     });
     simulation.patchAugmintParams(getParamsFromUI());
 }
-
 
 function parseLoadedJSON(contents) {
     const jsonObj = JSON.parse(contents);
@@ -532,13 +542,13 @@ function init() {
 
     pauseBtn.addEventListener("click", togglePause);
     ratesDropDown.addEventListener("change", () => ratesDropDownOnChange(ratesDropDown.value));
+    clearLogBtn.addEventListener("click", () => logger.clear());
     dumpStateBtn.addEventListener("click", () => {
         simulation.patchAugmintParams(getParamsFromUI());
         logger.print(simulation.getState());
     });
     dumpMovesLogBtn.addEventListener("click", () => {
-        let startPos = logTextArea.textLength;
-        logger.printMovesLog();
+        let startPos = 0;
         logTextArea.focus();
         let endPos = logTextArea.textLength;
         startPos += logTextArea.value.substring(startPos, endPos).indexOf("\n") + 1;
@@ -546,7 +556,7 @@ function init() {
         logTextArea.selectionStart = startPos;
         logTextArea.selectionEnd = endPos;
         document.execCommand("copy");
-        alert("Moves log CSV copied to clipboard");
+        alert("log copied to clipboard");
     });
 
     toggleLogBtn.addEventListener("click", toggleLog);
@@ -566,11 +576,14 @@ function render() {
     const state = simulation.getState();
     const daysPassed = state.meta.currentDay;
 
-    // only re-render once per day:
+    // only update graphData once per day:
     if (daysPassed > lastRender) {
         lastRender = daysPassed;
         clockElem.innerHTML = daysPassed;
-        graphs.update(state.meta.currentTime, state.augmint);
+        graphs.updateData(state.meta.currentTime, state.augmint);
+        if (state.meta.currentDay % state.augmint.params.graphRefreshDays === 0) {
+            graphs.refreshGraph();
+        }
     }
 }
 

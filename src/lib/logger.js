@@ -1,5 +1,7 @@
 "use strict";
+
 const clock = require("./clock.js");
+
 let printEachMove = true;
 
 let simulationState;
@@ -26,6 +28,11 @@ let movesLog = new Array(movesLogHeader);
 function init(_simulationState, _logTextArea) {
     simulationState = _simulationState;
     logTextArea = _logTextArea;
+}
+
+function clear() {
+    movesLog = new Array(movesLogHeader);
+    logTextArea.value = "";
 }
 
 function addToLogTextArea(text) {
@@ -61,24 +68,22 @@ function toCsv(_array) {
 }
 
 function logMove(actor, move, params) {
-    const daysPassed = clock.getDay();
-    const logItem = [daysPassed, simulationState().meta.iteration, actor, move, params];
-    if (printEachMove) {
-        if (movesLog.length === 1) {
-            addToLogTextArea("MOVE, " + movesConsoleLogHeader + "\n");
+    if (simulationState().augmint.params.logMoves) {
+        const daysPassed = clock.getDay();
+        const logItem = [daysPassed, simulationState().meta.iteration, actor, move, params];
+        if (printEachMove) {
+            if (movesLog.length === 1) {
+                addToLogTextArea("MOVE, " + movesConsoleLogHeader + "\n");
+            }
+            addToLogTextArea("MOVE, " + toCsv(new Array(logItem)) + "\n");
         }
-        addToLogTextArea("MOVE, " + toCsv(new Array(logItem)) + "\n");
+        movesLog.push(logItem);
     }
-    movesLog.push(logItem);
-}
-
-function printMovesLog() {
-    addToLogTextArea("===== MOVES LOG =====\n" + toCsv(movesLog) + "\n" + "===== /MOVES LOG =====\n\n");
 }
 
 module.exports = {
     init,
+    clear,
     logMove,
-    print,
-    printMovesLog
+    print
 };

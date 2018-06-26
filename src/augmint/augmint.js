@@ -5,12 +5,7 @@
 // TODO: add transferFeePt param (and transferAcdWithFee functions)
 // TODO: would prefer proper setters/getters, but this is cool for now...
 
-const bigNums = require("../lib/bigNums.js");
-const Acd = bigNums.BigAcd;
-const Eth = bigNums.BigEth;
-const Pt = bigNums.BigPt;
-const ACD0 = bigNums.ACD0;
-const PT1 = bigNums.PT1;
+const { ACD0, PT1, ACD_DP, Pt, Eth, Acd } = require("../lib/augmintNums.js");
 
 module.exports = {
     actors: {},
@@ -32,10 +27,12 @@ module.exports = {
     params: {
         marketLoanInterestRate: Pt(0.18), // what do we compete with?  actor's demand for loans depends on it
         marketLockInterestRate: Pt(0.04), // what do we compete with? actor's demand for locks depends on it
-        exchangeFeePercentage: Pt(0.1),
+        exchangeFeePercentage: Pt(0.003),
         lockedAcdInterestPercentage: Pt(0.5),
         lockTimeInDays: 365,
         ethUsdTrendSampleDays: 3, // how many days to inspect for rates.ethToUsdTrend calculation)
+        graphRefreshDays: 5, // refresh graph in every x days
+        logMoves: false, // wheter to log moves - big performance impact
         minimumLockAmount: Acd(100), // without interest
         ltdLockDifferenceLimit: Pt(0.2) /* allow lock if Loan To Deposut ratio stay within 1 +/- this param  */,
         ltdLoanDifferenceLimit: Pt(0.2) /* allow loan if Loan To Deposut ratio stay within 1 +/- this param  */,
@@ -119,7 +116,7 @@ module.exports = {
         this.orderBook.buy.length = 0;
         this.orderBook.sell.length = 0;
         this.loanProducts.length = 0;
- 
+
         this.clearObject(this.loanProducts[0]);
         this.loanProducts.pop();
 
@@ -230,7 +227,7 @@ module.exports = {
             : allowedByLtdDifferencePt;
         const maxLoanWithMinLoanLimit = maxLoan.lt(this.loanProducts[productId].minimumLoanInAcd)
             ? ACD0
-            : maxLoan.round(bigNums.ACD_DP, 0);
+            : maxLoan.round(ACD_DP, 0);
 
         return maxLoanWithMinLoanLimit;
     },
@@ -258,9 +255,7 @@ module.exports = {
             Math.min(Math.max(allowedByLtdDifferencePt, allowedByLtdDifferenceAmount), allowedByEarning)
         );
 
-        const maxLockWithMinLockLimit = maxLock.lt(this.params.minimumLockAmount)
-            ? ACD0
-            : maxLock.round(bigNums.ACD_DP, 0);
+        const maxLockWithMinLockLimit = maxLock.lt(this.params.minimumLockAmount) ? ACD0 : maxLock.round(ACD_DP, 0);
 
         return maxLockWithMinLockLimit;
     }
