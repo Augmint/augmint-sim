@@ -97,4 +97,4 @@ Augmint was born at [DECENT Labs](http://www.decent.org)
 
 ## Licence
 
-This project is licensed under the GNU General Public License v3.0 license - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU Affero General Public License v3.0 license - see the [LICENSE](LICENSE) file for details.
