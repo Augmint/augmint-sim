@@ -108,6 +108,42 @@ const graphs = [
             }]
     },
     {
+        title: "Total default Loans (ACD)",
+        disableShift: true,
+        datasets: [{
+            func: augmint => { return augmint.balances.defaultedLoansAcd; },
+            options: {
+                borderColor: DEFAULTED_COLOR,
+                backgroundColor: DEFAULTED_COLOR_OPA
+            }
+        }]
+    },
+    {
+        title: "ETH Reserves (USD) / Total Default Loan, % - Logarithmic scale 1=10^1, 2=10^2, ...",
+        disableShift: true,
+        options: {
+            scales: { yAxes: [{ ticks: { suggestedMax: 2 } }]}},
+        datasets: [{
+            func: augmint => {
+                if (augmint.balances.defaultedLoansAcd == 0) {
+                    return 0;
+                } else {
+                    return Math.log10(100 * augmint.reserveEth * augmint.rates.ethToUsd / augmint.balances.defaultedLoansAcd);
+                }
+            },
+            options: { backgroundColor: TRANSPARENT } },
+        {
+            func: augmint => 2,
+            options: {
+                label: "limit",
+                borderDash: DASHED_LINE,
+                borderColor: LOCKED_ACD_COLOR,
+                backgroundColor: TRANSPARENT
+            }
+        }
+        ]
+    },
+    {
         title: "Open ACD user demand (% of total ACD)",
         options: { scales: { yAxes: [ {ticks: {min: undefined} }]}},
         datasets: [{
@@ -320,17 +356,6 @@ const graphs = [
         }]
     },
     {
-        title: "Total default Loans (ACD)",
-        datasets: [{
-            func: augmint => { return augmint.balances.defaultedLoansAcd; },
-            options: {
-                borderColor: DEFAULTED_COLOR,
-                backgroundColor: DEFAULTED_COLOR_OPA
-            }
-        }]
-    },
-
-    {
         title: "ACD fees earned",
         datasets: [{
             func: augmint => { return augmint.balances.acdFeesEarned; },
@@ -389,7 +414,11 @@ function init(wrapper) {
         canvas.height = 250;
         //canvas.width = 300;
         canvas.width =
-            graph.title === "ETH/USD" || graph.title === "Open ACD Demand '000s" || graph.title === "Loan to Lock Ratio"
+            graph.title === "ETH/USD" ||
+            graph.title === "Open ACD Demand '000s" ||
+            graph.title === "Loan to Lock Ratio"||
+            graph.title === "Total default Loans (ACD)" ||
+            graph.title === "ETH Reserves (USD) / Total Default Loan, % - Logarithmic scale 1=10^1, 2=10^2, ..."
                 ? 920
                 : 300;
 
