@@ -5,7 +5,7 @@
     "homepage": ".",
     "private": true,
     "dependencies": {
-        "chart.js": "2.7.2",
+        "chart.js": "2.7.3",
         "random-seed": "0.3.0"
     },
     "scripts": {
